@@ -16,7 +16,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import {RootStackParamList} from './types';
 import Splash from '../../screens/splash.tsx';
-import Intro from '../../screens/intro.tsx';
+import Onboarding from '../../screens/onboarding.tsx';
+import Login from '../../screens/login.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -40,7 +41,7 @@ const StackNavigator = () => {
         }
         routeNameRef.current = currentRouteName;
       }}>
-      <Stack.Navigator initialRouteName={'onboarding'}>
+      <Stack.Navigator initialRouteName={'login'}>
         <Stack.Screen
           name={'splash'}
           component={Splash}
@@ -48,7 +49,12 @@ const StackNavigator = () => {
         />
         <Stack.Screen
           name={'onboarding'}
-          component={Intro}
+          component={Onboarding}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'login'}
+          component={Login}
           options={{gestureEnabled: false, headerShown: false}}
         />
       </Stack.Navigator>

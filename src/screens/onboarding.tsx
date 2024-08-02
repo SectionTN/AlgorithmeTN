@@ -247,7 +247,7 @@ const Pagination = ({
 
 const AnimatedPagerView = Animated.createAnimatedComponent(PagerView);
 
-const Intro: React.FC = () => {
+const Onboarding: React.FC = () => {
   const scrollOffsetAnimatedValue = React.useRef(new Animated.Value(0)).current;
   const positionAnimatedValue = React.useRef(new Animated.Value(0)).current;
 
@@ -411,4 +411,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Intro;
+export default Onboarding;
