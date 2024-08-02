@@ -14,7 +14,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'AlgoTN' do
+target 'AlgorithmeTN' do
   config = use_native_modules!
 
   use_react_native!(
@@ -23,7 +23,7 @@ target 'AlgoTN' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'AlgoTNTests' do
+  target 'AlgorithmeTNTests' do
     inherit! :complete
     # Pods for testing
   end
