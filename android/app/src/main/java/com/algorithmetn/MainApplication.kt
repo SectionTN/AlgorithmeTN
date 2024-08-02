@@ -1,4 +1,4 @@
-package org.moon.algotn
+package com.algorithmetn
 
 import android.app.Application
 import com.facebook.react.PackageList
