@@ -74,9 +74,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.algorithmetn"
+    namespace "org.moon.algotn"
     defaultConfig {
-        applicationId "com.algorithmetn"
+        applicationId "org.moon.algotn"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
