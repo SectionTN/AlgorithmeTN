@@ -14,6 +14,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import StackNavigator from './config/navigation/stack.tsx';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 function App(): React.JSX.Element {
   const theme = useTheme();
@@ -24,16 +25,17 @@ function App(): React.JSX.Element {
     : {...DefaultTheme, colors: DefaultTheme.colors};
   return (
     <>
+      <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar
-        backgroundColor={
-          isDarkMode ? theme.colors.onBackground : theme.colors.background
-        }
+        backgroundColor={isDarkMode ? '#1C1B1F' : theme.colors.background}
         animated={true}
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        translucent={true}
       />
       <PaperProvider theme={paperTheme}>
         <StackNavigator />
       </PaperProvider>
+      </GestureHandlerRootView>
     </>
   );
 }

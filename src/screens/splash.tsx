@@ -63,7 +63,7 @@ const Splash: React.FC = () => {
       );
       translateY.value = withDelay(
         300,
-        withTiming(heightPercentageToDP(6), {duration: 375}),
+        withTiming(heightPercentageToDP(4.9), {duration: 375}),
       );
       scaleX.value = withSpring(0.08);
       scaleY.value = withSpring(0.08);
@@ -110,16 +110,16 @@ const Splash: React.FC = () => {
       position: 'absolute',
       textAlign: 'center',
       fontSize: fontValue(20),
-      bottom: heightPercentageToDP(6.25),
-      fontFamily: FONTS.bold,
+      bottom: heightPercentageToDP(7.25),
+      fontFamily: FONTS.p_bold,
     },
     slogan_text: {
       position: 'absolute',
       textAlign: 'center',
       fontSize: fontValue(16),
-      bottom: heightPercentageToDP(2.75),
+      bottom: heightPercentageToDP(3.75),
       color: isDarkMode ? COLORS.white : COLORS.black,
-      fontFamily: FONTS.regular,
+      fontFamily: FONTS.p_regular,
       opacity: 0.4,
     },
   });
@@ -129,9 +129,7 @@ const Splash: React.FC = () => {
       style={[
         styles.fill_screen,
         {
-          backgroundColor: isDarkMode
-            ? COLORS.primaryDark
-            : COLORS.primaryLight,
+          backgroundColor: theme.colors.background,
         },
       ]}>
       <Animated.View style={[styles.container, viewAnimatedStyle]}>
@@ -142,7 +140,7 @@ const Splash: React.FC = () => {
         <Text
           style={[
             styles.bottom_text,
-            {color: isDarkMode ? COLORS.accentDark : COLORS.purple},
+            {color: theme.colors.secondary},
           ]}>
           Algorithme Tunisie
         </Text>
