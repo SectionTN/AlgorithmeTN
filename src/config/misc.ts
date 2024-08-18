@@ -7,10 +7,13 @@
  */
 
 const FONTS = {
-  bold: 'Product-Sans-Bold',
-  bold_italic: 'Product-Sans-Bold-Italic',
-  italic: 'Product-Sans-Italic',
-  regular: 'Product-Sans-Regular',
+  p_bold: 'Product-Sans-Bold',
+  p_bold_italic: 'Product-Sans-Bold-Italic',
+  p_italic: 'Product-Sans-Italic',
+  p_regular: 'Product-Sans-Regular',
+  m_regular: 'Montserrat-Regular',
+  r_regular: 'Roboto-Regular',
+  r_bold: 'Roboto-Bold',
 };
 
 const COLORS = {

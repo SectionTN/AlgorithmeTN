@@ -1,12 +1,22 @@
 import React from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
-import {Menu, Text, TextInput} from 'react-native-paper';
-import {fontValue} from '../config/dimensions.ts';
+import {Button, Text, TextInput, useTheme} from 'react-native-paper';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../config/dimensions.ts';
 import {COLORS, FONTS} from '../config/misc.ts';
 import SpacerV from '../components/spacer/spacerv.tsx';
 
 const Login: React.FC = () => {
+  /**
+   * Theme
+   */
+
+  const theme = useTheme();
+
   /**
    * Login variables
    */
@@ -14,6 +24,8 @@ const Login: React.FC = () => {
   const [password, setPassword] = React.useState<string>('');
   const [loading, setLoading] = React.useState<boolean>(false);
   const [confirmPassword, setConfirmPassword] = React.useState<string>('');
+
+  const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
 
   /**
    * Screen mode
@@ -24,29 +36,54 @@ const Login: React.FC = () => {
   return (
     <BaseView>
       <View style={styles.top_bar}>
-        <Text style={styles.top_text}>
-          {`Login to your${'\n'}existing account`}
+        <Text style={[styles.top_text, {color: theme.colors.primary}]}>
+          {'Welcome Back'}
         </Text>
-        <View
+        <Text
           style={{
-            paddingLeft: '2%',
-            paddingRight: '2%',
+            color: theme.colors.onBackground,
+            fontSize: fontValue(16),
+            marginHorizontal: widthPercentageToDP(4),
+            textAlign: 'left',
+            opacity: 0.4,
+            fontFamily: FONTS.p_regular,
           }}>
-          <Text
-            style={{
-              color: COLORS.black,
-              fontSize: fontValue(16),
-              textAlign: 'center',
-              paddingBottom: '4%',
-              opacity: 0.4,
-              fontFamily: FONTS.regular,
-            }}>
-            {'get started by logging in to your account'}
-          </Text>
-        </View>
+          {"let's sign you in"}
+        </Text>
       </View>
-      <SpacerV height={1} />
-      <TextInput mode="outlined" label="Name" />
+      <SpacerV height={heightPercentageToDP(0.1)} />
+      <View style={{padding: '5%', flex: 1}}>
+        <TextInput
+          mode="outlined"
+          value={email}
+          label="Email"
+          onChangeText={text => {
+            setEmail(text);
+          }}
+        />
+        <SpacerV height={heightPercentageToDP(0.5)} />
+        <TextInput
+          mode="outlined"
+          value={password}
+          label="Password"
+          onChangeText={text => {
+            setPassword(text);
+          }}
+          secureTextEntry={!passwordVisible}
+        />
+        <SpacerV height={heightPercentageToDP(0.5)} />
+        <Button mode="contained" onPress={() => {}}>
+          Log In
+        </Button>
+        <SpacerV height={heightPercentageToDP(0.1)} />
+        <Button mode={'text'} onPress={() => {}}>Forgot Password?</Button>
+        <View style={{flex: 1, flexBasis: 1, flexGrow: 1}}>
+          {/* stub */}
+        </View>
+        <Button mode={'contained-tonal'} onPress={() => {}}>
+          Create new account
+        </Button>
+      </View>
     </BaseView>
   );
 };
@@ -65,13 +102,12 @@ const styles = StyleSheet.create({
     fontSize: fontValue(28),
     paddingLeft: '3%',
     paddingRight: '3%',
-    textAlign: 'center',
-    color: COLORS.accentLight,
-    fontFamily: FONTS.regular,
+    textAlign: 'left',
+    fontFamily: FONTS.r_bold,
   },
   description: {
     fontSize: fontValue(18),
-    textAlign: 'center',
+    textAlign: 'left',
     color: COLORS.grey,
     fontFamily: '',
   },

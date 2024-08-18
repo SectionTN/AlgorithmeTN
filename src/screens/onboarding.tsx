@@ -10,8 +10,11 @@ import {
 } from 'react-native';
 import type {PagerViewOnPageScrollEventData} from 'react-native-pager-view';
 import PagerView from 'react-native-pager-view';
-import {COLORS, FONTS} from '../config/misc.ts';
+import {FONTS} from '../config/misc.ts';
 import {Button, useTheme} from 'react-native-paper';
+import {useNavigation} from '@react-navigation/native';
+import {RootStackParamList} from '../config/navigation/types.ts';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 const ViewPagerData = [
   {
@@ -117,6 +120,7 @@ const Ticker = ({
     inputRange,
     outputRange: [0, ViewPagerData.length * -TICKER_HEIGHT],
   });
+  const theme = useTheme();
   return (
     <View style={styles.tickerContainer}>
       <Animated.View style={{transform: [{translateY}]}}>
@@ -124,7 +128,7 @@ const Ticker = ({
           return (
             <Text
               key={index}
-              style={styles.tickerText}
+              style={[styles.tickerText, { color: theme.colors.primary }]}
               adjustsFontSizeToFit={true}>
               {title}
             </Text>
@@ -162,7 +166,8 @@ const Item = ({
   });
 
   const theme = useTheme();
-
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   return (
     <View style={styles.itemStyle}>
       <Animated.Image
@@ -180,6 +185,7 @@ const Item = ({
           style={[
             styles.heading,
             {
+              color: theme.colors.secondary,
               opacity,
             },
           ]}>
@@ -190,13 +196,14 @@ const Item = ({
           style={[
             styles.description,
             {
+              color: theme.colors.onBackground,
               opacity,
             },
           ]}>
           {description}
         </Animated.Text>
         {id === 3 && (
-          <Button mode="contained" onPress={() => {}}>
+          <Button mode="contained" onPress={() => navigation.navigate('login')}>
             Continue
           </Button>
         )}
@@ -251,8 +258,16 @@ const Onboarding: React.FC = () => {
   const scrollOffsetAnimatedValue = React.useRef(new Animated.Value(0)).current;
   const positionAnimatedValue = React.useRef(new Animated.Value(0)).current;
 
+  const theme = useTheme();
+
+  const container = (bgColor: string) => ({
+    flex: 1,
+    backgroundColor: bgColor,
+  });
+
+
   return (
-    <View style={styles.container}>
+    <View style={container(theme.colors.background)}>
       <Circle scrollOffsetAnimatedValue={scrollOffsetAnimatedValue} />
       <AnimatedPagerView
         initialPage={0}
@@ -303,10 +318,6 @@ const Onboarding: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.primaryLight,
-  },
   itemStyle: {
     width,
     height,
@@ -325,23 +336,21 @@ const styles = StyleSheet.create({
     flex: 0.5,
   },
   heading: {
-    color: '#444',
     textTransform: 'uppercase',
     fontSize: 24,
     fontWeight: '800',
     letterSpacing: 2,
     marginBottom: 5,
-    fontFamily: FONTS.bold,
+    fontFamily: FONTS.r_regular,
   },
   description: {
-    color: '#ccc',
     fontWeight: '600',
     textAlign: 'left',
     width: width * 0.75,
     marginRight: 10,
     fontSize: 16,
     lineHeight: 16 * 1.5,
-    fontFamily: FONTS.regular,
+    fontFamily: FONTS.p_regular,
   },
   logo: {
     opacity: 0.9,
@@ -395,7 +404,7 @@ const styles = StyleSheet.create({
     lineHeight: TICKER_HEIGHT,
     textTransform: 'uppercase',
     fontWeight: '800',
-    fontFamily: FONTS.regular,
+    fontFamily: FONTS.p_regular,
   },
 
   circleContainer: {
