@@ -24,7 +24,7 @@
     "patch-package": "^8.0.0",
     "postinstall-postinstall": "^2.1.0",
     "react": "18.3.1",
-    "react-native": "0.75.1",
+    "react-native": "0.75.2",
     "react-native-gesture-handler": "^2.18.1",
     "react-native-mmkv": "^3.0.0-beta.7",
     "react-native-pager-view": "^6.3.4",
@@ -38,10 +38,11 @@
     "@babel/core": "^7.20.0",
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
-    "@react-native/babel-preset": "0.75.1",
-    "@react-native/eslint-config": "0.75.1",
-    "@react-native/metro-config": "0.75.1",
-    "@react-native/typescript-config": "0.75.1",
+    "@react-native/babel-preset": "0.75.2",
+    "@react-native/eslint-config": "0.75.2",
+    "@react-native/metro-config": "0.75.2",
+    "@react-native/typescript-config": "0.75.2",
+    "@rnx-kit/align-deps": "^2.5.3",
     "@types/react": "^18.2.6",
     "@types/react-test-renderer": "^18.0.0",
     "babel-jest": "^29.6.3",
@@ -53,5 +54,29 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "rnx-kit": {
+    "kitType": "app",
+    "alignDeps": {
+      "requirements": [
+        "react-native@0.75"
+      ],
+      "capabilities": [
+        "animation",
+        "babel-preset-react-native",
+        "core",
+        "core-android",
+        "core-ios",
+        "core/metro-config",
+        "gestures",
+        "hooks",
+        "jest",
+        "navigation/native",
+        "react",
+        "react-test-renderer",
+        "safe-area",
+        "screens"
+      ]
+    }
   }
 }
