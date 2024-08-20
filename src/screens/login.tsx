@@ -1,5 +1,11 @@
-import React from 'react';
-import {Linking, StyleSheet, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  EmitterSubscription,
+  Keyboard,
+  Linking,
+  StyleSheet,
+  View,
+} from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -29,20 +35,20 @@ const Login: React.FC = () => {
   /**
    * Login variables
    */
-  const [email, setEmail] = React.useState<string>('');
-  const [password, setPassword] = React.useState<string>('');
-  const [confirmPassword, setConfirmPassword] = React.useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-  const [passwordVisible, setPasswordVisible] = React.useState<boolean>(false);
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
   /**
    * Screen mode
    */
 
-  const [currentMode, setCurrentMode] = React.useState<string>('login');
+  const [currentMode, setCurrentMode] = useState<string>('login');
 
   /**
-   * Redirecting?
+   * Utils?
    */
 
   const handleTermsPress = async () => {
@@ -61,20 +67,48 @@ const Login: React.FC = () => {
     return false;
   });
 
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const keyboardDidShowListener = useRef<EmitterSubscription | null>(null);
+  const keyboardDidHideListener = useRef<EmitterSubscription | null>(null);
+
+  const onKeyboardShow = (event: {endCoordinates: {height: number}}) => {
+    setKeyboardOffset(event.endCoordinates.height);
+  };
+
+  const onKeyboardHide = () => {
+    setKeyboardOffset(0);
+  };
+
+  useEffect(() => {
+    keyboardDidShowListener.current = Keyboard.addListener(
+      'keyboardWillShow',
+      onKeyboardShow,
+    );
+    keyboardDidHideListener.current = Keyboard.addListener(
+      'keyboardWillHide',
+      onKeyboardHide,
+    );
+
+    return () => {
+      keyboardDidShowListener.current?.remove();
+      keyboardDidHideListener.current?.remove();
+    };
+  }, []);
+
   return (
     <>
-      <Appbar.Header>
-        {currentMode !== 'login' && (
-          <Tooltip title="Go Back">
-            <Appbar.BackAction onPress={() => setCurrentMode('login')} />
+      <BaseView needsPaddingTop={false} avoidingView={true}>
+        <Appbar.Header>
+          {currentMode !== 'login' && (
+            <Tooltip title="Go Back">
+              <Appbar.BackAction onPress={() => setCurrentMode('login')} />
+            </Tooltip>
+          )}
+          <Appbar.Content title="" />
+          <Tooltip title="Help">
+            <Appbar.Action icon="dots-vertical" onPress={() => {}} />
           </Tooltip>
-        )}
-        <Appbar.Content title="" />
-        <Tooltip title="Help">
-          <Appbar.Action icon="dots-vertical" onPress={() => {}} />
-        </Tooltip>
-      </Appbar.Header>
-      <BaseView needsPaddingTop={false}>
+        </Appbar.Header>
         <View style={styles.top_bar}>
           <Text style={[styles.top_text, {color: theme.colors.primary}]}>
             {currentMode === 'login'
@@ -109,6 +143,7 @@ const Login: React.FC = () => {
             onChangeText={text => {
               setEmail(text);
             }}
+            style={{marginBottom: keyboardOffset}}
           />
           {currentMode !== 'forgot-password' && (
             <>
@@ -121,6 +156,9 @@ const Login: React.FC = () => {
                   setPassword(text);
                 }}
                 secureTextEntry={!passwordVisible}
+                style={{
+                  marginBottom: keyboardOffset,
+                }}
                 right={
                   <TextInput.Icon
                     onPress={() => setPasswordVisible(!passwordVisible)}
@@ -141,6 +179,9 @@ const Login: React.FC = () => {
                   setConfirmPassword(text);
                 }}
                 secureTextEntry={!passwordVisible}
+                style={{
+                  bottom: keyboardOffset,
+                }}
                 right={
                   <TextInput.Icon
                     onPress={() => setPasswordVisible(!passwordVisible)}
