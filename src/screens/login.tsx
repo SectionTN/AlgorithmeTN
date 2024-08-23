@@ -4,6 +4,7 @@ import {
   Keyboard,
   Linking,
   StyleSheet,
+  useColorScheme,
   View,
 } from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
@@ -29,7 +30,7 @@ const Login: React.FC = () => {
   /**
    * Theme
    */
-
+  const isDarkMode = useColorScheme() === 'light';
   const theme = useTheme();
 
   /**
@@ -121,9 +122,9 @@ const Login: React.FC = () => {
             style={{
               color: theme.colors.onBackground,
               fontSize: fontValue(16),
-              marginHorizontal: widthPercentageToDP(4),
+              marginHorizontal: widthPercentageToDP(3),
               textAlign: 'left',
-              opacity: 0.4,
+              opacity: 0.75,
               fontFamily: FONTS.p_regular,
             }}>
             {currentMode === 'login'
@@ -193,7 +194,11 @@ const Login: React.FC = () => {
           )}
           <SpacerV height={heightPercentageToDP(0.5)} />
           <Button mode="contained" onPress={() => {}}>
-            Log In
+            {currentMode === 'login'
+              ? 'Log In'
+              : currentMode === 'signup'
+              ? 'Sign Up'
+              : 'Restore Account'}
           </Button>
           <SpacerV height={heightPercentageToDP(0.1)} />
           {currentMode === 'login' ? (

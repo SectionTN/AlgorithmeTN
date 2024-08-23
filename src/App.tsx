@@ -5,36 +5,48 @@
  * @format
  */
 
-import React from 'react';
+import React, {useMemo} from 'react';
 import {StatusBar, useColorScheme} from 'react-native';
 import {
-  MD3LightTheme as DefaultTheme,
-  MD3DarkTheme as DarkTheme,
   PaperProvider,
+  MD3DarkTheme,
+  MD3LightTheme,
   useTheme,
 } from 'react-native-paper';
 import StackNavigator from './config/navigation/stack.tsx';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {useMaterial3Theme} from '@pchmn/expo-material3-theme';
 
 function App(): React.JSX.Element {
-  const theme = useTheme();
   const isDarkMode = useColorScheme() === 'dark';
 
-  const paperTheme = isDarkMode
-    ? {...DarkTheme, colors: DarkTheme.colors}
-    : {...DefaultTheme, colors: DefaultTheme.colors};
+  const colorScheme = useColorScheme();
+  const {theme} = useMaterial3Theme();
+
+  const paperTheme = useMemo(
+    () =>
+      colorScheme === 'dark'
+        ? {...MD3DarkTheme, colors: theme.dark}
+        : {...MD3LightTheme, colors: theme.light},
+    [colorScheme, theme],
+  );
+
   return (
     <>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar
-        backgroundColor={isDarkMode ? '#1C1B1F' : theme.colors.background}
-        animated={true}
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        translucent={true}
-      />
-      <PaperProvider theme={paperTheme}>
-        <StackNavigator />
-      </PaperProvider>
+      <GestureHandlerRootView style={{flex: 1}}>
+        <StatusBar
+          backgroundColor={
+            isDarkMode
+              ? theme.dark.background
+              : theme.light.background
+          }
+          animated={true}
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          translucent={true}
+        />
+        <PaperProvider theme={paperTheme}>
+          <StackNavigator />
+        </PaperProvider>
       </GestureHandlerRootView>
     </>
   );
