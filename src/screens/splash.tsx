@@ -1,11 +1,10 @@
 import React, {useCallback, useEffect} from 'react';
 import {
   BackHandler,
-  SafeAreaView,
   StyleSheet,
   useColorScheme,
 } from 'react-native';
-import {COLORS, FONTS} from '../config/misc.ts';
+import {FONTS} from '../config/misc.ts';
 import {Text, useTheme} from 'react-native-paper';
 import Animated, {
   useAnimatedStyle,
@@ -23,6 +22,7 @@ import {AlgoTNLogo} from '../index.d';
 import {RootStackParamList} from '../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import BaseView from '../components/baseview/baseview.tsx';
 
 const Splash: React.FC = () => {
   const navigation =
@@ -91,63 +91,53 @@ const Splash: React.FC = () => {
     };
   }, []);
 
-  const styles = StyleSheet.create({
-    fill_screen: {
-      flex: 1,
-    },
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignContent: 'center',
-      alignItems: 'center',
-    },
-    logo: {
-      height: heightPercentageToDP(300),
-      width: widthPercentageToDP(800),
-      bottom: heightPercentageToDP(13.5),
-    },
-    bottom_text: {
-      position: 'absolute',
-      textAlign: 'center',
-      fontSize: fontValue(20),
-      bottom: heightPercentageToDP(7.25),
-      fontFamily: FONTS.p_bold,
-    },
-    slogan_text: {
-      position: 'absolute',
-      textAlign: 'center',
-      fontSize: fontValue(16),
-      bottom: heightPercentageToDP(3.75),
-      color: isDarkMode ? COLORS.white : COLORS.black,
-      fontFamily: FONTS.p_regular,
-      opacity: 0.4,
-    },
-  });
-
   return (
-    <SafeAreaView
-      style={[
-        styles.fill_screen,
-        {
-          backgroundColor: theme.colors.background,
-        },
-      ]}>
+    <BaseView avoidingView={false} needsPaddingTop={false}>
       <Animated.View style={[styles.container, viewAnimatedStyle]}>
         <Animated.Image
           style={[styles.logo, imageAnimatedStyle]}
           source={AlgoTNLogo}
         />
-        <Text
-          style={[
-            styles.bottom_text,
-            {color: theme.colors.secondary},
-          ]}>
-          Algorithme Tunisie
+        <Text style={[styles.bottom_text, {color: theme.colors.primary}]}>
+          {'Algorithme Tunisie'}
         </Text>
-        <Text style={styles.slogan_text}>Debou win tal9a chtochreb</Text>
+        <Text style={[styles.slogan_text, {color: theme.colors.onBackground}]}>
+          {'Debou win tal9a chtochreb'}
+        </Text>
       </Animated.View>
-    </SafeAreaView>
+    </BaseView>
   );
 };
 
+const styles = StyleSheet.create({
+  fill_screen: {
+    flex: 1,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    height: heightPercentageToDP(300),
+    width: widthPercentageToDP(800),
+    bottom: heightPercentageToDP(13.5),
+  },
+  bottom_text: {
+    position: 'absolute',
+    textAlign: 'center',
+    fontSize: fontValue(20),
+    bottom: heightPercentageToDP(7.25),
+    fontFamily: FONTS.p_bold,
+  },
+  slogan_text: {
+    position: 'absolute',
+    textAlign: 'center',
+    fontSize: fontValue(16),
+    bottom: heightPercentageToDP(3.75),
+    fontFamily: FONTS.p_regular,
+    opacity: 0.75,
+  },
+});
 export default Splash;

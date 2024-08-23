@@ -11,7 +11,7 @@ import {
 import type {PagerViewOnPageScrollEventData} from 'react-native-pager-view';
 import PagerView from 'react-native-pager-view';
 import {FONTS} from '../config/misc.ts';
-import {Button, useTheme} from 'react-native-paper';
+import {Button, MD3Theme, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -128,7 +128,7 @@ const Ticker = ({
           return (
             <Text
               key={index}
-              style={[styles.tickerText, { color: theme.colors.primary }]}
+              style={[styles.tickerText, {color: theme.colors.primary}]}
               adjustsFontSizeToFit={true}>
               {title}
             </Text>
@@ -202,15 +202,34 @@ const Item = ({
           ]}>
           {description}
         </Animated.Text>
-        {id === 3 && (
-          <Button mode="contained" onPress={() => navigation.navigate('login')}>
+        {id === 3 ? (
+          <Button
+            mode="contained"
+            onPress={() => {
+              navigation.navigate('login');
+            }}>
             Continue
           </Button>
+        ) : (
+          <></>
         )}
       </View>
     </View>
   );
 };
+
+function getRandomColor(id: number, theme: MD3Theme) {
+  switch (id) {
+    case 0:
+      return theme.colors.secondary;
+    case 1:
+      return theme.colors.tertiary;
+    case 2:
+      return theme.colors.error;
+    case 3:
+      return theme.colors.inversePrimary;
+  }
+}
 
 const Pagination = ({
   scrollOffsetAnimatedValue,
@@ -228,6 +247,8 @@ const Pagination = ({
     outputRange: [0, ViewPagerData.length * DOT_SIZE],
   });
 
+  const theme = useTheme();
+
   return (
     <View style={[styles.pagination]}>
       <Animated.View
@@ -236,6 +257,7 @@ const Pagination = ({
           {
             position: 'absolute',
             transform: [{translateX: translateX}],
+            borderColor: theme.colors.primary,
           },
         ]}
       />
@@ -243,7 +265,12 @@ const Pagination = ({
         return (
           <View key={item.key} style={styles.paginationDotContainer}>
             <View
-              style={[styles.paginationDot, {backgroundColor: item.color}]}
+              style={[
+                styles.paginationDot,
+                {
+                  backgroundColor: getRandomColor(item.id, theme),
+                },
+              ]}
             />
           </View>
         );
@@ -264,7 +291,6 @@ const Onboarding: React.FC = () => {
     flex: 1,
     backgroundColor: bgColor,
   });
-
 
   return (
     <View style={container(theme.colors.background)}>
@@ -390,7 +416,6 @@ const styles = StyleSheet.create({
     height: DOT_SIZE,
     borderRadius: DOT_SIZE / 2,
     borderWidth: 2,
-    borderColor: '#ddd',
   },
   tickerContainer: {
     position: 'absolute',
