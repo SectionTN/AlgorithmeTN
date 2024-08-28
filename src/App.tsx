@@ -6,16 +6,13 @@
  */
 
 import React, {useMemo} from 'react';
-import {StatusBar, useColorScheme} from 'react-native';
-import {
-  PaperProvider,
-  MD3DarkTheme,
-  MD3LightTheme,
-  useTheme,
-} from 'react-native-paper';
+import {StatusBar, StyleSheet, useColorScheme} from 'react-native';
+import {PaperProvider, MD3DarkTheme, MD3LightTheme} from 'react-native-paper';
 import StackNavigator from './config/navigation/stack.tsx';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {useMaterial3Theme} from '@pchmn/expo-material3-theme';
+import {setup} from '@baronha/ting';
+import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -31,25 +28,53 @@ function App(): React.JSX.Element {
     [colorScheme, theme],
   );
 
+  const toastInitOption = {
+    toast: {
+      messageColor: isDarkMode
+        ? theme.dark.onBackground
+        : theme.light.onBackground,
+      titleColor: isDarkMode ? theme.dark.primary : theme.light.primary,
+      backgroundColor: isDarkMode
+        ? theme.dark.surfaceContainerLow
+        : theme.light.surfaceContainerLow,
+    },
+    alert: {
+      titleColor: isDarkMode ? theme.dark.primary : theme.light.primary,
+      messageColor: isDarkMode
+        ? theme.dark.onBackground
+        : theme.light.onBackground,
+      backgroundColor: isDarkMode
+        ? theme.dark.surfaceContainerLow
+        : theme.light.surfaceContainerLow,
+    },
+  };
+
+  setup(toastInitOption);
+
   return (
     <>
-      <GestureHandlerRootView style={{flex: 1}}>
+      <GestureHandlerRootView style={styles.GHRV}>
         <StatusBar
           backgroundColor={
-            isDarkMode
-              ? theme.dark.background
-              : theme.light.background
+            isDarkMode ? theme.dark.background : theme.light.background
           }
           animated={true}
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
           translucent={true}
         />
         <PaperProvider theme={paperTheme}>
-          <StackNavigator />
+          <BottomSheetModalProvider>
+            <StackNavigator />
+          </BottomSheetModalProvider>
         </PaperProvider>
       </GestureHandlerRootView>
     </>
   );
 }
 
+const styles = StyleSheet.create({
+  GHRV: {
+    flex: 1,
+  },
+});
 export default App;
