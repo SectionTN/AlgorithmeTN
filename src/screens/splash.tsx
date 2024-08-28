@@ -1,9 +1,5 @@
 import React, {useCallback, useEffect} from 'react';
-import {
-  BackHandler,
-  StyleSheet,
-  useColorScheme,
-} from 'react-native';
+import {BackHandler, StyleSheet} from 'react-native';
 import {FONTS} from '../config/misc.ts';
 import {Text, useTheme} from 'react-native-paper';
 import Animated, {
@@ -28,7 +24,12 @@ const Splash: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useTheme();
-  const isDarkMode = useColorScheme() === 'dark';
+
+  useEffect(() => {
+    setTimeout(() => {
+      navigation.navigate('home');
+    }, 1000);
+  }, [navigation]);
 
   useFocusEffect(
     useCallback(() => {

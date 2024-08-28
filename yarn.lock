@@ -1786,6 +1786,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@baronha/ting@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "@baronha/ting@npm:1.2.2"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: aa1aa0f5d92e9cb574fe85d6ba1345bb4e888bd760f5d691148f8dd3257cd61aa63953bf45a60dd86f08125d76d4188ec6770ed77d459abdbc091f42f81c6ad6
+  languageName: node
+  linkType: hard
+
 "@bcoe/v8-coverage@npm:^0.2.3":
   version: 0.2.3
   resolution: "@bcoe/v8-coverage@npm:0.2.3"
@@ -2747,6 +2757,40 @@ __metadata:
   version: 1.0.0
   resolution: "@firebase/webchannel-wrapper@npm:1.0.0"
   checksum: 9e9f2070256ae2cce3cbd79b03f9590719ef7ea9591bc5f6ba804801ac5ca76731bc0f8d687d1ae4f629622741f5044d6804d7e2403e7b90f4fe70ef395ef5a5
+  languageName: node
+  linkType: hard
+
+"@gorhom/bottom-sheet@npm:^4.6.4":
+  version: 4.6.4
+  resolution: "@gorhom/bottom-sheet@npm:4.6.4"
+  dependencies:
+    "@gorhom/portal": 1.0.14
+    invariant: ^2.2.4
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-native": "*"
+    react: "*"
+    react-native: "*"
+    react-native-gesture-handler: ">=1.10.1"
+    react-native-reanimated: ">=2.2.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-native":
+      optional: true
+  checksum: 2cea033c4f321b93fdbf61470b507b5efd51425a8ab927b49d7aaa1d9f0568cbcfb188e385311389dbffbafe47b941dbd3e60f74b1d663a1a2d73262e2719f85
+  languageName: node
+  linkType: hard
+
+"@gorhom/portal@npm:1.0.14":
+  version: 1.0.14
+  resolution: "@gorhom/portal@npm:1.0.14"
+  dependencies:
+    nanoid: ^3.3.1
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 227bb96a2db854ab29bb9da8d4f3823c7f7448358de459709dd1b78522110da564c9a8734c6bc7d7153ed7c99320e0fb5d60b420c2ebb75ecaf2f0d757f410f9
   languageName: node
   linkType: hard
 
@@ -4629,6 +4673,8 @@ __metadata:
     "@babel/core": ^7.20.0
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@baronha/ting": ^1.2.2
+    "@gorhom/bottom-sheet": ^4.6.4
     "@pchmn/expo-material3-theme": ^1.3.2
     "@react-native-community/hooks": ^3.0.0
     "@react-native-firebase/app": ^20.3.0
@@ -4656,6 +4702,7 @@ __metadata:
     react: 18.3.1
     react-native: 0.75.2
     react-native-gesture-handler: ^2.18.1
+    react-native-image-crop-picker: ^0.41.2
     react-native-mmkv: ^3.0.0-beta.7
     react-native-pager-view: ^6.3.4
     react-native-paper: ^5.12.5
@@ -10007,7 +10054,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^3.1.23, nanoid@npm:^3.3.7":
+"nanoid@npm:^3.1.23, nanoid@npm:^3.3.1, nanoid@npm:^3.3.7":
   version: 3.3.7
   resolution: "nanoid@npm:3.3.7"
   bin:
@@ -11005,6 +11052,15 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 49b5b9a232fc60ddc38124a804410150070af5b20efbba1550831221560d71df704b7a7edfa2fb70d84fde32faf8675ad6118aea8b40f50c2a9d80eb7a08eb1c
+  languageName: node
+  linkType: hard
+
+"react-native-image-crop-picker@npm:^0.41.2":
+  version: 0.41.2
+  resolution: "react-native-image-crop-picker@npm:0.41.2"
+  peerDependencies:
+    react-native: ">=0.40.0"
+  checksum: c1333b3b761e948bd0bc856773f68dcc859c7ce39dda3e14d2c32c17d55927735bfc5cbbb7ac5e8bac21feda87c93399f2a596aca7d5b0611cc1e8203d97ad2e
   languageName: node
   linkType: hard
 
