@@ -13,12 +13,14 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 interface BaseViewProps {
   children: React.ReactNode;
   needsPaddingTop: boolean;
+  needsPaddingBottom: boolean;
   avoidingView: boolean;
 }
 
 const BaseView: React.FC<BaseViewProps> = ({
   children,
   needsPaddingTop,
+  needsPaddingBottom,
   avoidingView,
 }) => {
   const theme = useTheme();
@@ -32,8 +34,9 @@ const BaseView: React.FC<BaseViewProps> = ({
       flex: 1,
       backgroundColor: theme.colors.background,
       paddingTop: needsPaddingTop ? insets.top : 0,
-      paddingBottom: insets.bottom,
+      paddingBottom: needsPaddingBottom ? insets.bottom : 0,
       paddingLeft: insets.left,
+      paddingRight: insets.right,
     },
   });
 
