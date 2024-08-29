@@ -8,7 +8,6 @@ import {
   Text,
   TextInput,
   Tooltip,
-  TouchableRipple,
   useTheme,
 } from 'react-native-paper';
 import {
@@ -80,7 +79,7 @@ const Setup: React.FC = () => {
   }
 
   return (
-    <BaseView avoidingView={false} needsPaddingTop={false}>
+    <BaseView avoidingView={false} needsPaddingTop={false} needsPaddingBottom={false}>
       <Appbar.Header>
         <Appbar.Content title="" />
         <Tooltip title="Help">
