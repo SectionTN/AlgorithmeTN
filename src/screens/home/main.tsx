@@ -7,14 +7,13 @@ import {
   Card,
   IconButton,
   Searchbar,
-  Snackbar,
   Text,
   Tooltip,
   useTheme,
 } from 'react-native-paper';
 import {FlatGrid} from 'react-native-super-grid';
 import {FONTS} from '../../config/misc.ts';
-import {alert, toast} from '@baronha/ting';
+import {toast} from '@baronha/ting';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {widthPercentageToDP} from '../../config/dimensions.ts';
 
@@ -27,14 +26,24 @@ const Main: React.FC = () => {
 
   const windowWidth = Dimensions.get('window').width;
 
-  const rightContent = (props: any) => (
-    <IconButton
-      {...props}
-      size={24}
-      iconColor={theme.colors.onPrimary}
-      containerColor={theme.colors.primary}
-      icon="bookmark-outline"
-    />
+  const RightContent = (props: any) => (
+    <>
+    <View style={{flexDirection: 'column', alignItems: 'center'}}>
+      <IconButton
+        icon="eye"
+        iconColor={theme.colors.onPrimary}
+        containerColor={theme.colors.primary}
+        size={20}
+        onPress={() => {
+          //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+        }}
+      />
+      <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
+        5, 294K
+      </Text>
+    </View>
+      <SpacerH width={widthPercentageToDP(5)} />
+    </>
   );
 
   const [items, setItems] = useState([
@@ -62,25 +71,28 @@ const Main: React.FC = () => {
 
   const renderGridItem = ({item}) => {
     return (
-      <Card mode={'contained'} onPress={() => {
-        toast({title: 'Hello, there!', message: "i'm just a toast"});
-      }}>
+      <Card
+        mode={'contained'}
+        onPress={() => {
+          toast({title: 'Hello, there!', message: "i'm just a toast"});
+        }}>
         <Card.Title
           title={item.title}
           subtitle={item.desc}
           titleStyle={{fontFamily: FONTS.p_regular}}
           subtitleStyle={{fontFamily: FONTS.p_regular}}
           left={LeftContent}
-          // right={rightContent}
-          rightStyle={{paddingRight: '3.5%'}}
+          right={RightContent}
         />
         <Card.Content>
-          <Text variant="bodyMedium">{'a basic sorting algorithm useful for easy purposes'}</Text>
+          <Text variant="bodyMedium">
+            {'a basic sorting algorithm useful for easy purposes'}
+          </Text>
         </Card.Content>
         <Card.Actions>
           <View style={{flexDirection: 'column', alignItems: 'center'}}>
             <IconButton
-              icon="eye"
+              icon="heart"
               iconColor={theme.colors.onPrimary}
               containerColor={theme.colors.primary}
               size={20}
@@ -88,7 +100,23 @@ const Main: React.FC = () => {
                 //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
               }}
             />
-            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>1, 2M</Text>
+            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
+              1, 2M
+            </Text>
+          </View>
+          <View style={{flexDirection: 'column', alignItems: 'center'}}>
+            <IconButton
+              icon="thought-bubble"
+              iconColor={theme.colors.onPrimary}
+              containerColor={theme.colors.primary}
+              size={20}
+              onPress={() => {
+                //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+              }}
+            />
+            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
+              1, 133K
+            </Text>
           </View>
           <View style={{flexDirection: 'column', alignItems: 'center'}}>
             <IconButton
@@ -100,19 +128,9 @@ const Main: React.FC = () => {
                 //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
               }}
             />
-            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>3, 192K</Text>
-          </View>
-          <View style={{flexDirection: 'column', alignItems: 'center'}}>
-            <IconButton
-              icon="heart"
-              iconColor={theme.colors.onPrimary}
-              containerColor={theme.colors.primary}
-              size={20}
-              onPress={() => {
-                //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
-              }}
-            />
-            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>1, 133K</Text>
+            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
+              5, 294K
+            </Text>
           </View>
           <View style={{flexDirection: 'column', alignItems: 'center'}}>
             <IconButton
@@ -124,7 +142,9 @@ const Main: React.FC = () => {
                 //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
               }}
             />
-            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>5, 294K</Text>
+            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
+              5, 294K
+            </Text>
           </View>
         </Card.Actions>
       </Card>
@@ -137,9 +157,10 @@ const Main: React.FC = () => {
       avoidingView={false}
       needsPaddingBottom={false}>
       <Appbar.Header>
-        <SpacerH width={widthPercentageToDP(0.5)}  />
-        <Avatar.Text label={'XD'} size={34}/>
-        <SpacerH width={widthPercentageToDP(0.5)}  />
+        <SpacerH width={widthPercentageToDP(0.5)} />
+        {/* TODO: if user doesn't have a profile picture, show Text Avatar, else show his profile picture*/}
+        <Avatar.Text label={'XD'} size={34} />
+        <SpacerH width={widthPercentageToDP(0.5)} />
         <Appbar.Content
           title="Home"
           titleStyle={{fontFamily: FONTS.p_regular}}
