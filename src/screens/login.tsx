@@ -98,7 +98,7 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <BaseView needsPaddingTop={false} avoidingView={true}>
+      <BaseView needsPaddingTop={false} avoidingView={true} needsPaddingBottom={false}>
         <Appbar.Header>
           {currentMode !== 'login' && (
             <Tooltip title="Go Back">

@@ -14,8 +14,18 @@ const HomeRender: React.FC = () => {
       focusedIcon: 'home',
       unfocusedIcon: 'home-outline',
     },
-    {key: 'trending', title: 'Trending', focusedIcon: 'star', unfocusedIcon: 'star-outline'},
-    {key: 'bookmarks', title: 'Bookmarks', focusedIcon: 'bookmark', unfocusedIcon: 'bookmark-outline'},
+    {
+      key: 'trending',
+      title: 'Trending',
+      focusedIcon: 'star',
+      unfocusedIcon: 'star-outline',
+    },
+    {
+      key: 'bookmarks',
+      title: 'Bookmarks',
+      focusedIcon: 'bookmark',
+      unfocusedIcon: 'bookmark-outline',
+    },
     {
       key: 'profile',
       title: 'Notifications',
