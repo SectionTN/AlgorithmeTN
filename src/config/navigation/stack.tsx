@@ -19,8 +19,8 @@ import Splash from '../../screens/splash.tsx';
 import Onboarding from '../../screens/onboarding.tsx';
 import Login from '../../screens/login.tsx';
 import Setup from '../../screens/setup.tsx';
-import Main from '../../screens/home/main.tsx';
 import HomeRender from './bottom-navigation.tsx';
+import Settings from '../../screens/settings.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -68,6 +68,11 @@ const StackNavigator = () => {
         <Stack.Screen
           name={'home'}
           component={HomeRender}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'settings'}
+          component={Settings}
           options={{gestureEnabled: false, headerShown: false}}
         />
       </Stack.Navigator>
