@@ -5,6 +5,8 @@ import {
   Appbar,
   Avatar,
   Card,
+  Chip,
+  Icon,
   IconButton,
   Searchbar,
   Text,
@@ -15,12 +17,16 @@ import {FlatGrid} from 'react-native-super-grid';
 import {FONTS} from '../../config/misc.ts';
 import {toast} from '@baronha/ting';
 import SpacerH from '../../components/spacer/spacerh.tsx';
-import {widthPercentageToDP} from '../../config/dimensions.ts';
+import {heightPercentageToDP, widthPercentageToDP} from '../../config/dimensions.ts';
+import Animated, {SlideInLeft, SlideOutRight} from 'react-native-reanimated';
+import SpacerV from '../../components/spacer/spacerv.tsx';
 
 const LeftContent = (props: any) => <Avatar.Icon {...props} icon="code-tags" />;
 
 const Main: React.FC = () => {
   const theme = useTheme();
+
+
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -28,18 +34,18 @@ const Main: React.FC = () => {
 
   const RightContent = (props: any) => (
     <>
-    <View style={{flexDirection: 'column', alignItems: 'center'}}>
-      <IconButton
-        icon="eye"
-        iconColor={theme.colors.onPrimary}
-        containerColor={theme.colors.primary}
-        size={20}
-        onPress={undefined}
-      />
-      <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
-        5, 294K
-      </Text>
-    </View>
+      <View style={{flexDirection: 'column', alignItems: 'center'}}>
+        <IconButton
+          icon="eye"
+          iconColor={theme.colors.onPrimary}
+          containerColor={theme.colors.primary}
+          size={20}
+          onPress={undefined}
+        />
+        <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
+          5, 294K
+        </Text>
+      </View>
       <SpacerH width={widthPercentageToDP(5)} />
     </>
   );
@@ -69,6 +75,7 @@ const Main: React.FC = () => {
 
   const renderGridItem = ({item}) => {
     return (
+      <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
       <Card
         mode={'contained'}
         onPress={() => {
@@ -86,6 +93,8 @@ const Main: React.FC = () => {
           <Text variant="bodyMedium">
             {'a basic sorting algorithm useful for easy purposes'}
           </Text>
+          <SpacerV height={heightPercentageToDP(0.20)} />
+          <Icon size={24} color={theme.colors.primary}  source={'language-javascript'} />
         </Card.Content>
         <Card.Actions>
           <View style={{flexDirection: 'column', alignItems: 'center'}}>
@@ -146,6 +155,7 @@ const Main: React.FC = () => {
           </View>
         </Card.Actions>
       </Card>
+      </Animated.View>
     );
   };
 
