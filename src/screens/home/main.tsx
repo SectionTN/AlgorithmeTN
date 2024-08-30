@@ -34,9 +34,7 @@ const Main: React.FC = () => {
         iconColor={theme.colors.onPrimary}
         containerColor={theme.colors.primary}
         size={20}
-        onPress={() => {
-          //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
-        }}
+        onPress={undefined}
       />
       <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
         5, 294K
@@ -46,7 +44,7 @@ const Main: React.FC = () => {
     </>
   );
 
-  const [items, setItems] = useState([
+  const [items] = useState([
     {title: 'Bubble Sort', desc: 'Rayen Sbai'},
     {title: 'Quick Sort', desc: 'Lionel Messi'},
     {title: 'Fabonnaci', desc: '3M'},
