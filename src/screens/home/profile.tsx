@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {StyleSheet, View} from 'react-native';
 import {
@@ -6,6 +6,7 @@ import {
   Avatar,
   Card,
   Chip,
+  Menu,
   Text,
   Tooltip,
   useTheme,
@@ -19,14 +20,30 @@ import Animated, {
   ZoomInLeft,
   ZoomOutRight,
 } from 'react-native-reanimated';
-import {fontValue, heightPercentageToDP} from '../../config/dimensions.ts';
+import {
+  fontValue,
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../../config/dimensions.ts';
 import SpacerV from '../../components/spacer/spacerv.tsx';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../config/navigation/types.ts';
 
 const Profile: React.FC = () => {
   const theme = useTheme();
 
-  useEffect(() => {}, []);
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+  const [menuVisible, setMenuVisible] = React.useState(false);
+
+  const openMenu = () => setMenuVisible(true);
+
+  const closeMenu = () => setMenuVisible(false);
+
+  const insets = useSafeAreaInsets();
   return (
     <BaseView
       needsPaddingTop={false}
@@ -38,7 +55,21 @@ const Profile: React.FC = () => {
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
         <Tooltip title="Help">
-          <Appbar.Action icon="dots-vertical" onPress={() => {}} />
+          <Menu
+            style={{paddingTop: insets.top, paddingRight: insets.right}}
+            visible={menuVisible}
+            onDismiss={closeMenu}
+            anchor={
+              <Appbar.Action icon="dots-vertical" onPress={() => openMenu()} />
+            }>
+            <Menu.Item
+              onPress={() => {
+                closeMenu();
+                navigation.navigate('settings');
+              }}
+              title="Settings"
+            />
+          </Menu>
         </Tooltip>
       </Appbar.Header>
       <Animated.ScrollView
@@ -77,11 +108,12 @@ const Profile: React.FC = () => {
               numberOfLines={1}
               style={[styles.bioText, {color: theme.colors.onBackground}]}
               onPress={() => {}}>
-              {'yes, as you see, my hair is green!'}
+              {'yes, as you can see, my hair is green!'}
             </Text>
           )}
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.25)} />
+        {/*Language Chips*/}
         <Animated.View
           entering={FlipInEasyX}
           exiting={FlipOutEasyX}
@@ -173,63 +205,41 @@ const Profile: React.FC = () => {
             </Card.Content>
           </Card>
           <SpacerV height={heightPercentageToDP(0.25)} />
+          {/*Achievements Chips*/}
           <Card mode={'contained'}>
             <Card.Title title="Achievements" titleVariant={'titleLarge'} />
             <Card.Content style={styles.badgeView}>
               <Chip
-                style={[
-                  styles.chip,
-                  {backgroundColor: theme.colors.surface},
-                ]}
+                style={[styles.chip, {backgroundColor: theme.colors.surface}]}
                 icon="medal">
                 {'JS Master'}
               </Chip>
               <Chip
-                style={[
-                  styles.chip,
-                  {backgroundColor: theme.colors.surface},
-                ]}
+                style={[styles.chip, {backgroundColor: theme.colors.surface}]}
                 icon="medal">
                 {'Unstoppable'}
               </Chip>
               <Chip
-                style={[
-                  styles.chip,
-                  {backgroundColor: theme.colors.surface},
-                ]}
+                style={[styles.chip, {backgroundColor: theme.colors.surface}]}
                 icon="medal">
                 {'Algo Master'}
               </Chip>
             </Card.Content>
           </Card>
           <SpacerV height={heightPercentageToDP(0.25)} />
+          {/*Recent Activities*/}
           <Card mode={'contained'}>
             <Card.Title title="Recent Activities" titleVariant={'titleLarge'} />
-            <Card.Content style={styles.badgeView}>
-              <Chip
-                style={[
-                  styles.chip,
-                  {backgroundColor: theme.colors.surface},
-                ]}
-                icon="medal">
-                {'JS Master'}
-              </Chip>
-              <Chip
-                style={[
-                  styles.chip,
-                  {backgroundColor: theme.colors.surface},
-                ]}
-                icon="medal">
-                {'Unstoppable'}
-              </Chip>
-              <Chip
-                style={[
-                  styles.chip,
-                  {backgroundColor: theme.colors.surface},
-                ]}
-                icon="medal">
-                {'Algo Master'}
-              </Chip>
+            <Card.Content style={styles.recentActivities}>
+              <Text variant={'labelMedium'}>
+                - Posted a new algorithm: "Optimized Quicksort"
+              </Text>
+              <SpacerV height={heightPercentageToDP(0.15)} />
+              <Text variant={'labelMedium'}>
+                - Liked David Wesker's Posted Algorithm
+              </Text>
+              <SpacerV height={heightPercentageToDP(0.15)} />
+              <Text variant={'labelMedium'}>- Earned "JS Master" badge</Text>
             </Card.Content>
           </Card>
           <SpacerV height={heightPercentageToDP(0.25)} />
@@ -297,6 +307,11 @@ const styles = StyleSheet.create({
     fontSize: fontValue(14),
     fontFamily: FONTS.p_regular,
     marginTop: heightPercentageToDP(0.5),
+  },
+  recentActivities: {
+    paddingLeft: widthPercentageToDP(4.5),
+    paddingRight: '3%',
+    flexDirection: 'column',
   },
 });
 
