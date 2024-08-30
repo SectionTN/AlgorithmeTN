@@ -1,4 +1,10 @@
-type routeNamesType = 'splash' | 'onboarding' | 'login' | 'setup' | 'home';
+type routeNamesType =
+  | 'splash'
+  | 'onboarding'
+  | 'login'
+  | 'setup'
+  | 'home'
+  | 'settings';
 
 type RootStackParamList = {
   [key in routeNamesType]: object | undefined;
@@ -8,6 +14,7 @@ type RootStackParamList = {
   login: {} | undefined;
   setup: {} | undefined;
   home: {} | undefined;
+  settings: {} | undefined;
 };
 
 export type {routeNamesType, RootStackParamList};
