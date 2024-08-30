@@ -28,9 +28,9 @@ const HomeRender: React.FC = () => {
     },
     {
       key: 'profile',
-      title: 'Notifications',
-      focusedIcon: 'bell',
-      unfocusedIcon: 'bell-outline',
+      title: 'Profile',
+      focusedIcon: 'account',
+      unfocusedIcon: 'account-outline',
     },
   ]);
 
