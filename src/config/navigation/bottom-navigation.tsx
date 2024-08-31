@@ -2,7 +2,7 @@ import React from 'react';
 import {BottomNavigation} from 'react-native-paper';
 import Main from '../../screens/home/main.tsx';
 import Profile from '../../screens/home/profile.tsx';
-import Trending from '../../screens/home/trending.tsx';
+import Notifications from '../../screens/home/notifications.tsx';
 import Bookmarks from '../../screens/home/bookmarks.tsx';
 
 const HomeRender: React.FC = () => {
@@ -15,16 +15,16 @@ const HomeRender: React.FC = () => {
       unfocusedIcon: 'home-outline',
     },
     {
-      key: 'trending',
-      title: 'Trending',
-      focusedIcon: 'star',
-      unfocusedIcon: 'star-outline',
-    },
-    {
       key: 'bookmarks',
       title: 'Bookmarks',
       focusedIcon: 'bookmark',
       unfocusedIcon: 'bookmark-outline',
+    },
+    {
+      key: 'notifications',
+      title: 'Trending',
+      focusedIcon: 'bell',
+      unfocusedIcon: 'bell-outline',
     },
     {
       key: 'profile',
@@ -36,8 +36,8 @@ const HomeRender: React.FC = () => {
 
   const renderScene = BottomNavigation.SceneMap({
     home: Main,
-    trending: Trending,
     bookmarks: Bookmarks,
+    notifications: Notifications,
     profile: Profile,
   });
 
