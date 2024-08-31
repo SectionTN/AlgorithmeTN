@@ -26,8 +26,6 @@ const LeftContent = (props: any) => <Avatar.Icon {...props} icon="code-tags" />;
 const Main: React.FC = () => {
   const theme = useTheme();
 
-
-
   const [searchQuery, setSearchQuery] = useState('');
 
   const windowWidth = Dimensions.get('window').width;
