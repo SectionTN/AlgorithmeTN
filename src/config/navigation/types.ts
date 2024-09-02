@@ -4,7 +4,8 @@ type routeNamesType =
   | 'login'
   | 'setup'
   | 'home'
-  | 'settings';
+  | 'settings'
+  | 'algo';
 
 type RootStackParamList = {
   [key in routeNamesType]: object | undefined;
@@ -15,6 +16,7 @@ type RootStackParamList = {
   setup: {} | undefined;
   home: {} | undefined;
   settings: {} | undefined;
+  algo: {} | undefined;
 };
 
 export type {routeNamesType, RootStackParamList};

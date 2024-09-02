@@ -7,7 +7,6 @@
  */
 
 import React from 'react';
-
 import {
   NavigationContainer,
   useNavigationContainerRef,
@@ -15,16 +14,17 @@ import {
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import {RootStackParamList} from './types';
-import Splash from '../../screens/splash.tsx';
-import Onboarding from '../../screens/onboarding.tsx';
-import Login from '../../screens/login.tsx';
-import Setup from '../../screens/setup.tsx';
-import HomeRender from './bottom-navigation.tsx';
-import Settings from '../../screens/settings.tsx';
+import Splash from '../../screens/splash';
+import Onboarding from '../../screens/onboarding';
+import Login from '../../screens/login';
+import Setup from '../../screens/setup';
+import HomeRender from './bottom-navigation';
+import Settings from '../../screens/settings';
+import Algo from '../../screens/algo/algo.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const StackNavigator = () => {
+const StackNavigator: React.FC = () => {
   const routeNameRef = React.useRef<string>();
   const navigationRef = useNavigationContainerRef();
 
@@ -44,7 +44,7 @@ const StackNavigator = () => {
         }
         routeNameRef.current = currentRouteName;
       }}>
-      <Stack.Navigator initialRouteName={'splash'}>
+      <Stack.Navigator initialRouteName={'algo'}>
         <Stack.Screen
           name={'splash'}
           component={Splash}
@@ -68,12 +68,23 @@ const StackNavigator = () => {
         <Stack.Screen
           name={'home'}
           component={HomeRender}
-          options={{gestureEnabled: false, headerShown: false}}
+          options={{
+            gestureEnabled: false,
+            headerShown: false,
+          }}
         />
         <Stack.Screen
           name={'settings'}
           component={Settings}
           options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'algo'}
+          component={Algo}
+          options={{
+            gestureEnabled: false,
+            headerShown: false,
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

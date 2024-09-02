@@ -93,7 +93,10 @@ const Splash: React.FC = () => {
   }, []);
 
   return (
-    <BaseView avoidingView={false} needsPaddingTop={false} needsPaddingBottom={false}>
+    <BaseView
+      avoidingView={false}
+      needsPaddingTop={false}
+      needsPaddingBottom={false}>
       <Animated.View style={[styles.container, viewAnimatedStyle]}>
         <Animated.Image
           style={[styles.logo, imageAnimatedStyle]}
