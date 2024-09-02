@@ -28,6 +28,8 @@ function App(): React.JSX.Element {
     [colorScheme, theme],
   );
 
+  console.log(theme.light);
+
   const toastInitOption = {
     toast: {
       messageColor: isDarkMode
@@ -56,7 +58,9 @@ function App(): React.JSX.Element {
       <GestureHandlerRootView style={styles.GHRV}>
         <StatusBar
           backgroundColor={
-            isDarkMode ? theme.dark.background : theme.light.background
+            isDarkMode
+              ? theme.dark.elevation.level2
+              : theme.light.elevation.level2
           }
           animated={true}
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}

@@ -21,7 +21,6 @@ import SpacerV from '../../components/spacer/spacerv.tsx';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
-import {IconProps} from 'react-native-paper/lib/typescript/components/MaterialCommunityIcon';
 
 const LeftContent = (props: any) => <Avatar.Icon {...props} icon="code-tags" />;
 

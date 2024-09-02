@@ -1,5 +1,5 @@
-import React, {useCallback, useMemo, useRef, useState} from 'react';
-import {BackHandler, Keyboard, Pressable, StyleSheet, View} from 'react-native';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {BackHandler, Keyboard, Pressable, StatusBar, StyleSheet, View} from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -62,6 +62,10 @@ const Setup: React.FC = () => {
   const memoizedFirstName = useMemo(() => firstName?.trim(), [firstName]);
   const memoizedLastName = useMemo(() => lastName?.trim(), [lastName]);
 
+  useEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.background);
+  }, [theme.colors.background]);
+
   useBackHandler(() => {
     BackHandler.exitApp();
     return true;
@@ -77,6 +81,7 @@ const Setup: React.FC = () => {
     }
     return firstName[0].toUpperCase() + lastName[0].toUpperCase();
   }
+
 
   return (
     <BaseView avoidingView={false} needsPaddingTop={false} needsPaddingBottom={false}>
