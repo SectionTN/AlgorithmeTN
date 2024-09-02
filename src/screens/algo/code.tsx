@@ -1,14 +1,11 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
-import {
-  Appbar,
-  Tooltip,
-} from 'react-native-paper';
-import {FONTS} from '../../config/misc.ts';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useNavigation} from '@react-navigation/native';
+import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
+import {Chip} from 'react-native-paper';
 
 const Code: React.FC = () => {
   const navigation =
@@ -19,19 +16,9 @@ const Code: React.FC = () => {
       needsPaddingTop={false}
       needsPaddingBottom={false}
       avoidingView={false}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => navigation.popTo('home')} />
-        <Appbar.Content
-          title="Home"
-          titleStyle={{fontFamily: FONTS.p_regular}}
-        />
-        <Tooltip title="Bookmark">
-          <Appbar.Action icon="share-outline" onPress={() => {}} />
-        </Tooltip>
-        <Tooltip title="Share">
-          <Appbar.Action icon="bookmark-outline" onPress={() => {}} />
-        </Tooltip>
-      </Appbar.Header>
+      <Animated.View entering={FadeIn} exiting={FadeOut}>
+        <Chip  />
+      </Animated.View>
     </BaseView>
   );
 };

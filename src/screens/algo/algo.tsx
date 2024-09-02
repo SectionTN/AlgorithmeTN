@@ -1,22 +1,19 @@
 import BaseView from '../../components/baseview/baseview.tsx';
-import {Appbar, BottomNavigation, Text, Tooltip} from 'react-native-paper';
+import {Appbar, BottomNavigation, Tooltip, useTheme} from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
-
-const MusicRoute = () => <Text>Music</Text>;
-
-const AlbumsRoute = () => <Text>Albums</Text>;
-
-const RecentsRoute = () => <Text>Recents</Text>;
-
-const NotificationsRoute = () => <Text>Notifications</Text>;
+import Code from './code.tsx';
+import Instructions from './instructions.tsx';
+import {StatusBar} from 'react-native';
 
 const Algo: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const theme = useTheme();
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
@@ -32,27 +29,57 @@ const Algo: React.FC = () => {
     },
   ]);
 
-  const renderScene = BottomNavigation.SceneMap({
-    code: MusicRoute,
-    instructions: AlbumsRoute,
-  });
+  const renderScene = ({route}: {route: {key: string}}) => {
+    switch (route.key) {
+      case 'code':
+        return <Code />;
+      case 'instructions':
+        return <Instructions />;
+      default:
+        return null;
+    }
+  };
+
+  useEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+  }, [theme.colors.elevation.level2]);
+
+  const getHeaderTitle = () => {
+    switch (index) {
+      case 0:
+        return 'Code';
+      case 1:
+        return 'Instructions';
+      default:
+        return 'Home';
+    }
+  };
 
   return (
     <BaseView
       needsPaddingTop={false}
       needsPaddingBottom={false}
       avoidingView={false}>
-      <Appbar.Header>
+      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <Appbar.BackAction onPress={() => navigation.popTo('home')} />
         <Appbar.Content
-          title="Home"
+          title={getHeaderTitle()}
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
+        <Tooltip title="Like">
+          <Appbar.Action icon="heart-outline" onPress={() => {}} />
+        </Tooltip>
         <Tooltip title="Bookmark">
-          <Appbar.Action isLeading={true} icon="share-outline" onPress={() => {}} />
+          <Appbar.Action
+            icon="bookmark-outline"
+            onPress={() => {}}
+          />
         </Tooltip>
         <Tooltip title="Share">
-          <Appbar.Action icon="bookmark-outline" onPress={() => {}} />
+          <Appbar.Action
+            icon="share-outline"
+            onPress={() => {}}
+          />
         </Tooltip>
       </Appbar.Header>
       <BottomNavigation

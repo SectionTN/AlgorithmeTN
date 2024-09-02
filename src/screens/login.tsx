@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
   EmitterSubscription,
   Keyboard,
-  Linking,
+  Linking, StatusBar,
   StyleSheet,
   useColorScheme,
   View,
@@ -96,9 +96,16 @@ const Login: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.background);
+  }, [theme.colors.background]);
+
   return (
     <>
-      <BaseView needsPaddingTop={false} avoidingView={true} needsPaddingBottom={false}>
+      <BaseView
+        needsPaddingTop={false}
+        avoidingView={true}
+        needsPaddingBottom={true}>
         <Appbar.Header>
           {currentMode !== 'login' && (
             <Tooltip title="Go Back">
