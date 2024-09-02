@@ -5,7 +5,6 @@ import {
   Appbar,
   Avatar,
   Card,
-  Chip,
   Icon,
   IconButton,
   Searchbar,
@@ -15,15 +14,20 @@ import {
 } from 'react-native-paper';
 import {FlatGrid} from 'react-native-super-grid';
 import {FONTS} from '../../config/misc.ts';
-import {toast} from '@baronha/ting';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {heightPercentageToDP, widthPercentageToDP} from '../../config/dimensions.ts';
 import Animated, {SlideInLeft, SlideOutRight} from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../config/navigation/types.ts';
+import {IconProps} from 'react-native-paper/lib/typescript/components/MaterialCommunityIcon';
 
 const LeftContent = (props: any) => <Avatar.Icon {...props} icon="code-tags" />;
 
 const Main: React.FC = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   const theme = useTheme();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,6 +38,7 @@ const Main: React.FC = () => {
     <>
       <View style={{flexDirection: 'column', alignItems: 'center'}}>
         <IconButton
+          {...props}
           icon="eye"
           iconColor={theme.colors.onPrimary}
           containerColor={theme.colors.primary}
@@ -77,7 +82,7 @@ const Main: React.FC = () => {
       <Card
         mode={'contained'}
         onPress={() => {
-          toast({title: 'Hello, there!', message: "i'm just a toast"});
+          navigation.navigate('algo');
         }}>
         <Card.Title
           title={item.title}

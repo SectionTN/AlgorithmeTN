@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleProp, StyleSheet, View, ViewProps, ViewStyle} from 'react-native';
+import {StyleSheet} from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -10,34 +10,20 @@ import {
   useTheme,
 } from 'react-native-paper';
 import {FONTS} from '../config/misc.ts';
-import Animated, {BounceInUp, BounceOutUp} from 'react-native-reanimated';
+import Animated, {BounceInDown, BounceInUp, BounceOutDown, BounceOutUp} from 'react-native-reanimated';
 import {fontValue, heightPercentageToDP} from '../config/dimensions.ts';
 import SpacerV from '../components/spacer/spacerv.tsx';
 import {RootStackParamList} from '../config/navigation/types.ts';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-
-const DarkModeIcon = (props: any) => (
-  <Avatar.Icon {...props} icon="weather-night" />
-);
-const EditNameIcon = (props: any) => (
-  <Avatar.Icon {...props} icon="pencil-outline" />
-);
-const LogOutIcon = (props: any) => <Avatar.Icon {...props} icon="logout" />;
-const ShieldIcon = (props: any) => (
-  <Avatar.Icon {...props} icon="shield-outline" />
-);
-const AtIcon = (props: any) => <Avatar.Icon {...props} icon="at" />;
-const ActiveIcon = (props: any) => <Avatar.Icon {...props} icon="resistor" />;
-const BugReportIcon = (props: any) => (
-  <Avatar.Icon {...props} icon="bug-outline" />
-);
-const HelpIcon = (props: any) => (
-  <Avatar.Icon {...props} icon="help-circle-outline" />
-);
-const HandshakeIcon = (props: any) => (
-  <Avatar.Icon {...props} icon="handshake-outline" />
-);
+import {
+  ActiveIcon,
+  AtIcon, BugReportIcon,
+  DarkModeIcon,
+  EditNameIcon, HandshakeIcon, HelpIcon,
+  LogOutIcon,
+  ShieldIcon,
+} from '../components/card-icons/card-icons.tsx';
 
 const Settings: React.FC = () => {
   const navigation =
@@ -100,7 +86,7 @@ const Settings: React.FC = () => {
           )}
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.25)} />
-        <Animated.View style={{paddingLeft: '2%', paddingRight: '2%'}}>
+        <Animated.View entering={BounceInDown} exiting={BounceOutDown} style={{paddingLeft: '2%', paddingRight: '2%'}}>
           <Text variant={'titleMedium'}>Miscellaneous</Text>
           <SpacerV height={heightPercentageToDP(0.15)} />
           <Card mode={'contained'}>
@@ -186,6 +172,7 @@ const Settings: React.FC = () => {
     </BaseView>
   );
 };
+
 const styles = StyleSheet.create({
   under_header: {
     padding: '2%',
