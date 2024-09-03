@@ -1,10 +1,16 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import BaseView from '../../components/baseview/baseview.tsx';
-import {Appbar, Avatar, Card, Text} from 'react-native-paper';
+import {Appbar, Avatar, Card, Text, useTheme} from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {widthPercentageToDP} from '../../config/dimensions.ts';
-import {Dimensions, ScrollView, StyleSheet, View} from 'react-native';
+import {
+  Dimensions,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {FlatGrid} from 'react-native-super-grid';
 
 const LeftContent = () => (
@@ -17,6 +23,8 @@ const LeftContent = () => (
 );
 
 const Notifications: React.FC = () => {
+  const theme = useTheme();
+
   const windowDimension = Dimensions.get('window').width;
 
   const [items] = useState([
@@ -49,12 +57,16 @@ const Notifications: React.FC = () => {
     );
   };
 
+  useEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+  }, [theme.colors.elevation.level2]);
+
   return (
     <BaseView
       needsPaddingTop={false}
       avoidingView={false}
       needsPaddingBottom={false}>
-      <Appbar.Header>
+      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <SpacerH width={widthPercentageToDP(0.5)} />
         {/* TODO: if user doesn't have a profile picture, show Text Avatar, else show his profile picture*/}
         <Avatar.Text label={'XD'} size={34} />

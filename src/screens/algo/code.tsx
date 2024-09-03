@@ -1,13 +1,11 @@
 import React, {useRef, useState} from 'react';
-import {Dimensions, ScrollView, StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useNavigation} from '@react-navigation/native';
-import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
-import {Avatar, Card, Chip, useTheme} from 'react-native-paper';
-import SpacerV from '../../components/spacer/spacerv.tsx';
-import {fontValue, heightPercentageToDP} from '../../config/dimensions.ts';
+import {useTheme} from 'react-native-paper';
+import {fontValue} from '../../config/dimensions.ts';
 import CodeEditorWebView from '../../components/code-editor-webview/code-editor-webview.tsx';
 import {WebView} from 'react-native-webview';
 
@@ -117,7 +115,10 @@ const Code: React.FC = () => {
         </Chip>
       </Animated.View>
       <SpacerV height={heightPercentageToDP(0.10)} />*/}
-      <CodeEditorWebView theme={theme.dark ? 'monokai' : 'material theme'} fontSize={fontValue(14)} />
+      <CodeEditorWebView
+        theme={theme.dark ? 'monokai' : 'material theme'}
+        fontSize={fontValue(14)}
+      />
     </BaseView>
   );
 };
