@@ -19,11 +19,13 @@ import {RootStackParamList} from '../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import BaseView from '../components/baseview/baseview.tsx';
+import {useTranslation} from 'react-i18next';
 
 const Splash: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useTheme();
+  const {t} = useTranslation();
 
   useEffect(() => {
     setTimeout(() => {
@@ -103,10 +105,10 @@ const Splash: React.FC = () => {
           source={AlgoTNLogo}
         />
         <Text style={[styles.bottom_text, {color: theme.colors.primary}]}>
-          {'Algorithme Tunisie'}
+          {t('welcome')}
         </Text>
         <Text style={[styles.slogan_text, {color: theme.colors.onBackground}]}>
-          {'Debou win tal9a chtochreb'}
+          {t('slogan')}
         </Text>
       </Animated.View>
     </BaseView>

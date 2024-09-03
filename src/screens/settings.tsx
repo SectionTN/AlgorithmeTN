@@ -1,5 +1,5 @@
-import React from 'react';
-import {StyleSheet} from 'react-native';
+import React, {useEffect} from 'react';
+import {StatusBar, StyleSheet} from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -10,7 +10,12 @@ import {
   useTheme,
 } from 'react-native-paper';
 import {FONTS} from '../config/misc.ts';
-import Animated, {BounceInDown, BounceInUp, BounceOutDown, BounceOutUp} from 'react-native-reanimated';
+import Animated, {
+  BounceInDown,
+  BounceInUp,
+  BounceOutDown,
+  BounceOutUp,
+} from 'react-native-reanimated';
 import {fontValue, heightPercentageToDP} from '../config/dimensions.ts';
 import SpacerV from '../components/spacer/spacerv.tsx';
 import {RootStackParamList} from '../config/navigation/types.ts';
@@ -18,9 +23,12 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {
   ActiveIcon,
-  AtIcon, BugReportIcon,
+  AtIcon,
+  BugReportIcon,
   DarkModeIcon,
-  EditNameIcon, HandshakeIcon, HelpIcon,
+  EditNameIcon,
+  HandshakeIcon,
+  HelpIcon,
   LogOutIcon,
   ShieldIcon,
 } from '../components/card-icons/card-icons.tsx';
@@ -31,12 +39,16 @@ const Settings: React.FC = () => {
 
   const theme = useTheme();
 
+  useEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+  }, [theme.colors.elevation.level2]);
+
   return (
     <BaseView
       needsPaddingBottom={false}
       needsPaddingTop={false}
       avoidingView={false}>
-      <Appbar.Header>
+      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <Tooltip title="Navigate Back">
           <Appbar.BackAction onPress={() => navigation.goBack()} />
         </Tooltip>
@@ -86,7 +98,10 @@ const Settings: React.FC = () => {
           )}
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.25)} />
-        <Animated.View entering={BounceInDown} exiting={BounceOutDown} style={{paddingLeft: '2%', paddingRight: '2%'}}>
+        <Animated.View
+          entering={BounceInDown}
+          exiting={BounceOutDown}
+          style={{paddingLeft: '2%', paddingRight: '2%'}}>
           <Text variant={'titleMedium'}>Miscellaneous</Text>
           <SpacerV height={heightPercentageToDP(0.15)} />
           <Card mode={'contained'}>

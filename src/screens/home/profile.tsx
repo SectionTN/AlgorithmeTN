@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import BaseView from '../../components/baseview/baseview.tsx';
-import {StyleSheet, View} from 'react-native';
+import {StatusBar, StyleSheet, View} from 'react-native';
 import {
   Appbar,
   Avatar,
@@ -44,12 +44,16 @@ const Profile: React.FC = () => {
   const closeMenu = () => setMenuVisible(false);
 
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+  }, [theme.colors.elevation.level2]);
   return (
     <BaseView
       needsPaddingTop={false}
       avoidingView={false}
       needsPaddingBottom={false}>
-      <Appbar.Header>
+      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <Appbar.Content
           title="Profile"
           titleStyle={{fontFamily: FONTS.p_regular}}
