@@ -21,6 +21,7 @@ import Setup from '../../screens/setup';
 import HomeRender from './bottom-navigation';
 import Settings from '../../screens/settings';
 import Algo from '../../screens/algo/algo.tsx';
+import AddCode from '../../screens/add-code.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -44,7 +45,7 @@ const StackNavigator: React.FC = () => {
         }
         routeNameRef.current = currentRouteName;
       }}>
-      <Stack.Navigator initialRouteName={'algo'}>
+      <Stack.Navigator initialRouteName={'home'}>
         <Stack.Screen
           name={'splash'}
           component={Splash}
@@ -81,6 +82,14 @@ const StackNavigator: React.FC = () => {
         <Stack.Screen
           name={'algo'}
           component={Algo}
+          options={{
+            gestureEnabled: false,
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name={'add-code'}
+          component={AddCode}
           options={{
             gestureEnabled: false,
             headerShown: false,
