@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Dimensions, StyleSheet, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -15,7 +15,10 @@ import {
 import {FlatGrid} from 'react-native-super-grid';
 import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
-import {heightPercentageToDP, widthPercentageToDP} from '../../config/dimensions.ts';
+import {
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../../config/dimensions.ts';
 import Animated, {SlideInLeft, SlideOutRight} from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {useNavigation} from '@react-navigation/native';
@@ -25,7 +28,8 @@ import {RootStackParamList} from '../../config/navigation/types.ts';
 const LeftContent = (props: any) => <Avatar.Icon {...props} icon="code-tags" />;
 
 const Main: React.FC = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const theme = useTheme();
 
@@ -75,88 +79,104 @@ const Main: React.FC = () => {
     {title: 'ASBESTOS', desc: '#7f8c8d'},
   ]);
 
+  useEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+  }, [theme.colors.elevation.level2]);
+
   const renderGridItem = ({item}) => {
     return (
       <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
-      <Card
-        mode={'contained'}
-        onPress={() => {
-          navigation.navigate('algo');
-        }}>
-        <Card.Title
-          title={item.title}
-          subtitle={item.desc}
-          titleStyle={{fontFamily: FONTS.p_regular}}
-          subtitleStyle={{fontFamily: FONTS.p_regular}}
-          left={LeftContent}
-          right={RightContent}
-        />
-        <Card.Content>
-          <Text variant="bodyMedium">
-            {'a basic sorting algorithm useful for easy purposes'}
-          </Text>
-          <SpacerV height={heightPercentageToDP(0.20)} />
-          <Icon size={24} color={theme.colors.primary}  source={'language-javascript'} />
-        </Card.Content>
-        <Card.Actions>
-          <View style={{flexDirection: 'column', alignItems: 'center'}}>
-            <IconButton
-              icon="heart"
-              iconColor={theme.colors.onPrimary}
-              containerColor={theme.colors.primary}
-              size={20}
-              onPress={() => {
-                //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
-              }}
-            />
-            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
-              1, 2M
+        <Card
+          mode={'contained'}
+          onPress={() => {
+            navigation.navigate('algo');
+          }}>
+          <Card.Title
+            title={item.title}
+            subtitle={item.desc}
+            titleStyle={{fontFamily: FONTS.p_regular}}
+            subtitleStyle={{fontFamily: FONTS.p_regular}}
+            left={LeftContent}
+            right={RightContent}
+          />
+          <Card.Content>
+            <Text variant="bodyMedium">
+              {'a basic sorting algorithm useful for easy purposes'}
             </Text>
-          </View>
-          <View style={{flexDirection: 'column', alignItems: 'center'}}>
-            <IconButton
-              icon="thought-bubble"
-              iconColor={theme.colors.onPrimary}
-              containerColor={theme.colors.primary}
-              size={20}
-              onPress={() => {
-                //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
-              }}
+            <SpacerV height={heightPercentageToDP(0.2)} />
+            <Icon
+              size={24}
+              color={theme.colors.primary}
+              source={'language-javascript'}
             />
-            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
-              1, 133K
-            </Text>
-          </View>
-          <View style={{flexDirection: 'column', alignItems: 'center'}}>
-            <IconButton
-              icon="bookmark"
-              iconColor={theme.colors.onPrimary}
-              containerColor={theme.colors.primary}
-              size={20}
-              onPress={() => {
-                //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
-              }}
-            />
-            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
-              5, 294K
-            </Text>
-          </View>
-          <View style={{flexDirection: 'column', alignItems: 'center'}}>
-            <IconButton
-              icon="share"
-              iconColor={theme.colors.onPrimary}
-              containerColor={theme.colors.primary}
-              size={20}
-              onPress={() => {
-                //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
-              }}
-            />
-            <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
-              5, 294K
-            </Text>
-          </View>
-        </Card.Actions>
-      </Card>
+          </Card.Content>
+          <Card.Actions>
+            <View style={{flexDirection: 'column', alignItems: 'center'}}>
+              <IconButton
+                icon="heart"
+                iconColor={theme.colors.onPrimary}
+                containerColor={theme.colors.primary}
+                size={20}
+                onPress={() => {
+                  //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+                }}
+              />
+              <Text
+                style={{fontFamily: FONTS.p_regular}}
+                variant={'labelSmall'}>
+                1, 2M
+              </Text>
+            </View>
+            <View style={{flexDirection: 'column', alignItems: 'center'}}>
+              <IconButton
+                icon="thought-bubble"
+                iconColor={theme.colors.onPrimary}
+                containerColor={theme.colors.primary}
+                size={20}
+                onPress={() => {
+                  //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+                }}
+              />
+              <Text
+                style={{fontFamily: FONTS.p_regular}}
+                variant={'labelSmall'}>
+                1, 133K
+              </Text>
+            </View>
+            <View style={{flexDirection: 'column', alignItems: 'center'}}>
+              <IconButton
+                icon="bookmark"
+                iconColor={theme.colors.onPrimary}
+                containerColor={theme.colors.primary}
+                size={20}
+                onPress={() => {
+                  //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+                }}
+              />
+              <Text
+                style={{fontFamily: FONTS.p_regular}}
+                variant={'labelSmall'}>
+                5, 294K
+              </Text>
+            </View>
+            <View style={{flexDirection: 'column', alignItems: 'center'}}>
+              <IconButton
+                icon="share"
+                iconColor={theme.colors.onPrimary}
+                containerColor={theme.colors.primary}
+                size={20}
+                onPress={() => {
+                  //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+                }}
+              />
+              <Text
+                style={{fontFamily: FONTS.p_regular}}
+                variant={'labelSmall'}>
+                5, 294K
+              </Text>
+            </View>
+          </Card.Actions>
+        </Card>
       </Animated.View>
     );
   };
@@ -166,7 +186,7 @@ const Main: React.FC = () => {
       needsPaddingTop={false}
       avoidingView={false}
       needsPaddingBottom={false}>
-      <Appbar.Header>
+      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <SpacerH width={widthPercentageToDP(0.5)} />
         {/* TODO: if user doesn't have a profile picture, show Text Avatar, else show his profile picture*/}
         <Avatar.Text label={'XD'} size={34} />
@@ -176,9 +196,10 @@ const Main: React.FC = () => {
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
         <Tooltip title="Add">
-          <Appbar.Action icon="pencil-plus" onPress={() => {}} />
+          <Appbar.Action icon="pencil-plus" onPress={() => navigation.navigate('add-code')} />
         </Tooltip>
       </Appbar.Header>
+      <SpacerV height={heightPercentageToDP(0.25)} />
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder={'Search'}
@@ -204,7 +225,7 @@ const styles = StyleSheet.create({
   },
   gridView: {
     flex: 1,
-    marginTop: '1%',
+    marginTop: heightPercentageToDP(0.10),
   },
   itemContainer: {
     justifyContent: 'center',
