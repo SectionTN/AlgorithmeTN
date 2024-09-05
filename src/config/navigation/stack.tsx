@@ -22,6 +22,7 @@ import HomeRender from './bottom-navigation';
 import Settings from '../../screens/settings';
 import Algo from '../../screens/algo/algo.tsx';
 import AddCode from '../../screens/add-code.tsx';
+import WriteCode from '../../screens/write-code.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -45,7 +46,7 @@ const StackNavigator: React.FC = () => {
         }
         routeNameRef.current = currentRouteName;
       }}>
-      <Stack.Navigator initialRouteName={'home'}>
+      <Stack.Navigator initialRouteName={'add-code'}>
         <Stack.Screen
           name={'splash'}
           component={Splash}
@@ -94,6 +95,11 @@ const StackNavigator: React.FC = () => {
             gestureEnabled: false,
             headerShown: false,
           }}
+        />
+        <Stack.Screen
+          name={'write-code'}
+          component={WriteCode}
+          options={{gestureEnabled: false, headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

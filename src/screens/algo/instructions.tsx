@@ -7,6 +7,7 @@ import SpacerV from '../../components/spacer/spacerv.tsx';
 import {fontValue, heightPercentageToDP} from '../../config/dimensions.ts';
 import NumberedList from '../../components/numbered-list/numbered-list.tsx';
 import {FONTS} from '../../config/misc.ts';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const Instructions: React.FC = () => {
   const sortingSteps = [
@@ -23,16 +24,18 @@ const Instructions: React.FC = () => {
       needsPaddingBottom={false}
       avoidingView={false}>
       <SpacerV height={heightPercentageToDP(0.25)} />
-      <Animated.View style={styles.containerStyle}>
-        <Card mode={'contained'}>
-          <Card.Title title={'How it works:'} />
-          <Card.Content>
-            <NumberedList steps={sortingSteps} />
-          </Card.Content>
-        </Card>
-        <View style={{flex: 1}} />
-        <Text style={styles.bottomText}>Enjoy coding!</Text>
-      </Animated.View>
+      <ScrollView>
+        <Animated.View style={styles.containerStyle}>
+          <Card mode={'contained'}>
+            <Card.Title title={'How it works:'} />
+            <Card.Content>
+              <NumberedList steps={sortingSteps} />
+            </Card.Content>
+          </Card>
+          <View style={{flex: 1}} />
+        </Animated.View>
+      </ScrollView>
+      <Text style={styles.bottomText}>Enjoy coding!</Text>
       <SpacerV height={heightPercentageToDP(0.25)} />
     </BaseView>
   );

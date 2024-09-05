@@ -30,6 +30,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const Profile: React.FC = () => {
   const theme = useTheme();
@@ -76,7 +77,7 @@ const Profile: React.FC = () => {
           </Menu>
         </Tooltip>
       </Appbar.Header>
-      <Animated.ScrollView
+      <ScrollView
         nestedScrollEnabled={true}
         alwaysBounceVertical={true}>
         <Animated.View
@@ -248,7 +249,7 @@ const Profile: React.FC = () => {
           </Card>
           <SpacerV height={heightPercentageToDP(0.25)} />
         </Animated.View>
-      </Animated.ScrollView>
+      </ScrollView>
     </BaseView>
   );
 };

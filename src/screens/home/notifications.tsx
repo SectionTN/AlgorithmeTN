@@ -4,13 +4,7 @@ import {Appbar, Avatar, Card, Text, useTheme} from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {widthPercentageToDP} from '../../config/dimensions.ts';
-import {
-  Dimensions,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  View,
-} from 'react-native';
+import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
 import {FlatGrid} from 'react-native-super-grid';
 
 const LeftContent = () => (
