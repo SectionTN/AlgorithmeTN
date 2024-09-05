@@ -32,6 +32,7 @@ import {
   LogOutIcon,
   ShieldIcon,
 } from '../components/card-icons/card-icons.tsx';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const Settings: React.FC = () => {
   const navigation =
@@ -57,9 +58,7 @@ const Settings: React.FC = () => {
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
       </Appbar.Header>
-      <Animated.ScrollView
-        nestedScrollEnabled={true}
-        alwaysBounceVertical={true}>
+      <ScrollView nestedScrollEnabled={true} alwaysBounceVertical={true}>
         <Animated.View
           entering={BounceInUp}
           exiting={BounceOutUp}
@@ -183,7 +182,7 @@ const Settings: React.FC = () => {
           </Card>
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.5)} />
-      </Animated.ScrollView>
+      </ScrollView>
     </BaseView>
   );
 };
