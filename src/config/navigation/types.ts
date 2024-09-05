@@ -6,7 +6,8 @@ type routeNamesType =
   | 'home'
   | 'settings'
   | 'algo'
-  | 'add-code';
+  | 'add-code'
+  | 'write-code';
 
 type RootStackParamList = {
   [key in routeNamesType]: object | undefined;
@@ -18,7 +19,34 @@ type RootStackParamList = {
   home: {} | undefined;
   settings: {} | undefined;
   algo: {} | undefined;
-  'add-code': {} | undefined;
+  'add-code':
+    | {
+        language?:
+          | 'algorithm'
+          | 'javascript'
+          | 'python'
+          | 'html5'
+          | 'css3'
+          | 'php'
+          | 'sql'
+          | 'none';
+        codeValue: string;
+      }
+    | undefined;
+  'write-code':
+    | {
+        language:
+          | 'algorithm'
+          | 'javascript'
+          | 'python'
+          | 'html5'
+          | 'css3'
+          | 'php'
+          | 'sql'
+          | 'none';
+        codeValue: string;
+      }
+    | undefined;
 };
 
 export type {routeNamesType, RootStackParamList};
