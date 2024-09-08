@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {StatusBar, StyleSheet} from 'react-native';
-import BaseView from '../components/baseview/baseview.tsx';
+import BaseView from '../../components/baseview/baseview.tsx';
 import {
   Appbar,
   Avatar,
@@ -9,20 +9,19 @@ import {
   Tooltip,
   useTheme,
 } from 'react-native-paper';
-import {FONTS} from '../config/misc.ts';
+import {FONTS} from '../../config/misc.ts';
 import Animated, {
   BounceInDown,
   BounceInUp,
   BounceOutDown,
   BounceOutUp,
 } from 'react-native-reanimated';
-import {fontValue, heightPercentageToDP} from '../config/dimensions.ts';
-import SpacerV from '../components/spacer/spacerv.tsx';
-import {RootStackParamList} from '../config/navigation/types.ts';
+import {fontValue, heightPercentageToDP} from '../../config/dimensions.ts';
+import SpacerV from '../../components/spacer/spacerv.tsx';
+import {RootStackParamList} from '../../config/navigation/types.ts';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {
-  ActiveIcon,
   AtIcon,
   BugReportIcon,
   DarkModeIcon,
@@ -31,7 +30,7 @@ import {
   HelpIcon,
   LogOutIcon,
   ShieldIcon,
-} from '../components/card-icons/card-icons.tsx';
+} from '../../components/card-icons/card-icons.tsx';
 import {ScrollView} from 'react-native-gesture-handler';
 
 const Settings: React.FC = () => {
@@ -66,7 +65,7 @@ const Settings: React.FC = () => {
           <Avatar.Image
             size={85}
             source={{
-              uri: 'https://api.dicebear.com/9.x/adventurer/png?seed=Garfield',
+              uri: 'https://avatars.githubusercontent.com/u/73752904?s=400&u=4e326f643d19b525a0f17c25b80d911093d150cd&v=4',
             }}
           />
           <Text
@@ -92,7 +91,7 @@ const Settings: React.FC = () => {
               numberOfLines={1}
               style={[styles.bioText, {color: theme.colors.onBackground}]}
               onPress={() => {}}>
-              {'yes, as you can see, my hair is green!'}
+              {"we're oscar mike"}
             </Text>
           )}
         </Animated.View>
@@ -103,7 +102,7 @@ const Settings: React.FC = () => {
           style={{paddingLeft: '2%', paddingRight: '2%'}}>
           <Text variant={'titleMedium'}>Miscellaneous</Text>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'}>
+          <Card mode={'contained'} onPress={() => navigation.navigate('dark-mode')}>
             <Card.Title
               title={'Dark Mode'}
               subtitle={'Off'}
@@ -113,14 +112,6 @@ const Settings: React.FC = () => {
           <SpacerV height={heightPercentageToDP(0.15)} />
           <Text variant={'titleMedium'}>Account</Text>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'}>
-            <Card.Title
-              title={'Edit Name'}
-              titleStyle={{paddingTop: '1%'}}
-              left={EditNameIcon}
-            />
-          </Card>
-          <SpacerV height={heightPercentageToDP(0.125)} />
           <Card mode={'contained'}>
             <Card.Title
               title={'Security and Privacy'}
@@ -139,15 +130,23 @@ const Settings: React.FC = () => {
           <SpacerV height={heightPercentageToDP(0.15)} />
           <Text variant={'titleMedium'}>Profile</Text>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'}>
+          {/*<Card mode={'contained'}>
             <Card.Title
               title={'Active Status'}
               subtitle={'On'}
               left={ActiveIcon}
             />
           </Card>
+          <SpacerV height={heightPercentageToDP(0.15)} />*/}
+          <Card mode={'contained'} onPress={() => navigation.navigate('edit-profile')}>
+            <Card.Title
+              title={'Edit Profile'}
+              titleStyle={{paddingTop: '1%'}}
+              left={EditNameIcon}
+            />
+          </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'}>
+          <Card onPress={() => navigation.navigate('edit-username')} mode={'contained'}>
             <Card.Title
               title={'Username'}
               subtitle={'SectionTN'}
