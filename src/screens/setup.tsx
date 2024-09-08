@@ -128,7 +128,7 @@ const Setup: React.FC = () => {
             paddingLeft: '2.5%',
           }}>
           {userPhoto ? (
-            <Avatar.Image size={65} source={{uri: userPhoto?.path}} />
+            <Avatar.Image size={67.5} source={{uri: userPhoto?.path}} />
           ) : (
             <View
               style={{
@@ -136,7 +136,7 @@ const Setup: React.FC = () => {
                 justifyContent: 'center',
                 overflow: 'hidden',
               }}>
-              <Avatar.Text label={returnNameLike()} />
+              <Avatar.Text size={67.5} label={returnNameLike()} />
             </View>
           )}
         </Pressable>
@@ -220,7 +220,8 @@ const Setup: React.FC = () => {
 const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
-    margin: widthPercentageToDP(4),
+    marginBottom: 32,
+    marginRight: 16,
     right: 0,
     bottom: 0,
   },
