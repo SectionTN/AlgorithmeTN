@@ -6,8 +6,9 @@
  * Copyright Rayen Sbai, 2024-2025.
  */
 
-import React from 'react';
+import React, {useRef} from 'react';
 import {
+  DefaultTheme,
   NavigationContainer,
   useNavigationContainerRef,
 } from '@react-navigation/native';
@@ -19,20 +20,36 @@ import Onboarding from '../../screens/onboarding';
 import Login from '../../screens/login';
 import Setup from '../../screens/setup';
 import HomeRender from './bottom-navigation';
-import Settings from '../../screens/settings';
+import Settings from '../../screens/settings/settings.tsx';
 import Algo from '../../screens/algo/algo.tsx';
 import AddCode from '../../screens/add-code.tsx';
 import WriteCode from '../../screens/write-code.tsx';
+import DarkMode from '../../screens/settings/dark-mode.tsx';
+import EditProfile from '../../screens/settings/edit-profile.tsx';
+import AddBio from '../../screens/settings/add-bio.tsx';
+import EditUsername from '../../screens/settings/edit-username.tsx';
+import {useTheme} from 'react-native-paper';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const StackNavigator: React.FC = () => {
-  const routeNameRef = React.useRef<string>();
+  const routeNameRef = useRef<string>();
   const navigationRef = useNavigationContainerRef();
+
+  const theme = useTheme();
+
+  const navigationTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: theme.colors.background,
+    },
+  };
 
   return (
     <NavigationContainer
       ref={navigationRef}
+      theme={navigationTheme}
       onReady={() => {
         routeNameRef.current = navigationRef?.current?.getCurrentRoute()?.name;
       }}
@@ -46,7 +63,7 @@ const StackNavigator: React.FC = () => {
         }
         routeNameRef.current = currentRouteName;
       }}>
-      <Stack.Navigator initialRouteName={'add-code'}>
+      <Stack.Navigator initialRouteName={'settings'}>
         <Stack.Screen
           name={'splash'}
           component={Splash}
@@ -99,6 +116,29 @@ const StackNavigator: React.FC = () => {
         <Stack.Screen
           name={'write-code'}
           component={WriteCode}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'dark-mode'}
+          component={DarkMode}
+          options={{
+            gestureEnabled: false,
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name={'edit-profile'}
+          component={EditProfile}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'add-bio'}
+          component={AddBio}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'edit-username'}
+          component={EditUsername}
           options={{gestureEnabled: false, headerShown: false}}
         />
       </Stack.Navigator>
