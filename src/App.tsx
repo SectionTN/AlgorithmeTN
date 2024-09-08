@@ -13,6 +13,8 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {useMaterial3Theme} from '@pchmn/expo-material3-theme';
 import {setup} from '@baronha/ting';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
+import i18n from './config/i18n/i18n.ts';
+import {I18nextProvider} from 'react-i18next';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -27,9 +29,6 @@ function App(): React.JSX.Element {
         : {...MD3LightTheme, colors: theme.light},
     [colorScheme, theme],
   );
-
-  console.log(theme.light);
-
   const toastInitOption = {
     toast: {
       messageColor: isDarkMode
@@ -55,7 +54,7 @@ function App(): React.JSX.Element {
 
   return (
     <>
-      <GestureHandlerRootView style={styles.GHRV}>
+      <PaperProvider theme={paperTheme}>
         <StatusBar
           backgroundColor={
             isDarkMode
@@ -66,12 +65,22 @@ function App(): React.JSX.Element {
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
           translucent={true}
         />
-        <PaperProvider theme={paperTheme}>
-          <BottomSheetModalProvider>
-            <StackNavigator />
-          </BottomSheetModalProvider>
-        </PaperProvider>
-      </GestureHandlerRootView>
+        <I18nextProvider i18n={i18n}>
+          <GestureHandlerRootView
+            style={[
+              styles.GHRV,
+              {
+                backgroundColor: isDarkMode
+                  ? theme.dark.background
+                  : theme.light.background,
+              },
+            ]}>
+            <BottomSheetModalProvider>
+              <StackNavigator />
+            </BottomSheetModalProvider>
+          </GestureHandlerRootView>
+        </I18nextProvider>
+      </PaperProvider>
     </>
   );
 }
