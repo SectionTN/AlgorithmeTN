@@ -7,7 +7,11 @@ type routeNamesType =
   | 'settings'
   | 'algo'
   | 'add-code'
-  | 'write-code';
+  | 'write-code'
+  | 'dark-mode'
+  | 'edit-profile'
+  | 'add-bio'
+  | 'edit-username';
 
 type RootStackParamList = {
   [key in routeNamesType]: object | undefined;
@@ -47,6 +51,10 @@ type RootStackParamList = {
         codeValue: string;
       }
     | undefined;
+  'dark-mode': {} | undefined;
+  'edit-profile': {} | undefined;
+  'add-bio': {} | undefined;
+  'edit-username': {} | undefined;
 };
 
 export type {routeNamesType, RootStackParamList};
