@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {StatusBar, StyleSheet} from 'react-native';
+import {BackHandler, StatusBar, StyleSheet} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -27,11 +27,14 @@ import {
   DarkModeIcon,
   EditNameIcon,
   HandshakeIcon,
-  HelpIcon, LanguageIcon,
+  HelpIcon,
+  LanguageIcon,
   LogOutIcon,
   ShieldIcon,
 } from '../../components/card-icons/card-icons.tsx';
 import {ScrollView} from 'react-native-gesture-handler';
+import {alert} from '@baronha/ting';
+import auth from '@react-native-firebase/auth';
 
 const Settings: React.FC = () => {
   const navigation =
@@ -124,7 +127,15 @@ const Settings: React.FC = () => {
           <SpacerV height={heightPercentageToDP(0.15)} />
           <Text variant={'titleMedium'}>Account</Text>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'}>
+          <Card
+            onPress={() =>
+              alert({
+                title: 'Coming Soon',
+                message: 'this feature will be available soon',
+                preset: 'none',
+              })
+            }
+            mode={'contained'}>
             <Card.Title
               title={'Security and Privacy'}
               titleStyle={{paddingTop: '1%'}}
@@ -132,7 +143,23 @@ const Settings: React.FC = () => {
             />
           </Card>
           <SpacerV height={heightPercentageToDP(0.125)} />
-          <Card mode={'contained'}>
+          <Card
+            onPress={() => {
+              alert({
+                title: 'Logging Out',
+                preset: 'spinner',
+              });
+              auth()
+                .signOut()
+                .then(() => {
+                  navigation.navigate('login');
+                })
+                .catch(error => {
+                  console.error(error);
+                  BackHandler.exitApp();
+                });
+            }}
+            mode={'contained'}>
             <Card.Title
               title={'Log out'}
               titleStyle={{paddingTop: '1%'}}
@@ -180,7 +207,9 @@ const Settings: React.FC = () => {
             />
           </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card onPress={() => navigation.navigate('bug-report')} mode={'contained'}>
+          <Card
+            onPress={() => navigation.navigate('bug-report')}
+            mode={'contained'}>
             <Card.Title
               title={'Bug Report'}
               titleStyle={{paddingTop: '1%'}}

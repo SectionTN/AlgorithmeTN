@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,7 @@ import {
   Dimensions,
   Animated,
   ImageRequireSource,
+  StatusBar,
 } from 'react-native';
 import type {PagerViewOnPageScrollEventData} from 'react-native-pager-view';
 import PagerView from 'react-native-pager-view';
@@ -15,6 +16,9 @@ import {Button, MD3Theme, useTheme} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {storage} from '../config/storage/mmkv.ts';
+import auth from '@react-native-firebase/auth';
+import {alert} from '@baronha/ting';
 
 const ViewPagerData = [
   {
@@ -206,7 +210,13 @@ const Item = ({
           <Button
             mode="contained"
             onPress={() => {
-              navigation.navigate('login');
+              setViewPagerCompleted();
+              alert({title: 'Please Wait', preset: 'spinner'});
+              if (auth()?.currentUser !== null) {
+                navigation.navigate('home');
+              } else {
+                navigation.navigate('login');
+              }
             }}>
             Continue
           </Button>
@@ -281,6 +291,10 @@ const Pagination = ({
 
 const AnimatedPagerView = Animated.createAnimatedComponent(PagerView);
 
+const setViewPagerCompleted = () => {
+  storage?.set('onboardingComplete', true);
+};
+
 const Onboarding: React.FC = () => {
   const scrollOffsetAnimatedValue = React.useRef(new Animated.Value(0)).current;
   const positionAnimatedValue = React.useRef(new Animated.Value(0)).current;
@@ -291,6 +305,10 @@ const Onboarding: React.FC = () => {
     flex: 1,
     backgroundColor: bgColor,
   });
+
+  useEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.background);
+  }, [theme.colors.background]);
 
   return (
     <View style={container(theme.colors.background)}>

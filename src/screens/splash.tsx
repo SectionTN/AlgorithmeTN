@@ -20,6 +20,8 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import BaseView from '../components/baseview/baseview.tsx';
 import {useTranslation} from 'react-i18next';
+import {useMMKVBoolean} from 'react-native-mmkv';
+import auth from '@react-native-firebase/auth';
 
 const Splash: React.FC = () => {
   const navigation =
@@ -27,9 +29,17 @@ const Splash: React.FC = () => {
   const theme = useTheme();
   const {t} = useTranslation();
 
+  const [onboardingComplete] = useMMKVBoolean('onboardingComplete');
+
   useEffect(() => {
     setTimeout(() => {
-      navigation.navigate('home');
+      if (auth().currentUser !== null) {
+        navigation.navigate('home');
+      } else if (onboardingComplete) {
+        navigation.navigate('login');
+      } else {
+        navigation.navigate('onboarding');
+      }
     }, 1000);
   }, [navigation]);
 
