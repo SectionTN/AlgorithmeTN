@@ -11,7 +11,9 @@ type routeNamesType =
   | 'dark-mode'
   | 'edit-profile'
   | 'add-bio'
-  | 'edit-username';
+  | 'edit-username'
+  | 'bug-report'
+  | 'change-language';
 
 type RootStackParamList = {
   [key in routeNamesType]: object | undefined;
@@ -55,6 +57,8 @@ type RootStackParamList = {
   'edit-profile': {} | undefined;
   'add-bio': {} | undefined;
   'edit-username': {} | undefined;
+  'bug-report': {} | undefined;
+  'change-language': {} | undefined;
 };
 
 export type {routeNamesType, RootStackParamList};

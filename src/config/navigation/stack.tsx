@@ -29,6 +29,8 @@ import EditProfile from '../../screens/settings/edit-profile.tsx';
 import AddBio from '../../screens/settings/add-bio.tsx';
 import EditUsername from '../../screens/settings/edit-username.tsx';
 import {useTheme} from 'react-native-paper';
+import BugReport from '../../screens/settings/bug-report.tsx';
+import ChangeLanguage from '../../screens/settings/change-language.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -139,6 +141,16 @@ const StackNavigator: React.FC = () => {
         <Stack.Screen
           name={'edit-username'}
           component={EditUsername}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'bug-report'}
+          component={BugReport}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'change-language'}
+          component={ChangeLanguage}
           options={{gestureEnabled: false, headerShown: false}}
         />
       </Stack.Navigator>
