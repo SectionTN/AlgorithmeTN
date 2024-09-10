@@ -18,13 +18,13 @@ const languageDetector: LanguageDetectorModule = {
 const resources = {
   en: {
     translation: {
-      welcome: 'Welcome to Algorithme Tunisie',
+      welcome: 'Welcome to AlgoTN',
       slogan: 'Work hard and find your drink',
     },
   },
   fr: {
     translation: {
-      welcome: 'Bienvenue en Algorithme Tunisie',
+      welcome: 'Bienvenue en AlgoTN',
       slogan: 'Travaillez dur et trouvez votre boisson',
     },
   },
