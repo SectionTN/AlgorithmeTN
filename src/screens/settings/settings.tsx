@@ -11,10 +11,10 @@ import {
 } from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
 import Animated, {
-  BounceInDown,
   BounceInUp,
-  BounceOutDown,
   BounceOutUp,
+  FadeInUp,
+  FadeOutDown,
 } from 'react-native-reanimated';
 import {fontValue, heightPercentageToDP} from '../../config/dimensions.ts';
 import SpacerV from '../../components/spacer/spacerv.tsx';
@@ -27,7 +27,7 @@ import {
   DarkModeIcon,
   EditNameIcon,
   HandshakeIcon,
-  HelpIcon,
+  HelpIcon, LanguageIcon,
   LogOutIcon,
   ShieldIcon,
 } from '../../components/card-icons/card-icons.tsx';
@@ -97,16 +97,28 @@ const Settings: React.FC = () => {
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.25)} />
         <Animated.View
-          entering={BounceInDown}
-          exiting={BounceOutDown}
+          entering={FadeInUp}
+          exiting={FadeOutDown}
           style={{paddingLeft: '2%', paddingRight: '2%'}}>
           <Text variant={'titleMedium'}>Miscellaneous</Text>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'} onPress={() => navigation.navigate('dark-mode')}>
+          <Card
+            mode={'contained'}
+            onPress={() => navigation.navigate('dark-mode')}>
             <Card.Title
               title={'Dark Mode'}
               subtitle={'Off'}
               left={DarkModeIcon}
+            />
+          </Card>
+          <SpacerV height={heightPercentageToDP(0.15)} />
+          <Card
+            mode={'contained'}
+            onPress={() => navigation.navigate('change-language')}>
+            <Card.Title
+              title={'Language'}
+              subtitle={'English'}
+              left={LanguageIcon}
             />
           </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />
@@ -138,7 +150,9 @@ const Settings: React.FC = () => {
             />
           </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />*/}
-          <Card mode={'contained'} onPress={() => navigation.navigate('edit-profile')}>
+          <Card
+            mode={'contained'}
+            onPress={() => navigation.navigate('edit-profile')}>
             <Card.Title
               title={'Edit Profile'}
               titleStyle={{paddingTop: '1%'}}
@@ -146,7 +160,9 @@ const Settings: React.FC = () => {
             />
           </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card onPress={() => navigation.navigate('edit-username')} mode={'contained'}>
+          <Card
+            onPress={() => navigation.navigate('edit-username')}
+            mode={'contained'}>
             <Card.Title
               title={'Username'}
               subtitle={'SectionTN'}
@@ -164,7 +180,7 @@ const Settings: React.FC = () => {
             />
           </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'}>
+          <Card onPress={() => navigation.navigate('bug-report')} mode={'contained'}>
             <Card.Title
               title={'Bug Report'}
               titleStyle={{paddingTop: '1%'}}

@@ -20,7 +20,7 @@ import {AvatarPicker, openImagePicker, PhotoType} from '../../config/image-picke
 import {BottomSheetModal, useBottomSheetModal} from '@gorhom/bottom-sheet';
 import {alert} from '@baronha/ting';
 import {isEmpty} from 'lodash';
-import Animated, {BounceIn, BounceOut, FadeInUp, FadeOutDown, FadeOutUp} from 'react-native-reanimated';
+import Animated, {FadeInUp, FadeOutDown} from 'react-native-reanimated';
 import {openCamera} from 'react-native-image-crop-picker';
 import ImagePickerActionSheet from '../../components/modals/image-picker-action-sheet.tsx';
 
@@ -149,7 +149,7 @@ const EditProfile: React.FC = () => {
           onChangeText={onLastnameTextChange}
         />
       </Animated.View>
-      <Animated.View entering={FadeInUp} exiting={FadeOutUp} style={styles.instruction}>
+      <Animated.View entering={FadeInUp} exiting={FadeOutDown} style={styles.instruction}>
         <HelperText
           padding={'none'}
           type="info"
