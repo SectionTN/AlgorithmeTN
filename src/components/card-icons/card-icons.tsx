@@ -1,13 +1,15 @@
 import React from 'react';
 import { Avatar } from 'react-native-paper';
 
-// Define the expected props for the Card.Title left prop
 type LeftComponentProps = {
   size: number;
 };
 
 const DarkModeIcon = ({ size }: LeftComponentProps) => (
   <Avatar.Icon size={size} icon="weather-night" />
+);
+const LanguageIcon = ({ size }: LeftComponentProps) => (
+  <Avatar.Icon size={size} icon="translate" />
 );
 const EditNameIcon = ({ size }: LeftComponentProps) => (
   <Avatar.Icon size={size} icon="pencil-outline" />
@@ -44,4 +46,5 @@ export {
   BugReportIcon,
   HelpIcon,
   HandshakeIcon,
+  LanguageIcon,
 };
