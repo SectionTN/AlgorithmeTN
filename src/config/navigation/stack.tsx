@@ -65,7 +65,7 @@ const StackNavigator: React.FC = () => {
         }
         routeNameRef.current = currentRouteName;
       }}>
-      <Stack.Navigator initialRouteName={'settings'}>
+      <Stack.Navigator initialRouteName={'splash'}>
         <Stack.Screen
           name={'splash'}
           component={Splash}

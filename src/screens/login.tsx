@@ -2,9 +2,9 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
   EmitterSubscription,
   Keyboard,
-  Linking, StatusBar,
+  Linking,
+  StatusBar,
   StyleSheet,
-  useColorScheme,
   View,
 } from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
@@ -25,12 +25,25 @@ import {
 import {COLORS, FONTS} from '../config/misc.ts';
 import SpacerV from '../components/spacer/spacerv.tsx';
 import {useBackHandler} from '@react-native-community/hooks';
+import Animated, {
+  FadeInDown,
+  FadeInUp,
+  SlideInLeft,
+  SlideOutRight,
+} from 'react-native-reanimated';
+import auth from '@react-native-firebase/auth';
+import {alert} from '@baronha/ting';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../config/navigation/types.ts';
 
 const Login: React.FC = () => {
   /**
    * Theme
    */
-  const isDarkMode = useColorScheme() === 'light';
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   const theme = useTheme();
 
   /**
@@ -100,6 +113,107 @@ const Login: React.FC = () => {
     StatusBar.setBackgroundColor(theme.colors.background);
   }, [theme.colors.background]);
 
+  function onMainButtonPress() {
+    alert({title: 'Please Wait', preset: 'spinner'});
+    switch (currentMode) {
+      case 'login':
+        if (email.trim().length < 3 || password.trim().length < 3) {
+          return alert({
+            title: 'Incorrect Details',
+            message: "Please check out what you've entered",
+            preset: 'error',
+          });
+        }
+        if (password.trim() !== confirmPassword.trim()) {
+          return alert({
+            title: 'Incorrect Details',
+            message: "Your passwords doesn't match",
+            preset: 'error',
+          });
+        }
+        auth()
+          .signInWithEmailAndPassword(email, password)
+          .then(() => {
+            navigation.navigate('home');
+          })
+          .catch(error => {
+            let errorMessage = '';
+            switch (error.code) {
+              case 'auth/invalid-email':
+                errorMessage = 'The email address is not valid.';
+                break;
+              case 'auth/user-disabled':
+                errorMessage =
+                  'The user corresponding to the given email has been disabled.';
+                break;
+              case 'auth/user-not-found':
+                errorMessage =
+                  'There is no user corresponding to the given email.';
+                break;
+              case 'auth/wrong-password':
+                errorMessage = 'The password is invalid for the given email.';
+                break;
+              case 'auth/invalid-credential':
+                errorMessage = 'The credential is invalid.';
+                break;
+              default:
+                errorMessage = 'An unknown error occurred.';
+                break;
+            }
+            alert({title: 'Error', message: errorMessage, preset: 'error'});
+          });
+        break;
+      case 'signup':
+        if (email.trim().length < 3 || password.trim().length < 3) {
+          return alert({
+            title: 'Incorrect Details',
+            message: "Please check out what you've entered",
+            preset: 'error',
+          });
+        }
+        auth()
+          .createUserWithEmailAndPassword(email, password)
+          .then(() => {
+            navigation.navigate('setup');
+          })
+          .catch(error => {
+            let errorMessage = '';
+            switch (error.code) {
+              case 'auth/email-already-in-use':
+                errorMessage =
+                  'There already exists an account with the given email address.';
+                break;
+              case 'auth/invalid-email':
+                errorMessage = 'The email address is not valid.';
+                break;
+              case 'auth/operation-not-allowed':
+                errorMessage =
+                  'Email & password accounts are not enabled, at the moment.';
+                break;
+              case 'auth/weak-password':
+                errorMessage = 'The password is not strong enough.';
+                break;
+              default:
+                errorMessage = 'An unknown error occurred.';
+                break;
+            }
+            alert({
+              title: 'Error',
+              message: errorMessage,
+              preset: 'error',
+            });
+          });
+        break;
+      default:
+        alert({
+          title: 'Error',
+          message: 'Invalid operation mode.',
+          preset: 'error',
+        });
+        break;
+    }
+  }
+
   return (
     <>
       <BaseView
@@ -117,7 +231,10 @@ const Login: React.FC = () => {
             <Appbar.Action icon="dots-vertical" onPress={() => {}} />
           </Tooltip>
         </Appbar.Header>
-        <View style={styles.top_bar}>
+        <Animated.View
+          entering={SlideInLeft}
+          exiting={SlideOutRight}
+          style={styles.top_bar}>
           <Text style={[styles.top_text, {color: theme.colors.primary}]}>
             {currentMode === 'login'
               ? 'Welcome Back'
@@ -140,10 +257,13 @@ const Login: React.FC = () => {
               ? 'and start your journey here with us'
               : 'we gonna help you restore your account it'}
           </Text>
-        </View>
+        </Animated.View>
         <SpacerV height={heightPercentageToDP(0.1)} />
         <View style={{flex: 1}}>{/* stub view */}</View>
-        <View style={{paddingLeft: '5%', paddingRight: '5%'}}>
+        <Animated.View
+          entering={FadeInUp}
+          exiting={FadeInDown}
+          style={{paddingLeft: '5%', paddingRight: '5%'}}>
           <TextInput
             mode={'outlined'}
             value={email}
@@ -161,7 +281,7 @@ const Login: React.FC = () => {
                 value={password}
                 label={'Password'}
                 onChangeText={text => {
-                  setPassword(text);
+                  setPassword(text.trim());
                 }}
                 secureTextEntry={!passwordVisible}
                 style={{
@@ -184,7 +304,7 @@ const Login: React.FC = () => {
                 value={confirmPassword}
                 label={'Confirm Password'}
                 onChangeText={text => {
-                  setConfirmPassword(text);
+                  setConfirmPassword(text.trim());
                 }}
                 secureTextEntry={!passwordVisible}
                 style={{
@@ -200,7 +320,7 @@ const Login: React.FC = () => {
             </>
           )}
           <SpacerV height={heightPercentageToDP(0.5)} />
-          <Button mode="contained" onPress={() => {}}>
+          <Button mode="contained" onPress={onMainButtonPress}>
             {currentMode === 'login'
               ? 'Log In'
               : currentMode === 'signup'
@@ -233,7 +353,7 @@ const Login: React.FC = () => {
           ) : (
             <></>
           )}
-        </View>
+        </Animated.View>
         <View style={{flex: 1}}>{/* stub view */}</View>
         {currentMode === 'login' && (
           <>
