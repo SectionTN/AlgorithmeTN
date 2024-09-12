@@ -24,6 +24,8 @@ import SpacerV from '../../components/spacer/spacerv.tsx';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
+import auth from '@react-native-firebase/auth';
+
 
 const LeftContent = (props: any) => <Avatar.Icon {...props} icon="code-tags" />;
 
@@ -36,6 +38,8 @@ const Main: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const windowWidth = Dimensions.get('window').width;
+
+  const [photoUrl, setPhotoUrl] = useState('XD');
 
   const RightContent = (props: any) => (
     <>
@@ -82,6 +86,10 @@ const Main: React.FC = () => {
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
+
+  useEffect(() => {
+    setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
+  }, []);
 
   const renderGridItem = ({item}) => {
     return (
@@ -188,15 +196,21 @@ const Main: React.FC = () => {
       needsPaddingBottom={false}>
       <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <SpacerH width={widthPercentageToDP(0.5)} />
-        {/* TODO: if user doesn't have a profile picture, show Text Avatar, else show his profile picture*/}
-        <Avatar.Text label={'XD'} size={34} />
+        {photoUrl && photoUrl.length === 2 ? (
+          <Avatar.Text label={photoUrl} size={34} />
+        ) : (
+          <Avatar.Image source={{uri: photoUrl}} size={34} />
+        )}
         <SpacerH width={widthPercentageToDP(0.5)} />
         <Appbar.Content
           title="Home"
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
         <Tooltip title="Add">
-          <Appbar.Action icon="pencil-plus" onPress={() => navigation.navigate('add-code')} />
+          <Appbar.Action
+            icon="pencil-plus"
+            onPress={() => navigation.navigate('add-code')}
+          />
         </Tooltip>
       </Appbar.Header>
       <SpacerV height={heightPercentageToDP(0.25)} />
@@ -207,6 +221,7 @@ const Main: React.FC = () => {
           onChangeText={setSearchQuery}
         />
       </View>
+      <SpacerV height={heightPercentageToDP(0.10)} />
       <FlatGrid
         itemDimension={windowWidth}
         data={items}
@@ -225,7 +240,7 @@ const styles = StyleSheet.create({
   },
   gridView: {
     flex: 1,
-    marginTop: heightPercentageToDP(0.10),
+    marginTop: heightPercentageToDP(0.1),
   },
   itemContainer: {
     justifyContent: 'center',
