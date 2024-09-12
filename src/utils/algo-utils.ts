@@ -24,4 +24,24 @@ const customCapitalize = (language: string): string => {
   }
 };
 
-export {capitalizeFirstLetter, customCapitalize};
+function generateRandomString(length: number) {
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
+}
+
+const lowerToUppercase = (text: string): string => {
+  if (!text || text?.length < 1) {
+    return '';
+  }
+  return (text[0]?.toUpperCase() + text?.substring(1))?.trim();
+};
+
+export {capitalizeFirstLetter, customCapitalize, generateRandomString, lowerToUppercase};
