@@ -3265,6 +3265,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@notifee/react-native@npm:^7.8.2":
+  version: 7.8.2
+  resolution: "@notifee/react-native@npm:7.8.2"
+  peerDependencies:
+    react-native: "*"
+  checksum: f3b3ea116653d4dc7b50f8124898f9e22567ae30306225841d2057bc9ce40d451b15436dff3e60e0e042ffd7f34338054b202cd2dc61c5dc5eab7676b625b9f9
+  languageName: node
+  linkType: hard
+
 "@npmcli/agent@npm:^2.0.0":
   version: 2.2.2
   resolution: "@npmcli/agent@npm:2.2.2"
@@ -3654,12 +3663,40 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-firebase/crashlytics@npm:^20.4.0":
+  version: 20.4.0
+  resolution: "@react-native-firebase/crashlytics@npm:20.4.0"
+  dependencies:
+    stacktrace-js: ^2.0.2
+  peerDependencies:
+    "@react-native-firebase/app": 20.4.0
+    expo: ">=47.0.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 697928e974f06ff46d775443768cce7a968fa3b1a5660ed84f217b8ebba10eeb45d21b98ea547a3aa9d0acbb6cb1727d3e833f0db0740c83f03568d4a7d19d35
+  languageName: node
+  linkType: hard
+
 "@react-native-firebase/firestore@npm:^20.4.0":
   version: 20.4.0
   resolution: "@react-native-firebase/firestore@npm:20.4.0"
   peerDependencies:
     "@react-native-firebase/app": 20.4.0
   checksum: 7f9eb0905f265357eff6cc05ac3880eaffbadbe798eb9b520d834350e819e5a6fc67ae55dad9b6f14a981a204805ff080bd81afa2ef8e95e69a1e18a3fd5574d
+  languageName: node
+  linkType: hard
+
+"@react-native-firebase/perf@npm:^20.5.0":
+  version: 20.5.0
+  resolution: "@react-native-firebase/perf@npm:20.5.0"
+  peerDependencies:
+    "@react-native-firebase/app": 20.5.0
+    expo: ">=47.0.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 0dac0a5efb0fe87c9593e36f6fdf66a180531e454a8c29749df1ac9047c46c711412b871def95b942d1014bff74215db4269b2c37994ebedc5f9766404216c10
   languageName: node
   linkType: hard
 
@@ -4221,6 +4258,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/crypto-js@npm:^4.2.2":
+  version: 4.2.2
+  resolution: "@types/crypto-js@npm:4.2.2"
+  checksum: 727daa0d2db35f0abefbab865c23213b6ee6a270e27e177939bbe4b70d1e84c2202d9fac4ea84859c4b4d49a4ee50f948f601327a39b69ec013288018ba07ca5
+  languageName: node
+  linkType: hard
+
 "@types/graceful-fs@npm:^4.1.3":
   version: 4.1.9
   resolution: "@types/graceful-fs@npm:4.1.9"
@@ -4720,13 +4764,16 @@ __metadata:
     "@babel/runtime": ^7.20.0
     "@baronha/ting": ^1.2.2
     "@gorhom/bottom-sheet": ^5.0.0-alpha.11
+    "@notifee/react-native": ^7.8.2
     "@pchmn/expo-material3-theme": ^1.3.2
     "@react-native-clipboard/clipboard": ^1.14.1
     "@react-native-community/hooks": ^3.0.0
     "@react-native-community/netinfo": ^11.3.2
     "@react-native-firebase/app": ^20.4.0
     "@react-native-firebase/auth": ^20.4.0
+    "@react-native-firebase/crashlytics": ^20.4.0
     "@react-native-firebase/firestore": ^20.4.0
+    "@react-native-firebase/perf": ^20.5.0
     "@react-native-firebase/storage": ^20.4.0
     "@react-native/babel-preset": 0.75.2
     "@react-native/eslint-config": 0.75.2
@@ -4735,10 +4782,12 @@ __metadata:
     "@react-navigation/native": ^7.0.0-rc.18
     "@react-navigation/native-stack": ^7.0.0-rc.25
     "@rnx-kit/align-deps": ^2.5.3
+    "@types/crypto-js": ^4.2.2
     "@types/lodash": ^4.17.7
     "@types/react": ^18.2.6
     "@types/react-test-renderer": ^18.0.0
     babel-jest: ^29.6.3
+    crypto-js: ^4.2.0
     eslint: ^8.19.0
     expo: ^51.0.32
     i18next: ^23.14.0
@@ -4746,18 +4795,22 @@ __metadata:
     intl-pluralrules: ^2.0.1
     jest: ^29.6.3
     lodash: ^4.17.21
+    moment: ^2.30.1
     patch-package: ^8.0.0
     postinstall-postinstall: ^2.1.0
     prettier: 2.8.8
     react: 18.3.1
     react-i18next: ^15.0.1
     react-native: 0.75.2
+    react-native-file-access: ^3.1.0
     react-native-gesture-handler: ^2.18.1
     react-native-image-crop-picker: ^0.41.2
     react-native-localize: ^3.2.1
     react-native-mmkv: ^3.0.2
+    react-native-onesignal: ^5.2.4
     react-native-pager-view: ^6.4.1
     react-native-paper: ^5.12.5
+    react-native-randombytes: ^3.6.1
     react-native-reanimated: ^3.15.0
     react-native-safe-area-context: ^4.10.9
     react-native-screens: ^3.34.0
@@ -5269,7 +5322,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"base64-js@npm:^1.2.3, base64-js@npm:^1.3.1, base64-js@npm:^1.5.1":
+"base64-js@npm:^1.0.2, base64-js@npm:^1.2.3, base64-js@npm:^1.3.1, base64-js@npm:^1.5.1":
   version: 1.5.1
   resolution: "base64-js@npm:1.5.1"
   checksum: 669632eb3745404c2f822a18fc3a0122d2f9a7a13f7fb8b5823ee19d1d2ff9ee5b52c53367176ea4ad093c332fd5ab4bd0ebae5a8e27917a4105a4cfc86b1005
@@ -5409,6 +5462,17 @@ __metadata:
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
   checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
+  languageName: node
+  linkType: hard
+
+"buffer@npm:^4.9.1":
+  version: 4.9.2
+  resolution: "buffer@npm:4.9.2"
+  dependencies:
+    base64-js: ^1.0.2
+    ieee754: ^1.1.4
+    isarray: ^1.0.0
+  checksum: 8801bc1ba08539f3be70eee307a8b9db3d40f6afbfd3cf623ab7ef41dffff1d0a31de0addbe1e66e0ca5f7193eeb667bfb1ecad3647f8f1b0750de07c13295c3
   languageName: node
   linkType: hard
 
@@ -6012,6 +6076,13 @@ __metadata:
   version: 0.0.2
   resolution: "crypt@npm:0.0.2"
   checksum: baf4c7bbe05df656ec230018af8cf7dbe8c14b36b98726939cef008d473f6fe7a4fad906cfea4062c93af516f1550a3f43ceb4d6615329612c6511378ed9fe34
+  languageName: node
+  linkType: hard
+
+"crypto-js@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "crypto-js@npm:4.2.0"
+  checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
   languageName: node
   linkType: hard
 
@@ -8124,7 +8195,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ieee754@npm:^1.1.13":
+"ieee754@npm:^1.1.13, ieee754@npm:^1.1.4":
   version: 1.2.1
   resolution: "ieee754@npm:1.2.1"
   checksum: 5144c0c9815e54ada181d80a0b810221a253562422e7c6c3a60b1901154184f49326ec239d618c416c1c5945a2e197107aee8d986a3dd836b53dffefd99b5e7e
@@ -8247,7 +8318,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"invariant@npm:2.2.4, invariant@npm:^2.2.4":
+"invariant@npm:2.2.4, invariant@npm:^2.2.2, invariant@npm:^2.2.4":
   version: 2.2.4
   resolution: "invariant@npm:2.2.4"
   dependencies:
@@ -8687,17 +8758,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"isarray@npm:^1.0.0, isarray@npm:~1.0.0":
+  version: 1.0.0
+  resolution: "isarray@npm:1.0.0"
+  checksum: f032df8e02dce8ec565cf2eb605ea939bdccea528dbcf565cdf92bfa2da9110461159d86a537388ef1acef8815a330642d7885b29010e8f7eac967c9993b65ab
+  languageName: node
+  linkType: hard
+
 "isarray@npm:^2.0.5":
   version: 2.0.5
   resolution: "isarray@npm:2.0.5"
   checksum: bd5bbe4104438c4196ba58a54650116007fa0262eccef13a4c55b2e09a5b36b59f1e75b9fcc49883dd9d4953892e6fc007eef9e9155648ceea036e184b0f930a
-  languageName: node
-  linkType: hard
-
-"isarray@npm:~1.0.0":
-  version: 1.0.0
-  resolution: "isarray@npm:1.0.0"
-  checksum: f032df8e02dce8ec565cf2eb605ea939bdccea528dbcf565cdf92bfa2da9110461159d86a537388ef1acef8815a330642d7885b29010e8f7eac967c9993b65ab
   languageName: node
   linkType: hard
 
@@ -10368,6 +10439,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"moment@npm:^2.30.1":
+  version: 2.30.1
+  resolution: "moment@npm:2.30.1"
+  checksum: 859236bab1e88c3e5802afcf797fc801acdbd0ee509d34ea3df6eea21eb6bcc2abd4ae4e4e64aa7c986aa6cba563c6e62806218e6412a765010712e5fa121ba6
+  languageName: node
+  linkType: hard
+
 "ms@npm:2.0.0":
   version: 2.0.0
   resolution: "ms@npm:2.0.0"
@@ -11425,6 +11503,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-file-access@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "react-native-file-access@npm:3.1.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 945e1f098558216faf7dcd7a6a88960d9a537dabb24a23f11b569d14292cb90f832eb2ddac813eb6553a08ae24860a0a6164b46b3b53c705a6e245c47ebf5dea
+  languageName: node
+  linkType: hard
+
 "react-native-gesture-handler@npm:^2.18.1":
   version: 2.18.1
   resolution: "react-native-gesture-handler@npm:2.18.1"
@@ -11473,6 +11561,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-onesignal@npm:^5.2.4":
+  version: 5.2.4
+  resolution: "react-native-onesignal@npm:5.2.4"
+  dependencies:
+    invariant: ^2.2.2
+  checksum: ccc8c07e5a550124d8da7bae24a553a0b1beb68431eeb555ef7a3abc362462f6ed557606f0ff64af9a5a2fd6f35e7ce4f8cf7160e947ddd2d2a82b0e3dc09142
+  languageName: node
+  linkType: hard
+
 "react-native-pager-view@npm:^6.4.1":
   version: 6.4.1
   resolution: "react-native-pager-view@npm:6.4.1"
@@ -11496,6 +11593,16 @@ __metadata:
     react-native-safe-area-context: "*"
     react-native-vector-icons: "*"
   checksum: 35ce56e0bb19c46ce85adc47a504527b7ec455d1a15f3ace0d6fd438abd51b1fe30e1b44351950e16d6376ddbc18ecc94b558e267767d0a9fd886a5f66a4c322
+  languageName: node
+  linkType: hard
+
+"react-native-randombytes@npm:^3.6.1":
+  version: 3.6.1
+  resolution: "react-native-randombytes@npm:3.6.1"
+  dependencies:
+    buffer: ^4.9.1
+    sjcl: ^1.0.3
+  checksum: a0d8ec80e1a4573d8c4924cb52b01007fe2ae1d3698bb5e1e1330246f0ae307af4e7df236e176f438a7f69151e321a36a633f53dbb61f1c965a960f572bd3b1e
   languageName: node
   linkType: hard
 
@@ -12347,6 +12454,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sjcl@npm:^1.0.3":
+  version: 1.0.8
+  resolution: "sjcl@npm:1.0.8"
+  checksum: ae5bc8172dec88376fbb1c8508f2be24c1dd064be2af25368e6267824b6a84b52b515546b48c8f72460c715a39e934b077f0bf2adefc36c22527bff57ec06e1d
+  languageName: node
+  linkType: hard
+
 "slash@npm:^2.0.0":
   version: 2.0.0
   resolution: "slash@npm:2.0.0"
@@ -12434,6 +12548,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"source-map@npm:0.5.6":
+  version: 0.5.6
+  resolution: "source-map@npm:0.5.6"
+  checksum: 390b3f5165c9631a74fb6fb55ba61e62a7f9b7d4026ae0e2bfc2899c241d71c1bccb8731c496dc7f7cb79a5f523406eb03d8c5bebe8448ee3fc38168e2d209c8
+  languageName: node
+  linkType: hard
+
 "source-map@npm:^0.5.6":
   version: 0.5.7
   resolution: "source-map@npm:0.5.7"
@@ -12487,6 +12608,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"stack-generator@npm:^2.0.5":
+  version: 2.0.10
+  resolution: "stack-generator@npm:2.0.10"
+  dependencies:
+    stackframe: ^1.3.4
+  checksum: 4fc3978a934424218a0aa9f398034e1f78153d5ff4f4ff9c62478c672debb47dd58de05b09fc3900530cbb526d72c93a6e6c9353bacc698e3b1c00ca3dda0c47
+  languageName: node
+  linkType: hard
+
 "stack-utils@npm:^2.0.3":
   version: 2.0.6
   resolution: "stack-utils@npm:2.0.6"
@@ -12500,6 +12630,27 @@ __metadata:
   version: 1.3.4
   resolution: "stackframe@npm:1.3.4"
   checksum: bae1596873595c4610993fa84f86a3387d67586401c1816ea048c0196800c0646c4d2da98c2ee80557fd9eff05877efe33b91ba6cd052658ed96ddc85d19067d
+  languageName: node
+  linkType: hard
+
+"stacktrace-gps@npm:^3.0.4":
+  version: 3.1.2
+  resolution: "stacktrace-gps@npm:3.1.2"
+  dependencies:
+    source-map: 0.5.6
+    stackframe: ^1.3.4
+  checksum: 85daa232d138239b6ae0f4bcdd87d15d302a045d93625db17614030945b5314e204b5fbcf9bee5b6f4f9e6af5fca05f65c27fe910894b861ef6853b99470aa1c
+  languageName: node
+  linkType: hard
+
+"stacktrace-js@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "stacktrace-js@npm:2.0.2"
+  dependencies:
+    error-stack-parser: ^2.0.6
+    stack-generator: ^2.0.5
+    stacktrace-gps: ^3.0.4
+  checksum: 081e786d56188ac04ac6604c09cd863b3ca2b4300ec061366cf68c3e4ad9edaa34fb40deea03cc23a05f442aa341e9171f47313f19bd588f9bec6c505a396286
   languageName: node
   linkType: hard
 
