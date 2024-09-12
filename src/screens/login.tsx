@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   EmitterSubscription,
   Keyboard,
@@ -36,6 +36,11 @@ import {alert} from '@baronha/ting';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../config/navigation/types.ts';
+import {generateRandomString} from '../utils/algo-utils.ts';
+import crashlytics from '@react-native-firebase/crashlytics';
+import {OneSignal} from 'react-native-onesignal';
+import {encryptedStorage} from '../config/storage/mmkv.ts';
+import firestore from '@react-native-firebase/firestore';
 
 const Login: React.FC = () => {
   /**
@@ -113,7 +118,44 @@ const Login: React.FC = () => {
     StatusBar.setBackgroundColor(theme.colors.background);
   }, [theme.colors.background]);
 
+  const [pushToken, setPushToken] = React.useState<string | undefined>('');
+  const [userId, setUserId] = React.useState<string | undefined>('');
+  const [isSubscribed, setSubscribed] = React.useState<boolean | undefined>(
+    false,
+  );
+
+  const initializeDevice = useCallback(async () => {
+    try {
+      const deviceState = OneSignal.User.pushSubscription;
+      const token = await deviceState?.getTokenAsync();
+      const id = await deviceState?.getIdAsync();
+      const optedIn = await deviceState?.getOptedInAsync();
+
+      setPushToken(token || undefined);
+      setUserId(id || undefined);
+      setSubscribed(optedIn || false);
+
+      if (__DEV__) {
+        console.log(token, optedIn, id);
+      }
+    } catch (e) {
+      if (__DEV__) {
+        console.error('OneSignal: ', e);
+      }
+      crashlytics().log("couldn't get OneSignal properties.");
+      if (e instanceof Error) {
+        crashlytics().recordError(e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    initializeDevice();
+  }, [initializeDevice]);
+
   function onMainButtonPress() {
+    Keyboard.dismiss();
+    // TODO: dismiss any bottom sheet if available
     alert({title: 'Please Wait', preset: 'spinner'});
     switch (currentMode) {
       case 'login':
@@ -124,21 +166,35 @@ const Login: React.FC = () => {
             preset: 'error',
           });
         }
-        if (password.trim() !== confirmPassword.trim()) {
-          return alert({
-            title: 'Incorrect Details',
-            message: "Your passwords doesn't match",
-            preset: 'error',
-          });
-        }
         auth()
           .signInWithEmailAndPassword(email, password)
-          .then(() => {
-            navigation.navigate('home');
+          .then(async () => {
+            if (auth().currentUser) {
+              const userData = await firestore()
+                .collection('users')
+                .doc(auth().currentUser?.uid)
+                .get();
+              if (userData.exists) {
+                navigation.navigate('home');
+              } else {
+                const username = auth()
+                  ?.currentUser?.uid?.substring(0, 4)
+                  .concat(generateRandomString(6));
+                encryptedStorage.set('password', password);
+                navigation.navigate('setup', {
+                  username: username,
+                  email: auth()?.currentUser?.email,
+                  password: password,
+                  osID: userId,
+                  osPT: pushToken,
+                  from_where: 'register',
+                });
+              }
+            }
           })
           .catch(error => {
             let errorMessage = '';
-            switch (error.code) {
+            switch (error?.code) {
               case 'auth/invalid-email':
                 errorMessage = 'The email address is not valid.';
                 break;
@@ -171,14 +227,32 @@ const Login: React.FC = () => {
             preset: 'error',
           });
         }
+        if (password.trim() !== confirmPassword.trim()) {
+          return alert({
+            title: 'Incorrect Details',
+            message: "Your passwords doesn't match",
+            preset: 'error',
+          });
+        }
         auth()
           .createUserWithEmailAndPassword(email, password)
           .then(() => {
-            navigation.navigate('setup');
+            const username = auth()
+              ?.currentUser?.uid?.substring(0, 4)
+              .concat(generateRandomString(6));
+            encryptedStorage.set('password', password);
+            navigation.navigate('setup', {
+              username: username,
+              email: auth()?.currentUser?.email,
+              password: password,
+              osID: userId,
+              osPT: pushToken,
+              from_where: 'register',
+            });
           })
           .catch(error => {
             let errorMessage = '';
-            switch (error.code) {
+            switch (error?.code) {
               case 'auth/email-already-in-use':
                 errorMessage =
                   'There already exists an account with the given email address.';
@@ -192,6 +266,46 @@ const Login: React.FC = () => {
                 break;
               case 'auth/weak-password':
                 errorMessage = 'The password is not strong enough.';
+                break;
+              default:
+                errorMessage = 'An unknown error occurred.';
+                break;
+            }
+            alert({
+              title: 'Error',
+              message: errorMessage,
+              preset: 'error',
+            });
+          });
+        break;
+      case 'forgot-password':
+        if (email.trim().length < 3) {
+          return alert({
+            title: 'Incorrect Details',
+            message: 'Please enter a valid email address.',
+            preset: 'error',
+          });
+        }
+        auth()
+          .sendPasswordResetEmail(email)
+          .then(() => {
+            alert({
+              title: 'Password Reset',
+              message: 'A password reset email has been sent.',
+              preset: 'done',
+            });
+            setCurrentMode('login');
+          })
+          .catch(error => {
+            let errorMessage: string;
+
+            switch (error?.code) {
+              case 'auth/invalid-email':
+                errorMessage = 'The email address is not valid.';
+                break;
+              case 'auth/user-not-found':
+                errorMessage =
+                  'There is no user corresponding to the email address.';
                 break;
               default:
                 errorMessage = 'An unknown error occurred.';
@@ -218,7 +332,9 @@ const Login: React.FC = () => {
     <>
       <BaseView
         needsPaddingTop={false}
-        avoidingView={true}
+        avoidingView={
+          currentMode === 'signup' || currentMode === 'forgot-password'
+        }
         needsPaddingBottom={true}>
         <Appbar.Header>
           {currentMode !== 'login' && (
@@ -269,7 +385,7 @@ const Login: React.FC = () => {
             value={email}
             label={'Email'}
             onChangeText={text => {
-              setEmail(text);
+              setEmail(text.trim());
             }}
             style={{marginBottom: keyboardOffset}}
           />
@@ -366,6 +482,7 @@ const Login: React.FC = () => {
                 {'Create new account'}
               </Button>
             </View>
+            <SpacerV height={heightPercentageToDP(0.5)} />
           </>
         )}
       </BaseView>
