@@ -4,8 +4,9 @@ import {Appbar, Avatar, Card, Text, useTheme} from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {widthPercentageToDP} from '../../config/dimensions.ts';
-import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
+import {Dimensions, StatusBar, StyleSheet} from 'react-native';
 import {FlatGrid} from 'react-native-super-grid';
+import auth from '@react-native-firebase/auth';
 
 const LeftContent = () => (
   <Avatar.Image
@@ -18,6 +19,8 @@ const LeftContent = () => (
 
 const Notifications: React.FC = () => {
   const theme = useTheme();
+
+  const [photoUrl, setPhotoUrl] = useState('XD');
 
   const windowDimension = Dimensions.get('window').width;
 
@@ -55,6 +58,10 @@ const Notifications: React.FC = () => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
 
+  useEffect(() => {
+    setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
+  }, []);
+
   return (
     <BaseView
       needsPaddingTop={false}
@@ -62,8 +69,11 @@ const Notifications: React.FC = () => {
       needsPaddingBottom={false}>
       <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <SpacerH width={widthPercentageToDP(0.5)} />
-        {/* TODO: if user doesn't have a profile picture, show Text Avatar, else show his profile picture*/}
-        <Avatar.Text label={'XD'} size={34} />
+        {photoUrl && photoUrl.length === 2 ? (
+          <Avatar.Text label={photoUrl} size={34} />
+        ) : (
+          <Avatar.Image source={{uri: photoUrl}} size={34} />
+        )}
         <SpacerH width={widthPercentageToDP(0.5)} />
         <Appbar.Content
           title="Notifications"
