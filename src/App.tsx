@@ -15,12 +15,13 @@ import {setup} from '@baronha/ting';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import i18n from './config/i18n/i18n.ts';
 import {I18nextProvider} from 'react-i18next';
+import {COLORS} from './config/misc.ts';
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colorScheme = useColorScheme();
-  const {theme} = useMaterial3Theme();
+  const {theme} = useMaterial3Theme({fallbackSourceColor: COLORS.yellowLightWarning});
 
   const paperTheme = useMemo(
     () =>
