@@ -21,7 +21,16 @@ type RootStackParamList = {
   splash: {} | undefined;
   onboarding: {} | undefined;
   login: {} | undefined;
-  setup: {} | undefined;
+  setup:
+    | {
+        username: string | undefined;
+        email: string | null | undefined;
+        password: string;
+        osID: string | undefined;
+        osPT: string | undefined;
+        from_where: string;
+      }
+    | undefined;
   home: {} | undefined;
   settings: {} | undefined;
   algo: {} | undefined;
