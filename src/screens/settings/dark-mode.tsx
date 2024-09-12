@@ -8,13 +8,17 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {Appearance, StatusBar, useColorScheme} from 'react-native';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {heightPercentageToDP} from '../../config/dimensions.ts';
+import getColorScheme = Appearance.getColorScheme;
 
 const DarkMode: React.FC = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useTheme();
   const systemTheme = useColorScheme();
 
-  const [themeValue, setThemeValue] = React.useState<'light' | 'dark' | 'system'>('system');
+  const [themeValue, setThemeValue] = React.useState<
+    'light' | 'dark' | 'system'
+  >('system');
 
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
@@ -37,13 +41,17 @@ const DarkMode: React.FC = () => {
       <SpacerV height={heightPercentageToDP(0.225)} />
       <RadioButton.Group
         onValueChange={themeChanged => {
-            if (themeChanged === 'system') {
-              Appearance.setColorScheme(null);
-            } else {
-              console.log(themeChanged);
-              Appearance.setColorScheme(themeChanged as 'light' | 'dark');
-            }
-            setThemeValue(themeChanged as 'light' | 'dark' | 'system');
+          switch (themeChanged) {
+            case 'light':
+              Appearance.setColorScheme(themeChanged as 'light');
+              break;
+            case 'dark':
+              Appearance.setColorScheme(themeChanged as 'dark');
+              break;
+            default:
+              Appearance.setColorScheme(Appearance.getColorScheme());
+          }
+          setThemeValue(themeChanged as 'light' | 'dark' | 'system');
         }}
         value={themeValue}>
         <RadioButton.Item label="Light" value="light" />
