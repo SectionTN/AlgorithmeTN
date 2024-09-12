@@ -117,6 +117,7 @@ const Code: React.FC = () => {
       <SpacerV height={heightPercentageToDP(0.10)} />*/}
       <CodeEditorWebView
         theme={theme.dark ? 'monokai' : 'material theme'}
+        readOnly={true}
         fontSize={fontValue(14)}
       />
     </BaseView>
