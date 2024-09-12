@@ -1,5 +1,12 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {BackHandler, Keyboard, Pressable, StatusBar, StyleSheet, View} from 'react-native';
+import {
+  BackHandler,
+  Keyboard,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  View,
+} from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -28,16 +35,33 @@ import {BottomSheetModal, useBottomSheetModal} from '@gorhom/bottom-sheet';
 import {alert} from '@baronha/ting';
 import {openCamera} from 'react-native-image-crop-picker';
 import ImagePickerActionSheet from '../components/modals/image-picker-action-sheet.tsx';
-import {useNavigation} from '@react-navigation/native';
+import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../config/navigation/types.ts';
+import NetInfo from '@react-native-community/netinfo';
+import {lowerToUppercase} from '../utils/algo-utils.ts';
+import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import crashlytics from '@react-native-firebase/crashlytics';
+import {createPasswordHash} from '../utils/hash.ts';
+import {encryptedStorage} from '../config/storage/mmkv.ts';
+
+type SetupRouteProp = RouteProp<RootStackParamList, 'setup'>;
 
 const Setup: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useTheme();
 
+  const route = useRoute<SetupRouteProp>();
+
+  const {username, email, password, osID, osPT, from_where} =
+    route.params || {};
+
   const [userPhoto, setUserPhoto] = useState<PhotoType | null>(null);
+
+  const [onGoingData, setOnGoingData] = useState(false);
 
   const pickerRef = useRef<BottomSheetModal>(null);
   const sheetSnapPoints = useMemo(() => ['27.5%'], []);
@@ -63,6 +87,17 @@ const Setup: React.FC = () => {
   const memoizedLastName = useMemo(() => lastName?.trim(), [lastName]);
 
   useEffect(() => {
+    if (from_where === 'register') {
+      if (encryptedStorage.contains('password')) {
+        const hi = encryptedStorage.getString('password');
+        console.log(hi);
+      } else {
+        console.log("doesn't contain");
+      }
+    }
+  }, [from_where]);
+
+  useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.background);
   }, [theme.colors.background]);
 
@@ -82,9 +117,182 @@ const Setup: React.FC = () => {
     return firstName[0].toUpperCase() + lastName[0].toUpperCase();
   }
 
+  const [isConnected, setIsConnected] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected ?? true);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  async function handleFABPress() {
+    setOnGoingData(true);
+    if (!isConnected) {
+      setOnGoingData(false);
+      return alert({title: 'No Internet', preset: 'error'});
+    }
+    const modifiedFirstName = lowerToUppercase(memoizedFirstName);
+    const modifiedLastName = lowerToUppercase(memoizedLastName);
+    if (firstName?.length > 1 && lastName?.length > 1) {
+      alert({title: 'Please Wait', preset: 'spinner', duration: 10});
+      if (!password) {
+        crashlytics().log('password seems to be undefined, crashing the app');
+        return crashlytics().crash();
+      }
+      const hashedPassword = await createPasswordHash(password);
+      const firebaseParams = {username, email, osID, osPT};
+      if (userPhoto) {
+        /**
+         * Extract the filename from userPhoto Path and remove extension
+         */
+        let fileName = userPhoto?.path?.substring(
+          userPhoto?.path?.lastIndexOf('/') + 1,
+        );
+        if (fileName) {
+          fileName = fileName.split('.').slice(0, -1).join('.');
+        } else {
+          fileName = 'photo';
+        }
+        /**
+         * Reference to users image path
+         */
+        try {
+          const userAvatarRef = `avatars/${
+            auth()?.currentUser?.uid
+          }/${fileName}`;
+          const storageRef = storage().ref(userAvatarRef);
+
+          /**
+           * Uploading image to Firebase Storage
+           */
+
+          const uploadImageTask = storageRef?.putFile(userPhoto?.path);
+
+          /**
+           * Add observer to image uploading.
+           */
+
+          if (__DEV__) {
+            uploadImageTask.on('state_changed', taskSnapshot => {
+              let percentage =
+                (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100;
+              console.log(`Upload is ${percentage}% done`);
+            });
+          }
+
+          /**
+           * an async function to get {avatarUrl} and upload all user data.
+           */
+
+          uploadImageTask.then(async () => {
+            const avatarUrl = await storage()
+              .ref(userAvatarRef)
+              .getDownloadURL();
+            const userData = {
+              ...firebaseParams,
+              uid: auth()?.currentUser?.uid,
+              first_name: modifiedFirstName,
+              last_name: modifiedLastName,
+              avatar: avatarUrl,
+              avatar_status: 'photo',
+              info: {
+                created_At: firestore?.Timestamp?.fromDate(new Date()),
+                premium: false,
+                premiumUntil: 'none',
+                banned: false,
+                bannedUntil: '',
+              },
+              active_status: 'normal',
+              active_time: firestore?.Timestamp?.fromDate(new Date()),
+              bio: '',
+              password: hashedPassword,
+            };
+            firestore()
+              .collection('users')
+              .doc(auth()?.currentUser?.uid)
+              .set(userData)
+              .finally(async () => {
+                await auth()?.currentUser?.updateProfile({
+                  displayName: `${memoizedFirstName} ${memoizedLastName}`,
+                  photoURL: avatarUrl,
+                });
+                navigation?.navigate('home');
+              })
+              .catch(e => {
+                setOnGoingData(false);
+                if (e instanceof Error) {
+                  crashlytics().recordError(e);
+                }
+                if (__DEV__) {
+                  console.error(e);
+                }
+              });
+          });
+        } catch (e) {
+          setOnGoingData(false);
+          if (e instanceof Error) {
+            crashlytics().recordError(e);
+          }
+          if (__DEV__) {
+            console.error(e);
+          }
+        }
+      } else {
+        const avatarText = `${modifiedFirstName[0]}${modifiedLastName[0]}`;
+        const userData = {
+          ...firebaseParams,
+          first_name: modifiedFirstName,
+          last_name: modifiedLastName,
+          avatar: avatarText,
+          avatar_status: 'text',
+          info: {
+            created_At: firestore?.Timestamp?.fromDate(new Date()),
+            premium: false,
+            premiumUntil: 'none',
+            banned: false,
+            bannedUntil: '',
+          },
+          active_status: 'normal',
+          active_time: firestore?.Timestamp?.fromDate(new Date()),
+          bio: '',
+          password: hashedPassword,
+        };
+        firestore()
+          .collection('users')
+          .doc(auth()?.currentUser?.uid)
+          .set(userData)
+          .finally(async () => {
+            await auth()?.currentUser?.updateProfile({
+              displayName: `${memoizedFirstName} ${memoizedLastName}`,
+              photoURL: avatarText,
+            });
+            navigation?.navigate('home');
+          })
+          .catch(e => {
+            setOnGoingData(false);
+            if (e instanceof Error) {
+              crashlytics().recordError(e);
+            }
+            if (__DEV__) {
+              console.error(e);
+            }
+          });
+      }
+    } else {
+      setOnGoingData(false);
+      return alert({title: 'Wrong Info', message: 'Please fill a proper name'});
+    }
+  }
 
   return (
-    <BaseView avoidingView={false} needsPaddingTop={false} needsPaddingBottom={false}>
+    <BaseView
+      avoidingView={false}
+      needsPaddingTop={false}
+      needsPaddingBottom={false}>
       <Appbar.Header>
         <Appbar.Content title="" />
         <Tooltip title="Help">
@@ -161,7 +369,7 @@ const Setup: React.FC = () => {
             value={firstName}
             multiline={false}
             onChangeText={valueFirstName => {
-              setFirstName(valueFirstName);
+              setFirstName(valueFirstName.trim());
             }}
           />
           <SpacerV height={heightPercentageToDP(0.25)} />
@@ -174,17 +382,16 @@ const Setup: React.FC = () => {
             value={lastName}
             multiline={false}
             onChangeText={valueLastName => {
-              setLastName(valueLastName);
+              setLastName(valueLastName.trim());
             }}
           />
         </View>
       </View>
       <FAB
         icon="arrow-right"
+        disabled={onGoingData}
         style={styles.fab}
-        onPress={() => {
-          navigation.navigate('home');
-        }}
+        onPress={handleFABPress}
       />
       <ImagePickerActionSheet
         sheetRef={pickerRef}
