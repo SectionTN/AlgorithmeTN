@@ -1,12 +1,15 @@
-import React from 'react';
-import {BottomNavigation} from 'react-native-paper';
+import React, {useEffect} from 'react';
+import {BottomNavigation, useTheme} from 'react-native-paper';
 import Main from '../../screens/home/main.tsx';
 import Profile from '../../screens/home/profile.tsx';
 import Notifications from '../../screens/home/notifications.tsx';
 import Bookmarks from '../../screens/home/bookmarks.tsx';
+import {StatusBar} from 'react-native';
 
 const HomeRender: React.FC = () => {
   const [index, setIndex] = React.useState(0);
+
+  const theme = useTheme();
   const [routes] = React.useState([
     {
       key: 'home',
@@ -40,6 +43,10 @@ const HomeRender: React.FC = () => {
     notifications: Notifications,
     profile: Profile,
   });
+
+  useEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+  }, [theme.colors.elevation.level2]);
 
   return (
     <BottomNavigation
