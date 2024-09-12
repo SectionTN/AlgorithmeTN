@@ -11,15 +11,13 @@ import {
 } from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
 import Animated, {
-  BounceInUp,
-  BounceOutUp,
   FadeInUp,
   FadeOutDown,
 } from 'react-native-reanimated';
 import {fontValue, heightPercentageToDP} from '../../config/dimensions.ts';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {RootStackParamList} from '../../config/navigation/types.ts';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {
   AtIcon,
@@ -35,6 +33,7 @@ import {
 import {ScrollView} from 'react-native-gesture-handler';
 import {alert} from '@baronha/ting';
 import auth from '@react-native-firebase/auth';
+import {useBackHandler} from '@react-native-community/hooks';
 
 const Settings: React.FC = () => {
   const navigation =
@@ -45,6 +44,10 @@ const Settings: React.FC = () => {
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
+
+  useBackHandler(() => {
+    return false;
+  });
 
   return (
     <BaseView
@@ -62,8 +65,8 @@ const Settings: React.FC = () => {
       </Appbar.Header>
       <ScrollView nestedScrollEnabled={true} alwaysBounceVertical={true}>
         <Animated.View
-          entering={BounceInUp}
-          exiting={BounceOutUp}
+          entering={FadeInUp}
+          exiting={FadeOutDown}
           style={styles.under_header}>
           <Avatar.Image
             size={85}
@@ -152,7 +155,12 @@ const Settings: React.FC = () => {
               auth()
                 .signOut()
                 .then(() => {
-                  navigation.navigate('login');
+                  navigation.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [{name: 'login'}],
+                    }),
+                  );
                 })
                 .catch(error => {
                   console.error(error);
