@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {StatusBar, StyleSheet, View} from 'react-native';
 import {
@@ -27,18 +27,32 @@ import {
 } from '../../config/dimensions.ts';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import {ScrollView} from 'react-native-gesture-handler';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import storage, {FirebaseStorageTypes} from '@react-native-firebase/storage';
+import {isNull, isUndefined} from 'lodash';
 
-const Profile: React.FC = () => {
+interface ProfileProps {
+  uid: string;
+}
+
+const Profile: React.FC<ProfileProps> = ({uid}) => {
   const theme = useTheme();
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+  const [mode, setMode] = useState<'none' | 'itself' | 'someone'>('none');
+
   const [menuVisible, setMenuVisible] = React.useState(false);
+  const [photoUrl, setPhotoUrl] = useState('XD');
+  const [bio, setBio] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
 
   const openMenu = () => setMenuVisible(true);
 
@@ -47,8 +61,74 @@ const Profile: React.FC = () => {
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
+    if (mode === 'none') {
+      if (uid === auth().currentUser?.uid || isUndefined(uid)) {
+        setMode('itself');
+      } else {
+        setMode('someone');
+      }
+    }
+  }, [mode, uid]);
+
+  useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
+
+  useEffect(() => {
+    setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
+  }, []);
+
+  useEffect(() => {
+    return auth().onAuthStateChanged((user: FirebaseAuthTypes.User | null) => {
+      if (user === null) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: 'login'}],
+          }),
+        );
+      }
+    });
+  }, [navigation]);
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('users')
+      .doc(mode === 'itself' ? auth().currentUser?.uid : uid)
+      .onSnapshot(documentSnapshot => {
+        if (documentSnapshot?.exists) {
+          setBio(documentSnapshot?.data()?.bio);
+        } else {
+          try {
+            let userAvatarRef: FirebaseStorageTypes.Reference | undefined;
+            const photoURL = auth().currentUser?.photoURL;
+
+            if (
+              photoURL &&
+              !isNull(photoURL) &&
+              !isUndefined(photoURL) &&
+              photoURL.length > 2
+            ) {
+              userAvatarRef = storage().refFromURL(photoURL);
+              userAvatarRef.delete().catch(err => {
+                console.error(err);
+              });
+            }
+
+            auth()
+              .currentUser?.delete()
+              .catch(err => {
+                console.error(err);
+              });
+          } catch (error) {
+            console.error('Error during user/profile photo deletion:', error);
+          }
+        }
+      });
+
+    return () => unsubscribe();
+  }, [mode, uid]);
+
   return (
     <BaseView
       needsPaddingTop={false}
@@ -77,19 +157,16 @@ const Profile: React.FC = () => {
           </Menu>
         </Tooltip>
       </Appbar.Header>
-      <ScrollView
-        nestedScrollEnabled={true}
-        alwaysBounceVertical={true}>
+      <ScrollView nestedScrollEnabled={true} alwaysBounceVertical={true}>
         <Animated.View
           entering={BounceInUp}
           exiting={BounceOutUp}
           style={styles.under_header}>
-          <Avatar.Image
-            size={85}
-            source={{
-              uri: 'https://api.dicebear.com/9.x/adventurer/png?seed=Garfield',
-            }}
-          />
+          {photoUrl && photoUrl.length === 2 ? (
+            <Avatar.Text label={photoUrl} size={85} />
+          ) : (
+            <Avatar.Image source={{uri: photoUrl}} size={85} />
+          )}
           <Text
             adjustsFontSizeToFit
             numberOfLines={2}
@@ -97,23 +174,25 @@ const Profile: React.FC = () => {
               styles.under_header_text,
               {color: theme.colors.onBackground},
             ]}>
-            {'Rayen Sbai'}
+            {mode === 'itself'
+              ? auth().currentUser?.displayName
+              : `${firstName} ${lastName}`}
           </Text>
-          {false ? (
+          {bio ? (
             <Text
               adjustsFontSizeToFit={true}
               numberOfLines={1}
               onPress={() => {}}
               style={[styles.bioText, {color: theme.colors.onBackground}]}>
-              {'userBio'}
+              {bio}
             </Text>
           ) : (
             <Text
               adjustsFontSizeToFit={true}
               numberOfLines={1}
               style={[styles.bioText, {color: theme.colors.onBackground}]}
-              onPress={() => {}}>
-              {'yes, as you can see, my hair is green!'}
+              onPress={() => navigation.navigate('add-bio')}>
+              {'tap to add a biography'}
             </Text>
           )}
         </Animated.View>
@@ -203,7 +282,10 @@ const Profile: React.FC = () => {
                 <Text
                   adjustsFontSizeToFit={true}
                   numberOfLines={1}
-                  style={styles.statLabel}>
+                  style={[
+                    styles.statLabel,
+                    {color: theme.colors.onPrimaryContainer},
+                  ]}>
                   Views
                 </Text>
               </View>
@@ -215,17 +297,26 @@ const Profile: React.FC = () => {
             <Card.Title title="Achievements" titleVariant={'titleLarge'} />
             <Card.Content style={styles.badgeView}>
               <Chip
-                style={[styles.chip, {backgroundColor: theme.colors.surface}]}
+                style={[
+                  styles.chip,
+                  {backgroundColor: theme.colors.elevation.level3},
+                ]}
                 icon="medal">
                 {'JS Master'}
               </Chip>
               <Chip
-                style={[styles.chip, {backgroundColor: theme.colors.surface}]}
+                style={[
+                  styles.chip,
+                  {backgroundColor: theme.colors.elevation.level3},
+                ]}
                 icon="medal">
                 {'Unstoppable'}
               </Chip>
               <Chip
-                style={[styles.chip, {backgroundColor: theme.colors.surface}]}
+                style={[
+                  styles.chip,
+                  {backgroundColor: theme.colors.elevation.level3},
+                ]}
                 icon="medal">
                 {'Algo Master'}
               </Chip>
