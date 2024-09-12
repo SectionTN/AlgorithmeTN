@@ -19,6 +19,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {storage} from '../config/storage/mmkv.ts';
 import auth from '@react-native-firebase/auth';
 import {alert} from '@baronha/ting';
+import {OneSignal} from 'react-native-onesignal';
 
 const ViewPagerData = [
   {
@@ -209,7 +210,8 @@ const Item = ({
         {id === 3 ? (
           <Button
             mode="contained"
-            onPress={() => {
+            onPress={async () => {
+              await OneSignal.Notifications.requestPermission(true);
               setViewPagerCompleted();
               alert({title: 'Please Wait', preset: 'spinner'});
               if (auth()?.currentUser !== null) {
