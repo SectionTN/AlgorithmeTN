@@ -33,7 +33,7 @@ import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {lowerToUppercase} from '../../utils/algo-utils.ts';
 import NetInfo from '@react-native-community/netinfo';
-import {unAllowedChars} from '../../utils/regex.ts';
+import {nameRegex} from '../../utils/regex.ts';
 
 const EditProfile: React.FC = () => {
   const pickerRef = useRef<BottomSheetModal>(null);
@@ -59,10 +59,16 @@ const EditProfile: React.FC = () => {
   const [oldFirstname, setOldFirstname] = React.useState('');
   const [oldLastname, setOldLastName] = React.useState('');
 
-  const onFirstnameTextChange = (firstnameText: string) =>
-    setFirstName(firstnameText.replace(unAllowedChars, ''));
-  const onLastnameTextChange = (lastnameText: string) =>
-    setLastName(lastnameText.replace(unAllowedChars, ''));
+  const onFirstnameTextChange = (firstnameText: string) => {
+    if (nameRegex.test(firstnameText)) {
+      setFirstName(firstnameText);
+    }
+  };
+  const onLastnameTextChange = (lastnameText: string) => {
+    if (nameRegex.test(lastnameText)) {
+      setLastName(lastnameText);
+    }
+  };
 
   const [isConnected, setIsConnected] = useState(true);
 
@@ -100,7 +106,7 @@ const EditProfile: React.FC = () => {
     return () => userData();
   }, []);
 
-  async function pushUserData() {
+  async function pushUserPhoto() {
     alert({title: 'Please Wait', preset: 'spinner', duration: 5});
     /**
      * Extract the filename from userPhoto Path and remove an extension
@@ -164,19 +170,12 @@ const EditProfile: React.FC = () => {
         avatar: pureImageUrl,
       })
       .finally(async () => {
-        if (
-          firstName?.trim() !== oldFirstname?.trim() &&
-          lastName?.trim() !== oldLastname?.trim()
-        ) {
-          // Keep showing loader and FAB
-        } else {
-          await auth()?.currentUser?.updateProfile({photoURL: pureImageUrl});
-          alert({
-            title: 'Profile Updated',
-            message: 'Your profile is updated successfully',
-            preset: 'done',
-          });
-        }
+        await auth()?.currentUser?.updateProfile({photoURL: pureImageUrl});
+        alert({
+          title: 'Profile Updated',
+          message: 'Your profile is updated successfully',
+          preset: 'done',
+        });
       })
       .catch(error => {
         crashlytics().recordError(error);
@@ -240,7 +239,7 @@ const EditProfile: React.FC = () => {
           navigation?.goBack();
         } else {
           if (userPhoto) {
-            pushUserData();
+            pushUserPhoto();
           }
           if (
             firstName?.trim() !== oldFirstname?.trim() ||
@@ -302,7 +301,10 @@ const EditProfile: React.FC = () => {
           alignSelf: 'center',
         }}>
         {avatarReference && avatarReference.length > 2 ? (
-          <Avatar.Image size={70} source={{uri: userPhoto ? userPhoto.path : avatarReference}} />
+          <Avatar.Image
+            size={70}
+            source={{uri: userPhoto ? userPhoto.path : avatarReference}}
+          />
         ) : (
           <View
             style={{
