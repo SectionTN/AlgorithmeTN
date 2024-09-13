@@ -147,7 +147,7 @@ const Setup: React.FC = () => {
       const firebaseParams = {username, email, osID, osPT};
       if (userPhoto) {
         /**
-         * Extract the filename from userPhoto Path and remove extension
+         * Extract the filename from userPhoto Path and remove the extension
          */
         let fileName = userPhoto?.path?.substring(
           userPhoto?.path?.lastIndexOf('/') + 1,
