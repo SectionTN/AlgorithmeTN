@@ -59,7 +59,7 @@ const BugReport: React.FC = () => {
         paragraphs bellow
       </Text>
       <SpacerV height={heightPercentageToDP(0.225)} />
-      <View style={{paddingRight: '2%', paddingLeft: '2%'}}>
+      <View style={{paddingRight: '2.5%', paddingLeft: '2.5%'}}>
         <TextInput
           mode="outlined"
           label="Report a problem"
