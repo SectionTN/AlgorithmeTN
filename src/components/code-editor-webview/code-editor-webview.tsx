@@ -89,8 +89,8 @@ const CodeEditorWebView: React.FC<CodeEditorWebViewProps> = ({
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Code Editor</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+        <title>Code Editor</title>;
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>;
         <style>
             html, body, #editor {
                 height: 100%;
@@ -116,83 +116,115 @@ const CodeEditorWebView: React.FC<CodeEditorWebViewProps> = ({
                 overflow: auto;
             }
             ${editorStyles}
-        </style>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.js"></script>
+        </style>;
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>;
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.js"></script>;
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-snippets.js"></script>;
+        
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const editor = ace.edit('editor');
-                editor.setTheme('ace/theme/${theme}');
-                editor.session.setMode('ace/mode/${language}');
-                editor.setValue(\`${initialCode}\`);
-                editor.setReadOnly(${readOnly});
-                editor.setFontSize(${fontSize});
-                editor.renderer.setShowGutter(${showGutter});
-                editor.setOptions({
-                    enableBasicAutocompletion: ${enableBasicAutocompletion},
-                    enableLiveAutocompletion: ${enableLiveAutocompletion},
-                    enableSnippets: true,
-                    showPrintMargin: ${showPrintMargin},
-                    highlightActiveLine: ${highlightActiveLine},
-                    wrap: ${wrapEnabled},
-                    ...${JSON.stringify(additionalProps)},
-                });
+          ace.define("ace/mode/algorithm", [], function(require, exports, module) {
+            var oop = require('ace/lib/oop');
+            var TextMode = require('ace/mode/text').Mode;
+            var AlgorithmHighlightRules = function() {
+              this.$rules = {
+                'start': [
+                  { token: 'comment', regex: '\\\\/\\\\/.*$' },
+                  { token: 'keyword.control.flow', regex: '(à|alors|autres|de|début|fin|si|sinon|tant que)\\\\b' },
+                  { token: 'support.function', regex: '(écrire|lire|effacer|lire_ligne)\\\\b' },
+                  { token: 'entity.name.type', regex: '(entier|réel|caractère)\\\\b' },
+                  { token: 'string', regex: '".*?"' },
+                  { token: 'constant.numeric', regex: '\\\\b\\\\d+\\\\b' },
+                  { token: 'constant.language.boolean', regex: '(vrai|faux)\\\\b' },
+                  { token: 'variable', regex: '[a-zA-Z_][a-zA-Z0-9_]*' },
+                ]
+              };
+            };
+            oop.inherits(AlgorithmHighlightRules, require('ace/mode/text_highlight_rules').TextHighlightRules);
+            var Mode = function() {
+              this.HighlightRules = AlgorithmHighlightRules;
+            };
+            oop.inherits(Mode, TextMode);
+            (function() {
+              this.$id = 'ace/mode/algorithm';
+            }).call(Mode.prototype);
+            exports.Mode = Mode;
+          });
 
-                editor.renderer.setPadding(8);
-
-                document.addEventListener('message', function(event) {
-                    try {
-                        const message = JSON.parse(event.data);
-                        if (message.action === 'getCode') {
-                            const code = editor.getValue();
-                            if (window.ReactNativeWebView) {
-                                window.ReactNativeWebView.postMessage(
-                                    JSON.stringify({
-                                        action: 'code',
-                                        code: code,
-                                    })
-                                );
-                            }
-                        } else if (message.action === 'setCode') {
-                            editor.setValue(message.code);
-                            handleFocus();
-                        } else if (message.action === 'pasteCode') {
-                            editor.insert(message.code);
-                            handleFocus();
-                        } else if (message.action === 'undo') {
-                            editor.undo();
-                        } else if (message.action === 'redo') {
-                            editor.redo();
-                        }
-                    } catch (e) {
-                        console.error('Error handling message:', e);
-                    }
-                });
-
-                function handleFocus() {
-                    setTimeout(() => {
-                        editor.focus();
-                    }, 300);
-                }
-
-                handleFocus();
+          document.addEventListener('DOMContentLoaded', function() {
+            const editor = ace.edit('editor');
+            editor.setTheme('ace/theme/${theme}');
+            editor.session.setMode('ace/mode/${
+      language === 'algorithm' ? 'algorithm' : language
+    }');
+            editor.setValue(\`${initialCode}\`);
+            editor.setReadOnly(${readOnly});
+            editor.setFontSize(${fontSize});
+            editor.renderer.setShowGutter(${showGutter});
+            editor.setOptions({
+                enableBasicAutocompletion: ${enableBasicAutocompletion},
+                enableLiveAutocompletion: ${enableLiveAutocompletion},
+                enableSnippets: true,
+                showPrintMargin: ${showPrintMargin},
+                highlightActiveLine: ${highlightActiveLine},
+                wrap: ${wrapEnabled},
+                ...${JSON.stringify(additionalProps)},
             });
 
-            function sendInitializationMessage() {
-                if (window.ReactNativeWebView) {
-                    window.ReactNativeWebView.postMessage(
-                        JSON.stringify({
-                            action: 'initialized',
-                        })
-                    );
+            editor.renderer.setPadding(8);
+
+            document.addEventListener('message', function(event) {
+                try {
+                    const message = JSON.parse(event.data);
+                    if (message.action === 'getCode') {
+                        const code = editor.getValue();
+                        if (window.ReactNativeWebView) {
+                            window.ReactNativeWebView.postMessage(
+                                JSON.stringify({
+                                    action: 'code',
+                                    code: code,
+                                })
+                            );
+                        }
+                    } else if (message.action === 'setCode') {
+                        editor.setValue(message.code);
+                        handleFocus();
+                    } else if (message.action === 'pasteCode') {
+                        editor.insert(message.code);
+                        handleFocus();
+                    } else if (message.action === 'undo') {
+                        editor.undo();
+                    } else if (message.action === 'redo') {
+                        editor.redo();
+                    }
+                } catch (e) {
+                    console.error('Error handling message:', e);
                 }
+            });
+
+            function handleFocus() {
+                setTimeout(() => {
+                    editor.focus();
+                }, 300);
             }
-            sendInitializationMessage();
-        </script>
+
+            handleFocus();
+          });
+
+          function sendInitializationMessage() {
+            if (window.ReactNativeWebView) {
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  action: 'initialized',
+                })
+              );
+            }
+          }
+          sendInitializationMessage();
+        </script>;
     </head>
     <body>
         <div id="editor" class="ace_editor"></div>
-    </body>
+    </body>;
     </html>
     `,
     [
