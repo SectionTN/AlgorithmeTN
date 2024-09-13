@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {BackHandler, StatusBar, StyleSheet} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
@@ -10,10 +10,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
-import Animated, {
-  FadeInUp,
-  FadeOutDown,
-} from 'react-native-reanimated';
+import Animated, {FadeInUp, FadeOutDown} from 'react-native-reanimated';
 import {fontValue, heightPercentageToDP} from '../../config/dimensions.ts';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {RootStackParamList} from '../../config/navigation/types.ts';
@@ -34,6 +31,9 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {alert} from '@baronha/ting';
 import auth from '@react-native-firebase/auth';
 import {useBackHandler} from '@react-native-community/hooks';
+import {useMMKVString} from 'react-native-mmkv';
+import firestore from '@react-native-firebase/firestore';
+import {MidnightPhoto} from '../../utils/const.ts';
 
 const Settings: React.FC = () => {
   const navigation =
@@ -41,9 +41,39 @@ const Settings: React.FC = () => {
 
   const theme = useTheme();
 
+  const [themeStatus, setThemeStatus] = useMMKVString('theme');
+
+  const [languageStatus, setLanguageStatus] = useMMKVString('language');
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [avatar, setAvatar] = useState('');
+  const [username, setUsername] = useState('');
+  const [bio, setBio] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('users')
+      .doc(auth().currentUser?.uid)
+      .onSnapshot(documentSnapshot => {
+        if (documentSnapshot.exists) {
+          setFirstName(documentSnapshot.data()?.first_name);
+          setLastName(documentSnapshot.data()?.last_name);
+          setUsername(documentSnapshot.data()?.username);
+          setBio(documentSnapshot.data()?.bio);
+        }
+      });
+
+    return () => unsubscribe();
+  }, []);
+
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
+
+  useEffect(() => {
+    setAvatar(auth()?.currentUser?.photoURL ?? 'XD');
+  }, []);
 
   useBackHandler(() => {
     return false;
@@ -68,12 +98,14 @@ const Settings: React.FC = () => {
           entering={FadeInUp}
           exiting={FadeOutDown}
           style={styles.under_header}>
-          <Avatar.Image
-            size={85}
-            source={{
-              uri: 'https://avatars.githubusercontent.com/u/73752904?s=400&u=4e326f643d19b525a0f17c25b80d911093d150cd&v=4',
-            }}
-          />
+          {avatar && avatar.length === 2 ? (
+            <Avatar.Text label={avatar} size={85} />
+          ) : (
+            <Avatar.Image
+              source={{uri: avatar === '' ? MidnightPhoto : avatar}}
+              size={85}
+            />
+          )}
           <Text
             adjustsFontSizeToFit
             numberOfLines={2}
@@ -81,15 +113,15 @@ const Settings: React.FC = () => {
               styles.under_header_text,
               {color: theme.colors.onBackground},
             ]}>
-            {'Rayen Sbai'}
+            {auth().currentUser?.displayName ?? `${firstName} ${lastName}`}
           </Text>
-          {false ? (
+          {bio ? (
             <Text
               adjustsFontSizeToFit={true}
               numberOfLines={1}
               onPress={() => {}}
               style={[styles.bioText, {color: theme.colors.onBackground}]}>
-              {'userBio'}
+              {bio}
             </Text>
           ) : (
             <Text
@@ -97,7 +129,7 @@ const Settings: React.FC = () => {
               numberOfLines={1}
               style={[styles.bioText, {color: theme.colors.onBackground}]}
               onPress={() => {}}>
-              {"we're oscar mike"}
+              {'tap to add a biography'}
             </Text>
           )}
         </Animated.View>
@@ -113,7 +145,11 @@ const Settings: React.FC = () => {
             onPress={() => navigation.navigate('dark-mode')}>
             <Card.Title
               title={'Dark Mode'}
-              subtitle={'Off'}
+              subtitle={
+                themeStatus
+                  ? themeStatus[0].toUpperCase() + themeStatus.slice(1)
+                  : 'System'
+              }
               left={DarkModeIcon}
             />
           </Card>
@@ -123,7 +159,11 @@ const Settings: React.FC = () => {
             onPress={() => navigation.navigate('change-language')}>
             <Card.Title
               title={'Language'}
-              subtitle={'English'}
+              subtitle={
+                languageStatus && languageStatus === 'fr-FR'
+                  ? 'French'
+                  : 'English'
+              }
               left={LanguageIcon}
             />
           </Card>
@@ -198,11 +238,7 @@ const Settings: React.FC = () => {
           <Card
             onPress={() => navigation.navigate('edit-username')}
             mode={'contained'}>
-            <Card.Title
-              title={'Username'}
-              subtitle={'SectionTN'}
-              left={AtIcon}
-            />
+            <Card.Title title={'Username'} subtitle={username} left={AtIcon} />
           </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />
           <Text variant={'titleMedium'}>{'Help'}</Text>
