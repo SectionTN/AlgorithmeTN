@@ -9,6 +9,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import {useNavigation} from '@react-navigation/native';
 import {changeLanguage} from '../../config/i18n/changeLanguage.ts';
+import {useMMKVString} from 'react-native-mmkv';
 
 type SupportedLanguage = 'en' | 'fr';
 
@@ -18,7 +19,7 @@ const ChangeLanguage: React.FC = () => {
 
   const theme = useTheme();
 
-  const [language, setLanguage] = useState<SupportedLanguage>('en');
+  const [language, setLanguage] = useMMKVString('language');
 
   return (
     <BaseView
@@ -30,7 +31,7 @@ const ChangeLanguage: React.FC = () => {
           <Appbar.BackAction onPress={() => navigation.goBack()} />
         </Tooltip>
         <Appbar.Content
-          title="Dark Mode"
+          title="Change Language"
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
       </Appbar.Header>
@@ -40,9 +41,9 @@ const ChangeLanguage: React.FC = () => {
           setLanguage(languageChanged as SupportedLanguage);
           changeLanguage(languageChanged as SupportedLanguage);
         }}
-        value={language}>
+        value={language ?? 'en'}>
         <RadioButton.Item label="English" value="en" />
-        <RadioButton.Item label="French" value="fr" />
+        <RadioButton.Item label="French" value="fr-FR" />
       </RadioButton.Group>
     </BaseView>
   );

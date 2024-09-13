@@ -5,8 +5,8 @@
  * @format
  */
 
-import React, {useMemo} from 'react';
-import {StatusBar, StyleSheet, useColorScheme} from 'react-native';
+import React, {useEffect, useMemo} from 'react';
+import {Appearance, StatusBar, StyleSheet, useColorScheme} from 'react-native';
 import {PaperProvider, MD3DarkTheme, MD3LightTheme} from 'react-native-paper';
 import StackNavigator from './config/navigation/stack.tsx';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -16,12 +16,47 @@ import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import i18n from './config/i18n/i18n.ts';
 import {I18nextProvider} from 'react-i18next';
 import {COLORS} from './config/misc.ts';
+import {useMMKVString} from 'react-native-mmkv';
+import setColorScheme = Appearance.setColorScheme;
+import * as RNLocalize from 'react-native-localize';
+import {changeLanguage} from './config/i18n/changeLanguage.ts';
+
+const locales = RNLocalize.getLocales();
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colorScheme = useColorScheme();
-  const {theme} = useMaterial3Theme({fallbackSourceColor: COLORS.yellowLightWarning});
+  const {theme} = useMaterial3Theme({
+    fallbackSourceColor: COLORS.yellowLightWarning,
+  });
+
+  const [themeStatus, setThemeStatus] = useMMKVString('theme');
+
+  const [languageStatus, setLanguageStatus] = useMMKVString('language');
+ // TODO: bug here
+  useEffect(() => {
+    if (themeStatus === undefined) {
+      setThemeStatus('system');
+    } else if (themeStatus === 'system') {
+      setColorScheme(undefined);
+    } else {
+      setColorScheme(themeStatus as 'light' | 'dark');
+    }
+  }, [setThemeStatus, themeStatus]);
+
+  useEffect(() => {
+    if (languageStatus === undefined) {
+      setLanguageStatus(locales[0].languageTag);
+      changeLanguage(locales[0].languageTag);
+    } else if (languageStatus === 'fr') {
+      setLanguageStatus(languageStatus as 'fr');
+      changeLanguage(languageStatus as 'fr');
+    } else {
+      setLanguageStatus(languageStatus as 'en');
+      changeLanguage(languageStatus as 'en');
+    }
+  }, [languageStatus, setLanguageStatus]);
 
   const paperTheme = useMemo(
     () =>
@@ -91,4 +126,5 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
+
 export default App;
