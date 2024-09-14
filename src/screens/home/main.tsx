@@ -25,7 +25,9 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import auth from '@react-native-firebase/auth';
-
+import {CodeData} from '../../types/interfaces.ts';
+import firestore from '@react-native-firebase/firestore';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const LeftContent = (props: any) => <Avatar.Icon {...props} icon="code-tags" />;
 
@@ -41,6 +43,9 @@ const Main: React.FC = () => {
 
   const [photoUrl, setPhotoUrl] = useState('XD');
 
+  const [codes, setCodes] = useState<
+    (CodeData & {first_name: string; last_name: string})[]
+  >([]);
   const RightContent = (props: any) => (
     <>
       <View style={{flexDirection: 'column', alignItems: 'center'}}>
@@ -60,29 +65,6 @@ const Main: React.FC = () => {
     </>
   );
 
-  const [items] = useState([
-    {title: 'Bubble Sort', desc: 'Rayen Sbai'},
-    {title: 'Quick Sort', desc: 'Lionel Messi'},
-    {title: 'Fabonnaci', desc: '3M'},
-    {title: 'Matrix Sort', desc: 'who'},
-    {title: 'Maybe Dunno', desc: 'idk'},
-    {title: 'GREEN SEA', desc: '#16a085'},
-    {title: 'NEPHRITIS', desc: '#27ae60'},
-    {title: 'BELIZE HOLE', desc: '#2980b9'},
-    {title: 'WISTERIA', desc: '#8e44ad'},
-    {title: 'MIDNIGHT BLUE', desc: '#2c3e50'},
-    {title: 'SUN FLOWER', desc: '#f1c40f'},
-    {title: 'CARROT', desc: '#e67e22'},
-    {title: 'ALIZARIN', desc: '#e74c3c'},
-    {title: 'CLOUDS', desc: '#ecf0f1'},
-    {title: 'CONCRETE', desc: '#95a5a6'},
-    {title: 'ORANGE', desc: '#f39c12'},
-    {title: 'PUMPKIN', desc: '#d35400'},
-    {title: 'POMEGRANATE', desc: '#c0392b'},
-    {title: 'SILVER', desc: '#bdc3c7'},
-    {title: 'ASBESTOS', desc: '#7f8c8d'},
-  ]);
-
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
@@ -91,48 +73,154 @@ const Main: React.FC = () => {
     setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
   }, []);
 
-  const renderGridItem = ({item}) => {
+  const getUserData = async (
+    uid: string,
+  ): Promise<{first_name: string; last_name: string}> => {
+    try {
+      const userDoc = await firestore().collection('users').doc(uid).get();
+      const userData = userDoc.data();
+      return {
+        first_name: userData?.first_name || '',
+        last_name: userData?.last_name || '',
+      };
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      return {first_name: '', last_name: ''};
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('codes')
+      .onSnapshot(async snapshot => {
+        try {
+          const codesList = await Promise.all(
+            snapshot.docs.map(async doc => {
+              const codeData = doc.data() as CodeData;
+              const userData = await getUserData(codeData.uid);
+              return {
+                ...codeData,
+                id: doc.id,
+                ...userData,
+              };
+            })
+          );
+          setCodes(codesList);
+        } catch (error) {
+          if (error instanceof Error) {
+            crashlytics().recordError(error);
+          }
+          console.error('Error fetching codes:', error);
+        }
+      });
+
+    return () => unsubscribe();
+  }, []);
+
+  const toggleLike = async (codeId: string, likes: string[]) => {
+    const uid = auth().currentUser?.uid;
+    if (uid) {
+      try {
+        const codeRef = firestore().collection('codes').doc(codeId);
+        if (likes.includes(uid)) {
+          await codeRef.update({
+            likes: firestore.FieldValue.arrayRemove(uid),
+          });
+        } else {
+          await codeRef.update({
+            likes: firestore.FieldValue.arrayUnion(uid),
+          });
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          crashlytics().recordError(error);
+        }
+        console.error('Error toggling like:', error);
+      }
+    }
+  };
+
+  const handleBookmark = async (codeId: string) => {
+    const uid = auth().currentUser?.uid;
+    if (uid) {
+      try {
+        const bookmarkRef = firestore()
+          .collection('users')
+          .doc(uid)
+          .collection('bookmarks')
+          .doc(codeId);
+        await bookmarkRef.set({codeId});
+      } catch (error) {
+        console.error('Error adding bookmark:', error);
+      }
+    }
+  };
+
+  const renderGridItem = ({
+    item,
+  }: {
+    item: CodeData & {first_name: string; last_name: string};
+  }) => {
+    const uid = auth().currentUser?.uid;
+    const liked = uid ? item.likes.includes(uid) : false;
     return (
       <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
         <Card
           mode={'contained'}
           onPress={() => {
-            navigation.navigate('algo');
+            navigation.navigate('algo', {codeId: item.id});
           }}>
           <Card.Title
             title={item.title}
-            subtitle={item.desc}
+            subtitle={`${item.first_name} ${item.last_name}`}
             titleStyle={{fontFamily: FONTS.p_regular}}
             subtitleStyle={{fontFamily: FONTS.p_regular}}
             left={LeftContent}
-            right={RightContent}
+            right={() => (
+              <View style={{flexDirection: 'column', alignItems: 'center'}}>
+                <IconButton
+                  icon="eye"
+                  iconColor={theme.colors.onPrimary}
+                  containerColor={theme.colors.primary}
+                  size={20}
+                  onPress={undefined}
+                />
+                <Text
+                  style={{fontFamily: FONTS.p_regular}}
+                  variant={'labelSmall'}>
+                  {item.views}
+                </Text>
+              </View>
+            )}
           />
           <Card.Content>
-            <Text variant="bodyMedium">
-              {'a basic sorting algorithm useful for easy purposes'}
-            </Text>
+            <Text variant="bodyMedium">{item.description}</Text>
             <SpacerV height={heightPercentageToDP(0.2)} />
             <Icon
               size={24}
               color={theme.colors.primary}
-              source={'language-javascript'}
+              source={
+                item.language === 'algorithm'
+                  ? 'brain'
+                  : `language-${item.language}`
+              }
             />
           </Card.Content>
           <Card.Actions>
             <View style={{flexDirection: 'column', alignItems: 'center'}}>
               <IconButton
-                icon="heart"
+                icon={liked ? 'heart' : 'heart-outline'}
                 iconColor={theme.colors.onPrimary}
                 containerColor={theme.colors.primary}
                 size={20}
                 onPress={() => {
-                  //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+                  toggleLike(item.id, item.likes);
                 }}
               />
               <Text
                 style={{fontFamily: FONTS.p_regular}}
                 variant={'labelSmall'}>
-                1, 2M
+                {item.likes.length}
               </Text>
             </View>
             <View style={{flexDirection: 'column', alignItems: 'center'}}>
@@ -142,13 +230,13 @@ const Main: React.FC = () => {
                 containerColor={theme.colors.primary}
                 size={20}
                 onPress={() => {
-                  //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+                  navigation.navigate('comments');
                 }}
               />
               <Text
                 style={{fontFamily: FONTS.p_regular}}
                 variant={'labelSmall'}>
-                1, 133K
+                {item.comments.length}
               </Text>
             </View>
             <View style={{flexDirection: 'column', alignItems: 'center'}}>
@@ -158,7 +246,7 @@ const Main: React.FC = () => {
                 containerColor={theme.colors.primary}
                 size={20}
                 onPress={() => {
-                  //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+                  handleBookmark(item.id);
                 }}
               />
               <Text
@@ -167,22 +255,22 @@ const Main: React.FC = () => {
                 5, 294K
               </Text>
             </View>
-            <View style={{flexDirection: 'column', alignItems: 'center'}}>
-              <IconButton
-                icon="share"
-                iconColor={theme.colors.onPrimary}
-                containerColor={theme.colors.primary}
-                size={20}
-                onPress={() => {
-                  //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
-                }}
-              />
-              <Text
-                style={{fontFamily: FONTS.p_regular}}
-                variant={'labelSmall'}>
-                5, 294K
-              </Text>
-            </View>
+            {/**<View style={{flexDirection: 'column', alignItems: 'center'}}>
+             <IconButton
+             icon="share"
+             iconColor={theme.colors.onPrimary}
+             containerColor={theme.colors.primary}
+             size={20}
+             onPress={() => {
+             //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
+             }}
+             />
+             <Text
+             style={{fontFamily: FONTS.p_regular}}
+             variant={'labelSmall'}>
+             5, 294K
+             </Text>
+             </View>*/}
           </Card.Actions>
         </Card>
       </Animated.View>
@@ -206,6 +294,12 @@ const Main: React.FC = () => {
           title="Home"
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
+        {__DEV__ && (
+          <Appbar.Action
+            icon="clock-time-eight-outline"
+            onPress={() => navigation.navigate('pending-review')}
+          />
+        )}
         <Tooltip title="Add">
           <Appbar.Action
             icon="pencil-plus"
@@ -221,13 +315,14 @@ const Main: React.FC = () => {
           onChangeText={setSearchQuery}
         />
       </View>
-      <SpacerV height={heightPercentageToDP(0.10)} />
+      <SpacerV height={heightPercentageToDP(0.1)} />
       <FlatGrid
         itemDimension={windowWidth}
-        data={items}
+        data={codes}
         style={styles.gridView}
         spacing={10}
         renderItem={renderGridItem}
+        removeClippedSubviews={false}
       />
     </BaseView>
   );
