@@ -115,23 +115,13 @@ const Settings: React.FC = () => {
             ]}>
             {auth().currentUser?.displayName ?? `${firstName} ${lastName}`}
           </Text>
-          {bio ? (
-            <Text
-              adjustsFontSizeToFit={true}
-              numberOfLines={1}
-              onPress={() => {}}
-              style={[styles.bioText, {color: theme.colors.onBackground}]}>
-              {bio}
-            </Text>
-          ) : (
-            <Text
-              adjustsFontSizeToFit={true}
-              numberOfLines={1}
-              style={[styles.bioText, {color: theme.colors.onBackground}]}
-              onPress={() => {}}>
-              {'tap to add a biography'}
-            </Text>
-          )}
+          <Text
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            onPress={() => navigation.navigate('edit-bio')}
+            style={[styles.bioText, {color: theme.colors.onBackground}]}>
+            {bio ?? 'tap to add a biography'}
+          </Text>
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.25)} />
         <Animated.View
