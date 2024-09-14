@@ -1,6 +1,6 @@
-import React from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Card, Text} from 'react-native-paper';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet} from 'react-native';
+import {Card} from 'react-native-paper';
 import BaseView from '../../components/baseview/baseview.tsx';
 import Animated from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
@@ -8,15 +8,30 @@ import {fontValue, heightPercentageToDP} from '../../config/dimensions.ts';
 import NumberedList from '../../components/numbered-list/numbered-list.tsx';
 import {FONTS} from '../../config/misc.ts';
 import {ScrollView} from 'react-native-gesture-handler';
+import {InstructionsProps} from '../../types/interfaces.ts';
+import firestore from '@react-native-firebase/firestore';
 
-const Instructions: React.FC = () => {
-  const sortingSteps = [
-    'Start with an unsorted array of n elements.',
-    'Compare adjacent elements, swapping them if they are in the wrong order.',
-    'Repeat step 2 for n-1 passes.',
-    'After each pass, the largest unsorted element "bubbles up" to its correct position.',
-    'The array is sorted when no more swaps are needed.',
-  ];
+const Instructions: React.FC<InstructionsProps> = ({codeId}) => {
+  const [instructions, setInstructions] = useState<string>();
+
+  const fetchInstructions = async (codeId: string) => {
+    try {
+      const codeDoc = await firestore().collection('codes').doc(codeId).get();
+      let rawInstructions = codeDoc.data()?.instructions || '';
+
+      const formattedInstructions = rawInstructions.replace(
+        /\. (?=\S)/g,
+        '.\n',
+      );
+      setInstructions(formattedInstructions);
+    } catch (error) {
+      console.error('Error fetching instructions:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchInstructions(codeId);
+  }, [codeId]);
 
   return (
     <BaseView
@@ -29,13 +44,11 @@ const Instructions: React.FC = () => {
           <Card mode={'contained'}>
             <Card.Title title={'How it works:'} />
             <Card.Content>
-              <NumberedList steps={sortingSteps} />
+              <NumberedList steps={instructions?.split('\n')} />
             </Card.Content>
           </Card>
-          <View style={{flex: 1}} />
         </Animated.View>
       </ScrollView>
-      <Text style={styles.bottomText}>Enjoy coding!</Text>
       <SpacerV height={heightPercentageToDP(0.25)} />
     </BaseView>
   );
