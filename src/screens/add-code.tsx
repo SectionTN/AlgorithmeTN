@@ -18,9 +18,13 @@ import {ScrollView} from 'react-native-gesture-handler';
 import SpacerV from '../components/spacer/spacerv.tsx';
 import {fontValue, heightPercentageToDP} from '../config/dimensions.ts';
 import {alert} from '@baronha/ting';
-import {isEqual} from 'lodash';
+import {isEmpty, isEqual} from 'lodash';
 import {customCapitalize} from '../utils/algo-utils.ts';
 import {Language} from '../types/languages.ts';
+import NetInfo from '@react-native-community/netinfo';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const AddCode: React.FC = () => {
   const navigation =
@@ -65,6 +69,8 @@ const AddCode: React.FC = () => {
   const [sectionMenuVisible, setSectionMenuVisible] = useState(false);
   const [languageMenuVisible, setLanguageMenuVisible] = useState(false);
 
+  const [isConnected, setIsConnected] = useState(true);
+
   const [switchToggled, setSwitchToggle] = React.useState(false);
 
   const route = useRoute<RouteProp<RootStackParamList, 'add-code'>>();
@@ -75,6 +81,120 @@ const AddCode: React.FC = () => {
       setCodeValue(params.codeValue);
     }
   }, [params?.codeValue]);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected ?? true);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  function handleButtonPress() {
+    const titleLength = title.trim().length;
+    const descriptionLength = description.trim().length;
+    const uid = auth().currentUser?.uid;
+    if (!isConnected) {
+      return alert({
+        title: 'Network Unavailable',
+        message: 'Network connection is required',
+        preset: 'error',
+      });
+    }
+    if (isEmpty(title)) {
+      return alert({
+        title: 'Empty Title',
+        message: 'Code title is required',
+        preset: 'error',
+      });
+    }
+    if (titleLength < 5) {
+      return alert({
+        title: 'Short Code Title',
+        message: 'Title is too short',
+        preset: 'error',
+      });
+    }
+    if (isEmpty(description)) {
+      return alert({
+        title: 'Empty Description',
+        message: 'Code description is required',
+        preset: 'error',
+      });
+    }
+    if (descriptionLength < 5) {
+      return alert({
+        title: 'Short Code Description',
+        message: 'Description is too short',
+        preset: 'error',
+      });
+    }
+    if (!level) {
+      return alert({
+        title: 'Empty Level',
+        message: 'School level is required',
+        preset: 'error',
+      });
+    }
+    if (level !== '1ére' && !section) {
+      return alert({
+        title: 'Empty Section',
+        message: 'Level\'s section is required',
+        preset: 'error',
+      });
+    }
+    if (language === 'none') {
+      return alert({
+        title: 'Empty Language',
+        message: 'Language selection is required',
+        preset: 'error',
+      });
+    }
+    if (!codeValue) {
+      return alert({
+        title: 'Empty Code',
+        message: 'You must add some code',
+        preset: 'error',
+      });
+    }
+    if (switchToggled && !instructions) {
+      return alert({
+        title: 'Empty instructions',
+        message: 'Add some instructions to your code',
+        preset: 'error',
+      });
+    }
+    alert({title: 'Please Wait', preset: 'spinner'});
+
+    const newCode = {
+      title,
+      description,
+      level,
+      section,
+      language,
+      instructions,
+      codeValue,
+      uid,
+      likes: [],
+      comments: [],
+      views: 0,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+    };
+    firestore()
+      .collection('pending_codes')
+      .add(newCode)
+      .then(() => {
+        alert({title: 'Sent for review', preset: 'done'});
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        }
+      }).catch(error => {
+      crashlytics().recordError(error);
+      alert({title: 'Sending Failed', message: 'An error occurred'});
+    });
+  }
 
   return (
     <BaseView
@@ -95,7 +215,7 @@ const AddCode: React.FC = () => {
         style={styles.scrollContainer}>
         <SpacerV height={heightPercentageToDP(0.25)} />
         <TextInput
-          label="Algorithm Title"
+          label="Code Title"
           value={title}
           mode={'outlined'}
           multiline={false}
@@ -109,7 +229,7 @@ const AddCode: React.FC = () => {
         />
         <SpacerV height={heightPercentageToDP(0.25)} />
         <TextInput
-          label="Algorithm Description"
+          label="Code Description"
           value={description}
           mode={'outlined'}
           multiline={true}
@@ -213,7 +333,7 @@ const AddCode: React.FC = () => {
           value={
             codeValue
               ? 'Click to edit your code.'
-              : "You haven't submitted any code."
+              : 'You haven\'t submitted any code.'
           }
           onFocus={() => {
             Keyboard.dismiss();
@@ -255,21 +375,18 @@ const AddCode: React.FC = () => {
             mode={'outlined'}
             value={instructions}
             right={<TextInput.Affix text={`${instructions.length}/750`} />}
+            maxLength={775}
             onChangeText={text => {
               if (text.length > 750) {
                 return;
               }
               setInstructions(text);
             }}
-            multiline={true}
+            multiline={instructions.length >= 25}
           />
         )}
         <SpacerV height={heightPercentageToDP(0.25)} />
-        <Button
-          mode="contained-tonal"
-          onPress={() =>
-            alert({title: 'Sending your request', preset: 'spinner'})
-          }>
+        <Button mode="contained-tonal" onPress={handleButtonPress}>
           Send for review
         </Button>
         <SpacerV height={heightPercentageToDP(0.1)} />
