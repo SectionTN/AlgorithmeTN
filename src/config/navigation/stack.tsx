@@ -26,11 +26,13 @@ import AddCode from '../../screens/add-code.tsx';
 import WriteCode from '../../screens/write-code.tsx';
 import DarkMode from '../../screens/settings/dark-mode.tsx';
 import EditProfile from '../../screens/settings/edit-profile.tsx';
-import AddBio from '../../screens/settings/add-bio.tsx';
+import EditBio from '../../screens/settings/edit-bio.tsx';
 import EditUsername from '../../screens/settings/edit-username.tsx';
 import {useTheme} from 'react-native-paper';
 import BugReport from '../../screens/settings/bug-report.tsx';
 import ChangeLanguage from '../../screens/settings/change-language.tsx';
+import analytics from '@react-native-firebase/analytics';
+import PendingReview from '../../screens/pending-review.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -61,7 +63,10 @@ const StackNavigator: React.FC = () => {
           navigationRef?.current?.getCurrentRoute()?.name;
 
         if (previousRouteName !== currentRouteName) {
-          // analytics here
+          await analytics()?.logScreenView({
+            screen_name: currentRouteName,
+            screen_class: currentRouteName,
+          });
         }
         routeNameRef.current = currentRouteName;
       }}>
@@ -134,8 +139,8 @@ const StackNavigator: React.FC = () => {
           options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
-          name={'add-bio'}
-          component={AddBio}
+          name={'edit-bio'}
+          component={EditBio}
           options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
@@ -153,6 +158,10 @@ const StackNavigator: React.FC = () => {
           component={ChangeLanguage}
           options={{gestureEnabled: false, headerShown: false}}
         />
+        <Stack.Screen
+          name={'pending-review'}
+          component={PendingReview}
+          options={{gestureEnabled: false, headerShown: false}} />
       </Stack.Navigator>
     </NavigationContainer>
   );
