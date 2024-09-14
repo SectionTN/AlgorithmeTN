@@ -33,7 +33,7 @@ type RootStackParamList = {
     | undefined;
   home: {} | undefined;
   settings: {} | undefined;
-  algo: {} | undefined;
+  algo: {codeId?: string} | undefined;
   'add-code':
     | {
         language?:
@@ -64,10 +64,11 @@ type RootStackParamList = {
     | undefined;
   'dark-mode': {} | undefined;
   'edit-profile': {} | undefined;
-  'add-bio': {} | undefined;
+  'edit-bio': {} | undefined;
   'edit-username': {} | undefined;
   'bug-report': {} | undefined;
   'change-language': {} | undefined;
+  'pending-review': {} | undefined;
 };
 
 export type {routeNamesType, RootStackParamList};
