@@ -2,7 +2,7 @@ import BaseView from '../../components/baseview/baseview.tsx';
 import {Appbar, BottomNavigation, Tooltip, useTheme} from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
 import React, {useEffect} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import Code from './code.tsx';
@@ -16,6 +16,10 @@ const Algo: React.FC = () => {
   const theme = useTheme();
 
   const [index, setIndex] = React.useState(0);
+
+  const navRoute = useRoute<RouteProp<RootStackParamList, 'algo'>>();
+  const {codeId} = navRoute.params!;
+
   const [routes] = React.useState([
     {
       key: 'code',
@@ -32,9 +36,9 @@ const Algo: React.FC = () => {
   const renderScene = ({route}: {route: {key: string}}) => {
     switch (route.key) {
       case 'code':
-        return <Code />;
+        return <Code codeId={codeId ?? ''} />;
       case 'instructions':
-        return <Instructions />;
+        return <Instructions codeId={codeId ?? ''} />;
       default:
         return null;
     }
@@ -70,16 +74,10 @@ const Algo: React.FC = () => {
           <Appbar.Action icon="heart-outline" onPress={() => {}} />
         </Tooltip>
         <Tooltip title="Bookmark">
-          <Appbar.Action
-            icon="bookmark-outline"
-            onPress={() => {}}
-          />
+          <Appbar.Action icon="bookmark-outline" onPress={() => {}} />
         </Tooltip>
         <Tooltip title="Share">
-          <Appbar.Action
-            icon="share-outline"
-            onPress={() => {}}
-          />
+          <Appbar.Action icon="share-outline" onPress={() => {}} />
         </Tooltip>
       </Appbar.Header>
       <BottomNavigation
