@@ -178,23 +178,13 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
               ? auth().currentUser?.displayName
               : `${firstName} ${lastName}`}
           </Text>
-          {bio ? (
-            <Text
-              adjustsFontSizeToFit={true}
-              numberOfLines={1}
-              onPress={() => {}}
-              style={[styles.bioText, {color: theme.colors.onBackground}]}>
-              {bio}
-            </Text>
-          ) : (
-            <Text
-              adjustsFontSizeToFit={true}
-              numberOfLines={1}
-              style={[styles.bioText, {color: theme.colors.onBackground}]}
-              onPress={() => navigation.navigate('add-bio')}>
-              {'tap to add a biography'}
-            </Text>
-          )}
+          <Text
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            style={[styles.bioText, {color: theme.colors.onBackground}]}
+            onPress={() => navigation.navigate('edit-bio')}>
+            {bio ?? 'tap to add a biography'}
+          </Text>
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.25)} />
         {/*Language Chips*/}
