@@ -3631,9 +3631,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-firebase/app@npm:^20.4.0":
-  version: 20.4.0
-  resolution: "@react-native-firebase/app@npm:20.4.0"
+"@react-native-firebase/analytics@npm:^20.5.0":
+  version: 20.5.0
+  resolution: "@react-native-firebase/analytics@npm:20.5.0"
+  peerDependencies:
+    "@react-native-firebase/app": 20.5.0
+  checksum: af59364f0b02d6f2e15c19dabc414a7bb512f4475b965691d8ac9296639140143ccc3e8eb374e0e1e8ebc5618af6015f33ff3b2ad8ee757bbd7bfb364003f789
+  languageName: node
+  linkType: hard
+
+"@react-native-firebase/app@npm:^20.5.0":
+  version: 20.5.0
+  resolution: "@react-native-firebase/app@npm:20.5.0"
   dependencies:
     firebase: 10.12.2
     superstruct: ^0.6.2
@@ -3644,46 +3653,46 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 74e70ad28f158dfa6533269a5cb629cb737c1fc0eb81e334029a2de09fe0f962fa1772431322efa967840a03663ea5b4512e63db10883f416e1dfd1f12a994e9
+  checksum: 107293fe8f5bd62923ad2a428dca6ff50817526a8a9829c831f7e64bdad6f5d940457555faeffea24b1213ea09fa19db553f45081c568906a845d3f5871bd96c
   languageName: node
   linkType: hard
 
-"@react-native-firebase/auth@npm:^20.4.0":
-  version: 20.4.0
-  resolution: "@react-native-firebase/auth@npm:20.4.0"
+"@react-native-firebase/auth@npm:^20.5.0":
+  version: 20.5.0
+  resolution: "@react-native-firebase/auth@npm:20.5.0"
   dependencies:
     plist: ^3.1.0
   peerDependencies:
-    "@react-native-firebase/app": 20.4.0
+    "@react-native-firebase/app": 20.5.0
     expo: ">=47.0.0"
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 98702a22a8e83773f0b2552b0899ab8650912956db7f15b81bb86481e81d95d6838b22b47b6ff0ffe4fd77b1e6f0aad12c5a6b5692b2a812b17d6e2a05499862
+  checksum: 22ef07d5c2058d5ec88599d4a060f0af24e0d8fad3848d00a6c206818486508cc8e7718d9bb40cfddd5eb2513c78e9c6965ac42cb48c927de535235d2c625157
   languageName: node
   linkType: hard
 
-"@react-native-firebase/crashlytics@npm:^20.4.0":
-  version: 20.4.0
-  resolution: "@react-native-firebase/crashlytics@npm:20.4.0"
+"@react-native-firebase/crashlytics@npm:^20.5.0":
+  version: 20.5.0
+  resolution: "@react-native-firebase/crashlytics@npm:20.5.0"
   dependencies:
     stacktrace-js: ^2.0.2
   peerDependencies:
-    "@react-native-firebase/app": 20.4.0
+    "@react-native-firebase/app": 20.5.0
     expo: ">=47.0.0"
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 697928e974f06ff46d775443768cce7a968fa3b1a5660ed84f217b8ebba10eeb45d21b98ea547a3aa9d0acbb6cb1727d3e833f0db0740c83f03568d4a7d19d35
+  checksum: 0c1bd478f8aa1c1296db0f5484c213cd915332a93ed6931a84f5418f936392009927a2edd1bbc6bd574461d3f1435de230ba80d2a086f1c3ca851586ec4c956d
   languageName: node
   linkType: hard
 
-"@react-native-firebase/firestore@npm:^20.4.0":
-  version: 20.4.0
-  resolution: "@react-native-firebase/firestore@npm:20.4.0"
+"@react-native-firebase/firestore@npm:^20.5.0":
+  version: 20.5.0
+  resolution: "@react-native-firebase/firestore@npm:20.5.0"
   peerDependencies:
-    "@react-native-firebase/app": 20.4.0
-  checksum: 7f9eb0905f265357eff6cc05ac3880eaffbadbe798eb9b520d834350e819e5a6fc67ae55dad9b6f14a981a204805ff080bd81afa2ef8e95e69a1e18a3fd5574d
+    "@react-native-firebase/app": 20.5.0
+  checksum: d46e799a07a985eb477ecea1973d44d7316331f3244b2626468230c1f4c97f69f7724afeb7515aaddfa33ef3dd851689936b69dd447cbc3e45a59d90c779c6a2
   languageName: node
   linkType: hard
 
@@ -3700,12 +3709,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-firebase/storage@npm:^20.4.0":
-  version: 20.4.0
-  resolution: "@react-native-firebase/storage@npm:20.4.0"
+"@react-native-firebase/storage@npm:^20.5.0":
+  version: 20.5.0
+  resolution: "@react-native-firebase/storage@npm:20.5.0"
   peerDependencies:
-    "@react-native-firebase/app": 20.4.0
-  checksum: e467845688c0ea51ba0c4148c5bc2726c16b58ce01e4e743c62227a01b687fbea2f85a83cf015b2aa82cdf1ae2e84d33b269836318f5dd13c233a1db81966139
+    "@react-native-firebase/app": 20.5.0
+  checksum: 2f9f8a4d318111a73ec59578aaca15c544fb34c744b4a6d6c4b5e30648defd5f25c91fee9c7486db1be96ba61bcc0bff17a06cabebc24b880931aefc5ef5270f
   languageName: node
   linkType: hard
 
@@ -4769,12 +4778,13 @@ __metadata:
     "@react-native-clipboard/clipboard": ^1.14.1
     "@react-native-community/hooks": ^3.0.0
     "@react-native-community/netinfo": ^11.3.2
-    "@react-native-firebase/app": ^20.4.0
-    "@react-native-firebase/auth": ^20.4.0
-    "@react-native-firebase/crashlytics": ^20.4.0
-    "@react-native-firebase/firestore": ^20.4.0
+    "@react-native-firebase/analytics": ^20.5.0
+    "@react-native-firebase/app": ^20.5.0
+    "@react-native-firebase/auth": ^20.5.0
+    "@react-native-firebase/crashlytics": ^20.5.0
+    "@react-native-firebase/firestore": ^20.5.0
     "@react-native-firebase/perf": ^20.5.0
-    "@react-native-firebase/storage": ^20.4.0
+    "@react-native-firebase/storage": ^20.5.0
     "@react-native/babel-preset": 0.75.2
     "@react-native/eslint-config": 0.75.2
     "@react-native/metro-config": 0.75.2
