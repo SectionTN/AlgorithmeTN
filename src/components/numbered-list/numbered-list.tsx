@@ -4,15 +4,15 @@ import {Text} from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
 
 interface NumberedListProps {
-  steps: string[];
+  steps: string[] | undefined;
 }
 
 const NumberedList: React.FC<NumberedListProps> = ({steps}) => {
   return (
     <>
-      {steps.map((step, index) => (
+      {steps && steps?.map((step, index) => (
         <Text key={index} style={styles.text}>
-          {index + 1}- {step}
+          {index + 1} - {step}
         </Text>
       ))}
     </>
