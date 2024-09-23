@@ -14,9 +14,9 @@ import firestore from '@react-native-firebase/firestore';
 const Instructions: React.FC<InstructionsProps> = ({codeId}) => {
   const [instructions, setInstructions] = useState<string>();
 
-  const fetchInstructions = async (codeId: string) => {
+  const fetchInstructions = async (id: string) => {
     try {
-      const codeDoc = await firestore().collection('codes').doc(codeId).get();
+      const codeDoc = await firestore().collection('codes').doc(id).get();
       let rawInstructions = codeDoc.data()?.instructions || '';
 
       const formattedInstructions = rawInstructions.replace(
