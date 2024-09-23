@@ -13,6 +13,8 @@ interface CodeData {
   likes: string[];
   views: number;
   comments: string[];
+  bookmarksCount: number;
+  isBookmarked: boolean;
 }
 
 interface InstructionsProps {
