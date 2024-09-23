@@ -69,6 +69,10 @@ type RootStackParamList = {
   'bug-report': {} | undefined;
   'change-language': {} | undefined;
   'pending-review': {} | undefined;
+  comments: {
+    pid?: string
+  } | undefined;
+  profile: {uid?: string} | undefined
 };
 
 export type {routeNamesType, RootStackParamList};
