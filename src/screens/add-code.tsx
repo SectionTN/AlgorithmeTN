@@ -34,7 +34,7 @@ const AddCode: React.FC = () => {
 
   const sections = [
     {title: 'Science Informatique', value: 'Science Informatique'},
-    {title: 'Science Naturelle', value: 'Science Naturelle'},
+    {title: 'Science Naturel', value: 'Science Naturel'},
     {title: 'Économie & Gestion', value: 'Économie & Gestion'},
   ];
 
@@ -91,6 +91,7 @@ const AddCode: React.FC = () => {
       unsubscribe();
     };
   }, []);
+
 
   function handleButtonPress() {
     const titleLength = title.trim().length;
@@ -178,8 +179,7 @@ const AddCode: React.FC = () => {
       codeValue,
       uid,
       likes: [],
-      comments: [],
-      views: 0,
+      views: [],
       createdAt: firestore.FieldValue.serverTimestamp(),
     };
     firestore()
@@ -386,6 +386,7 @@ const AddCode: React.FC = () => {
           />
         )}
         <SpacerV height={heightPercentageToDP(0.25)} />
+        <View style={{flex: 1}}>{/*STUB VIEW*/}</View>
         <Button mode="contained-tonal" onPress={handleButtonPress}>
           Send for review
         </Button>
