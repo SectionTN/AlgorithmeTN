@@ -46,6 +46,10 @@ const Main: React.FC = () => {
   const [codes, setCodes] = useState<
     (CodeData & {first_name: string; last_name: string})[]
   >([]);
+
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
+    {},
+  );
   const RightContent = (props: any) => (
     <>
       <View style={{flexDirection: 'column', alignItems: 'center'}}>
@@ -98,12 +102,21 @@ const Main: React.FC = () => {
             snapshot.docs.map(async doc => {
               const codeData = doc.data() as CodeData;
               const userData = await getUserData(codeData.uid);
+              const bookmarksSnapshot = await firestore()
+                .collection('users')
+                .doc(auth().currentUser?.uid)
+                .collection('bookmarks')
+                .where('codeId', '==', doc.id)
+                .get();
+              const isBookmarked = !bookmarksSnapshot.empty;
               return {
                 ...codeData,
                 id: doc.id,
                 ...userData,
+                bookmarksCount: bookmarksSnapshot.size,
+                isBookmarked,
               };
-            })
+            }),
           );
           setCodes(codesList);
         } catch (error) {
@@ -119,40 +132,144 @@ const Main: React.FC = () => {
 
   const toggleLike = async (codeId: string, likes: string[]) => {
     const uid = auth().currentUser?.uid;
-    if (uid) {
-      try {
-        const codeRef = firestore().collection('codes').doc(codeId);
-        if (likes.includes(uid)) {
-          await codeRef.update({
+    if (!uid) {
+      return;
+    }
+    try {
+      const codeRef = firestore().collection('codes').doc(codeId);
+      if (likes.includes(uid)) {
+        await Promise.all([
+          codeRef.update({
             likes: firestore.FieldValue.arrayRemove(uid),
-          });
-        } else {
-          await codeRef.update({
+          }),
+          addRecentActivity(uid, {
+            type: 'unliked',
+            postId: codeId,
+            timestamp: firestore.Timestamp.fromDate(new Date()),
+          }),
+        ]);
+      } else {
+        await Promise.all([
+          addRecentActivity(uid, {
+            type: 'liked',
+            postId: codeId,
+            timestamp: firestore.Timestamp.fromDate(new Date()),
+          }),
+          codeRef.update({
             likes: firestore.FieldValue.arrayUnion(uid),
-          });
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          crashlytics().recordError(error);
-        }
-        console.error('Error toggling like:', error);
+          }),
+        ]);
       }
+    } catch (error) {
+      if (error instanceof Error) {
+        crashlytics().recordError(error);
+      }
+      console.error('Error toggling like:', error);
     }
   };
 
-  const handleBookmark = async (codeId: string) => {
+  const getCommentCounts = async (): Promise<Record<string, number>> => {
+    const commentCounts: Record<string, number> = {};
+
+    const snapshot = await firestore().collection('comments').get();
+    snapshot.docs.forEach(doc => {
+      const {postId} = doc.data();
+      if (postId) {
+        commentCounts[postId] = (commentCounts[postId] || 0) + 1;
+      }
+    });
+
+    return commentCounts;
+  };
+
+  useEffect(() => {
+    const fetchCommentCounts = async () => {
+      const counts = await getCommentCounts();
+      setCommentCounts(counts);
+    };
+
+    fetchCommentCounts();
+  }, []);
+
+  const incrementViewCount = async (codeId: string) => {
+    try {
+      const codeRef = firestore().collection('codes').doc(codeId);
+      await codeRef.update({
+        views: firestore.FieldValue.increment(1),
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        crashlytics().recordError(error);
+      }
+      console.error('Error incrementing view count:', error);
+    }
+  };
+
+  const addRecentActivity = async (uid: string, activity: object) => {
+    try {
+      await firestore()
+        .collection('users')
+        .doc(uid)
+        .collection('recent_activities')
+        .add(activity);
+    } catch (error) {
+      console.error('Error adding recent activity:', error);
+    }
+  };
+
+  const toggleBookmark = async (codeId: string) => {
     const uid = auth().currentUser?.uid;
-    if (uid) {
-      try {
-        const bookmarkRef = firestore()
+    if (!uid) {
+      return;
+    }
+    try {
+      const bookmarkRef = firestore()
+        .collection('users')
+        .doc(uid)
+        .collection('bookmarks')
+        .where('codeId', '==', codeId);
+
+      const snapshot = await bookmarkRef.get();
+      if (!snapshot.empty) {
+        await snapshot.docs[0].ref.delete();
+        await Promise.all([
+          addRecentActivity(uid, {
+            type: 'unbookmark',
+            postId: codeId,
+            timestamp: firestore.Timestamp.fromDate(new Date()),
+          }),
+        ]);
+      } else {
+        const newBookmarkRef = firestore()
           .collection('users')
           .doc(uid)
           .collection('bookmarks')
-          .doc(codeId);
-        await bookmarkRef.set({codeId});
-      } catch (error) {
-        console.error('Error adding bookmark:', error);
+          .doc();
+        await Promise.all([
+          newBookmarkRef.set({codeId}),
+          addRecentActivity(uid, {
+            type: 'bookmark',
+            postId: codeId,
+            timestamp: firestore.Timestamp.fromDate(new Date()),
+          }),
+        ]);
       }
+
+      setCodes(prevCodes =>
+        prevCodes.map(code =>
+          code.id === codeId
+            ? {
+                ...code,
+                bookmarksCount: !snapshot.empty
+                  ? code.bookmarksCount - 1
+                  : code.bookmarksCount + 1,
+                isBookmarked: snapshot.empty,
+              }
+            : code,
+        ),
+      );
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
     }
   };
 
@@ -163,12 +280,17 @@ const Main: React.FC = () => {
   }) => {
     const uid = auth().currentUser?.uid;
     const liked = uid ? item.likes.includes(uid) : false;
+
+    const commentCount = commentCounts[item.id] || 0;
+
     return (
       <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
         <Card
           mode={'contained'}
           onPress={() => {
-            navigation.navigate('algo', {codeId: item.id});
+            incrementViewCount(item.id).then(() => {
+              navigation.navigate('algo', {codeId: item.id});
+            });
           }}>
           <Card.Title
             title={item.title}
@@ -225,34 +347,38 @@ const Main: React.FC = () => {
             </View>
             <View style={{flexDirection: 'column', alignItems: 'center'}}>
               <IconButton
-                icon="thought-bubble"
+                icon={
+                  commentCount === 0
+                    ? 'thought-bubble-outline'
+                    : 'thought-bubble'
+                }
                 iconColor={theme.colors.onPrimary}
                 containerColor={theme.colors.primary}
                 size={20}
                 onPress={() => {
-                  navigation.navigate('comments');
+                  navigation.navigate('comments', {postId: item.id});
                 }}
               />
               <Text
                 style={{fontFamily: FONTS.p_regular}}
                 variant={'labelSmall'}>
-                {item.comments.length}
+                {commentCount}
               </Text>
             </View>
             <View style={{flexDirection: 'column', alignItems: 'center'}}>
               <IconButton
-                icon="bookmark"
+                icon={item.isBookmarked ? 'bookmark' : 'bookmark-outline'}
                 iconColor={theme.colors.onPrimary}
                 containerColor={theme.colors.primary}
                 size={20}
                 onPress={() => {
-                  handleBookmark(item.id);
+                  toggleBookmark(item.id);
                 }}
               />
               <Text
                 style={{fontFamily: FONTS.p_regular}}
                 variant={'labelSmall'}>
-                5, 294K
+                {item.bookmarksCount}
               </Text>
             </View>
             {/**<View style={{flexDirection: 'column', alignItems: 'center'}}>
