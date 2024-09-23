@@ -33,6 +33,8 @@ import BugReport from '../../screens/settings/bug-report.tsx';
 import ChangeLanguage from '../../screens/settings/change-language.tsx';
 import analytics from '@react-native-firebase/analytics';
 import PendingReview from '../../screens/pending-review.tsx';
+import Comments from '../../screens/comments.tsx';
+import Profile from '../../screens/home/profile.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -161,7 +163,18 @@ const StackNavigator: React.FC = () => {
         <Stack.Screen
           name={'pending-review'}
           component={PendingReview}
-          options={{gestureEnabled: false, headerShown: false}} />
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'comments'}
+          component={Comments}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'profile'}
+          component={Profile}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
