@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Text, Button, Dialog, Paragraph } from 'react-native-paper';
+import React, {useState, useEffect} from 'react';
+import {Text, Button, Dialog, Paragraph} from 'react-native-paper';
 import BaseView from '../components/baseview/baseview';
-import { View, FlatList } from 'react-native';
+import {View, FlatList} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import getUserData from '../utils/firebase.ts';
 import {CodeData} from '../types/interfaces.ts';
@@ -26,7 +26,7 @@ const PendingReview: React.FC = () => {
               last_name: userData?.last_name || 'User',
               id: doc.id,
             };
-          })
+          }),
         );
         setData(fetchedData as CodeData[]);
       };
@@ -35,11 +35,31 @@ const PendingReview: React.FC = () => {
     }
   }, []);
 
+  const addBadgeIfNotExist = async (uid: string, language: string) => {
+    if (!uid || language === 'none') {
+      return;
+    }
+
+    const userRef = firestore().collection('users').doc(uid);
+    const badgeRef = userRef.collection('badges').doc(language);
+
+    const badgeDoc = await badgeRef.get();
+    if (!badgeDoc.exists) {
+      await badgeRef.set({
+        language,
+        time: firestore.FieldValue.serverTimestamp(),
+      });
+    }
+  };
+
   const handleAction = async () => {
     if (selectedItem) {
-      const { id, ...codeData } = selectedItem;
+      const {id, ...codeData} = selectedItem;
       if (action === 'accept') {
-        await firestore().collection('codes').doc(id).set(codeData);
+        await Promise.all([
+          firestore().collection('codes').doc(id).set(codeData),
+          addBadgeIfNotExist(codeData.uid, codeData.language),
+        ]);
       }
       await firestore().collection('pending_codes').doc(id).delete();
       setData(data.filter(item => item.id !== id));
@@ -53,14 +73,13 @@ const PendingReview: React.FC = () => {
     <BaseView
       needsPaddingTop={true}
       needsPaddingBottom={false}
-      avoidingView={false}
-    >
+      avoidingView={false}>
       <View style={{flex: 1}}>
         <FlatList
           data={data}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <View style={{ padding: 10, borderBottomWidth: 1 }}>
+          renderItem={({item}) => (
+            <View style={{padding: 10, borderBottomWidth: 1}}>
               <Text>{item.title}</Text>
               <Text>{item.description}</Text>
               <Text>{`Author: ${item.first_name} ${item.last_name}`}</Text>
@@ -69,8 +88,7 @@ const PendingReview: React.FC = () => {
                   setSelectedItem(item);
                   setAction('accept');
                   setIsDialogVisible(true);
-                }}
-              >
+                }}>
                 Accept
               </Button>
               <Button
@@ -78,15 +96,18 @@ const PendingReview: React.FC = () => {
                   setSelectedItem(item);
                   setAction('deny');
                   setIsDialogVisible(true);
-                }}
-              >
+                }}>
                 Deny
               </Button>
             </View>
           )}
         />
-        <Dialog visible={isDialogVisible} onDismiss={() => setIsDialogVisible(false)}>
-          <Dialog.Title>{action === 'accept' ? 'Accept' : 'Deny'} Code?</Dialog.Title>
+        <Dialog
+          visible={isDialogVisible}
+          onDismiss={() => setIsDialogVisible(false)}>
+          <Dialog.Title>
+            {action === 'accept' ? 'Accept' : 'Deny'} Code?
+          </Dialog.Title>
           <Dialog.Content>
             <Paragraph>Are you sure you want to {action} this code?</Paragraph>
           </Dialog.Content>
@@ -101,9 +122,8 @@ const PendingReview: React.FC = () => {
     <BaseView
       needsPaddingTop={true}
       needsPaddingBottom={false}
-      avoidingView={false}
-    >
-      <Text style={{ textAlign: 'center' }}>
+      avoidingView={false}>
+      <Text style={{textAlign: 'center'}}>
         womp womp, you don't have access here
       </Text>
     </BaseView>
