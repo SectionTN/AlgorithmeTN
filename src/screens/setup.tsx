@@ -49,6 +49,52 @@ import {encryptedStorage} from '../config/storage/mmkv.ts';
 
 type SetupRouteProp = RouteProp<RootStackParamList, 'setup'>;
 
+const initialAchievements = [{title: 'New Member'}];
+
+const initialStatistics = {
+  posts: 0,
+  comments: 0,
+  views: 0,
+};
+
+const pushCollections = async () => {
+  const uid = auth().currentUser?.uid;
+  if (!uid) {
+    return;
+  }
+  const userRef = firestore().collection('users').doc(uid);
+
+  try {
+    const achievementsRef = userRef.collection('achievements');
+    const achievementsPromises = initialAchievements.map(achievement =>
+      achievementsRef.add(achievement),
+    );
+
+    const statisticsPromise = userRef
+      .collection('statistics')
+      .doc('user_stats')
+      .set(initialStatistics);
+
+    const recentActivitiesPromise = userRef
+      .collection('recent_activities')
+      .add({
+        type: 'account_created',
+        time: firestore.Timestamp.fromDate(new Date()),
+      });
+
+    await Promise.all([
+      ...achievementsPromises,
+      statisticsPromise,
+      recentActivitiesPromise,
+    ]);
+  } catch (error) {
+    if (error instanceof Error) {
+      crashlytics().recordError(error);
+    }
+    console.error('Error creating user data in Firestore:', error);
+  }
+};
+
 const Setup: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -145,6 +191,7 @@ const Setup: React.FC = () => {
       }
       const hashedPassword = await createPasswordHash(password);
       const firebaseParams = {username, email, osID, osPT};
+      await pushCollections();
       if (userPhoto) {
         /**
          * Extract the filename from userPhoto Path and remove the extension
@@ -158,7 +205,7 @@ const Setup: React.FC = () => {
           fileName = 'photo';
         }
         /**
-         * Reference to users image path
+         * Reference to users' image path
          */
         try {
           const userAvatarRef = `avatars/${
