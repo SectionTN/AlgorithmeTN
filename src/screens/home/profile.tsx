@@ -32,13 +32,69 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import {ScrollView} from 'react-native-gesture-handler';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import {isUndefined} from 'lodash';
 import firestore from '@react-native-firebase/firestore';
-import storage, {FirebaseStorageTypes} from '@react-native-firebase/storage';
-import {isNull, isUndefined} from 'lodash';
+import crashlytics from '@react-native-firebase/crashlytics';
+import getUserData from '../../utils/firebase.ts';
 
 interface ProfileProps {
   uid: string;
 }
+
+interface RecentActivity {
+  id: string;
+  postId: string;
+  type: string;
+  timestamp: number;
+  title: string;
+}
+
+interface Achievement {
+  id: string;
+  title: string;
+}
+
+interface Statistics {
+  posts: number;
+  comments: number;
+  views: number;
+}
+
+const fetchStatistics = async (uid: string): Promise<Statistics> => {
+  try {
+    const doc = await firestore()
+      .collection('users')
+      .doc(uid)
+      .collection('statistics')
+      .doc('user_stats')
+      .get();
+    if (doc.exists) {
+      return doc.data() as Statistics;
+    } else {
+      return {posts: 0, comments: 0, views: 0};
+    }
+  } catch (error) {
+    console.error('Error fetching user statistics', error);
+    return {posts: 0, comments: 0, views: 0};
+  }
+};
+
+const fetchAchievements = async (uid: string): Promise<Achievement[]> => {
+  try {
+    const snapshot = await firestore()
+      .collection('users')
+      .doc(uid)
+      .collection('achievements')
+      .get();
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Achievement[];
+  } catch (error) {
+    console.error('Error fetching achievements:', error);
+    return [];
+  }
+};
 
 const Profile: React.FC<ProfileProps> = ({uid}) => {
   const theme = useTheme();
@@ -58,17 +114,95 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
 
   const closeMenu = () => setMenuVisible(false);
 
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>(
+    [],
+  );
+
+  const [statistics, setStatistics] = useState<Statistics>({
+    posts: 0,
+    comments: 0,
+    views: 0,
+  });
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+
   const insets = useSafeAreaInsets();
+
+  const [profileUID, setProfileUID] = useState<string | undefined>('');
 
   useEffect(() => {
     if (mode === 'none') {
       if (uid === auth().currentUser?.uid || isUndefined(uid)) {
         setMode('itself');
+        if (isUndefined(uid)) {
+          setProfileUID(auth().currentUser?.uid);
+        }
       } else {
         setMode('someone');
+        setProfileUID(uid);
       }
     }
-  }, [mode, uid]);
+
+    const unsubscribeActivities = firestore()
+      .collection('users')
+      .doc(profileUID)
+      .collection('recent_activities')
+      .orderBy('timestamp', 'desc')
+      .limit(3)
+      .onSnapshot(
+        async querySnapshot => {
+          const activities = querySnapshot.docs.map(doc => ({
+            ...doc.data(),
+            id: doc.id,
+          })) as RecentActivity[];
+          const activitiesWithTitles = await Promise.all(
+            activities.map(async activity => {
+              const codeDoc = await firestore()
+                .collection('codes')
+                .doc(activity.postId)
+                .get();
+              if (codeDoc.exists) {
+                activity.title = codeDoc.data()?.title;
+              }
+              return activity;
+            }),
+          );
+          setRecentActivities(activitiesWithTitles);
+        },
+        error => {
+          crashlytics().recordError(error);
+          console.error('Error fetching recent activities:', error);
+        },
+      );
+
+    const fetchProfileData = async () => {
+      if (profileUID) {
+        try {
+          const user = await getUserData(profileUID);
+          if (user) {
+            setFirstName(user?.first_name);
+            setLastName(user?.last_name);
+          }
+          const [stats, achieves] = await Promise.all([
+            fetchStatistics(profileUID),
+            fetchAchievements(profileUID),
+          ]);
+          setStatistics(stats);
+          setAchievements(achieves);
+        } catch (error) {
+          if (error instanceof Error) {
+            crashlytics().recordError(error);
+          }
+          console.error('Error fetching profile data:', error);
+        }
+      }
+    };
+
+    fetchProfileData();
+
+    return () => {
+      unsubscribeActivities();
+    };
+  }, [mode, profileUID, uid]);
 
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
@@ -94,40 +228,15 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('users')
-      .doc(mode === 'itself' ? auth().currentUser?.uid : uid)
+      .doc(mode === 'itself' ? auth().currentUser?.uid : profileUID)
       .onSnapshot(documentSnapshot => {
         if (documentSnapshot?.exists) {
           setBio(documentSnapshot?.data()?.bio);
-        } else {
-          try {
-            let userAvatarRef: FirebaseStorageTypes.Reference | undefined;
-            const photoURL = auth().currentUser?.photoURL;
-
-            if (
-              photoURL &&
-              !isNull(photoURL) &&
-              !isUndefined(photoURL) &&
-              photoURL.length > 2
-            ) {
-              userAvatarRef = storage().refFromURL(photoURL);
-              userAvatarRef.delete().catch(err => {
-                console.error(err);
-              });
-            }
-
-            auth()
-              .currentUser?.delete()
-              .catch(err => {
-                console.error(err);
-              });
-          } catch (error) {
-            console.error('Error during user/profile photo deletion:', error);
-          }
         }
       });
 
     return () => unsubscribe();
-  }, [mode, uid]);
+  }, [mode, profileUID]);
 
   return (
     <BaseView
@@ -227,7 +336,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                     styles.statNumber,
                     {color: theme.colors.onPrimaryContainer},
                   ]}>
-                  42
+                  {statistics.posts}
                 </Text>
                 <Text
                   adjustsFontSizeToFit={true}
@@ -247,7 +356,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                     styles.statNumber,
                     {color: theme.colors.onPrimaryContainer},
                   ]}>
-                  128
+                  {statistics.comments}
                 </Text>
                 <Text
                   adjustsFontSizeToFit={true}
@@ -267,7 +376,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                     styles.statNumber,
                     {color: theme.colors.onPrimaryContainer},
                   ]}>
-                  1.5k
+                  {statistics.views}
                 </Text>
                 <Text
                   adjustsFontSizeToFit={true}
@@ -286,30 +395,16 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           <Card mode={'contained'}>
             <Card.Title title="Achievements" titleVariant={'titleLarge'} />
             <Card.Content style={styles.badgeView}>
-              <Chip
-                style={[
-                  styles.chip,
-                  {backgroundColor: theme.colors.elevation.level3},
-                ]}
-                icon="medal">
-                {'JS Master'}
-              </Chip>
-              <Chip
-                style={[
-                  styles.chip,
-                  {backgroundColor: theme.colors.elevation.level3},
-                ]}
-                icon="medal">
-                {'Unstoppable'}
-              </Chip>
-              <Chip
-                style={[
-                  styles.chip,
-                  {backgroundColor: theme.colors.elevation.level3},
-                ]}
-                icon="medal">
-                {'Algo Master'}
-              </Chip>
+              {achievements.map(achievement => (
+                <Chip
+                  style={[
+                    styles.chip,
+                    {backgroundColor: theme.colors.elevation.level3},
+                  ]}
+                  icon="medal">
+                  {achievement.title}
+                </Chip>
+              ))}
             </Card.Content>
           </Card>
           <SpacerV height={heightPercentageToDP(0.25)} />
@@ -317,15 +412,14 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           <Card mode={'contained'}>
             <Card.Title title="Recent Activities" titleVariant={'titleLarge'} />
             <Card.Content style={styles.recentActivities}>
-              <Text variant={'labelMedium'}>
-                - Posted a new algorithm: "Optimized Quicksort"
-              </Text>
-              <SpacerV height={heightPercentageToDP(0.15)} />
-              <Text variant={'labelMedium'}>
-                - Liked David Wesker's Posted Algorithm
-              </Text>
-              <SpacerV height={heightPercentageToDP(0.15)} />
-              <Text variant={'labelMedium'}>- Earned "JS Master" badge</Text>
+              {recentActivities.map(activity => (
+                <Text
+                  variant={'labelMedium'}
+                  style={{fontFamily: FONTS.p_regular}}>
+                  -{activity.type === 'liked' ? 'liked' : 'unliked'} "
+                  {activity.title}" post.
+                </Text>
+              ))}
             </Card.Content>
           </Card>
           <SpacerV height={heightPercentageToDP(0.25)} />
