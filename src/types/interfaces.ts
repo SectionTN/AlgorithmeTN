@@ -11,7 +11,7 @@ interface CodeData {
   level: string;
   section: string;
   likes: string[];
-  views: number;
+  views: string[];
   comments: string[];
   bookmarksCount: number;
   isBookmarked: boolean;
