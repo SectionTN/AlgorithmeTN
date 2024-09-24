@@ -20,6 +20,7 @@ import {storage} from '../config/storage/mmkv.ts';
 import auth from '@react-native-firebase/auth';
 import {alert} from '@baronha/ting';
 import {OneSignal} from 'react-native-onesignal';
+import {useTranslation} from 'react-i18next';
 
 const ViewPagerData = [
   {
@@ -125,6 +126,7 @@ const Ticker = ({
     inputRange,
     outputRange: [0, ViewPagerData.length * -TICKER_HEIGHT],
   });
+  const {t} = useTranslation();
   const theme = useTheme();
   return (
     <View style={styles.tickerContainer}>
@@ -135,7 +137,7 @@ const Ticker = ({
               key={index}
               style={[styles.tickerText, {color: theme.colors.primary}]}
               adjustsFontSizeToFit={true}>
-              {title}
+              {t('step' + (index + 1))}
             </Text>
           );
         })}
@@ -173,6 +175,9 @@ const Item = ({
   const theme = useTheme();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const {t} = useTranslation();
+
   return (
     <View style={styles.itemStyle}>
       <Animated.Image
@@ -194,7 +199,7 @@ const Item = ({
               opacity,
             },
           ]}>
-          {heading}
+          {t(`onboarding.step${id + 1}_heading`)}
         </Animated.Text>
         <Animated.Text
           adjustsFontSizeToFit={true}
@@ -205,9 +210,9 @@ const Item = ({
               opacity,
             },
           ]}>
-          {description}
+          {t(`onboarding.step${id + 1}_description`)}
         </Animated.Text>
-        {id === 3 ? (
+        {id === 3 && (
           <Button
             mode="contained"
             onPress={async () => {
@@ -220,10 +225,8 @@ const Item = ({
                 navigation.navigate('login');
               }
             }}>
-            Continue
+            {t('Continue')}
           </Button>
-        ) : (
-          <></>
         )}
       </View>
     </View>
