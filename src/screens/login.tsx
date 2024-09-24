@@ -41,6 +41,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import {OneSignal} from 'react-native-onesignal';
 import {encryptedStorage} from '../config/storage/mmkv.ts';
 import firestore from '@react-native-firebase/firestore';
+import {useTranslation} from 'react-i18next';
 
 const Login: React.FC = () => {
   /**
@@ -50,6 +51,9 @@ const Login: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const theme = useTheme();
+
+  const { t } = useTranslation();
+
 
   /**
    * Login variables
@@ -343,7 +347,7 @@ const Login: React.FC = () => {
             </Tooltip>
           )}
           <Appbar.Content title="" />
-          <Tooltip title="Help">
+          <Tooltip title={t('help')}>
             <Appbar.Action icon="dots-vertical" onPress={() => {}} />
           </Tooltip>
         </Appbar.Header>
@@ -353,10 +357,10 @@ const Login: React.FC = () => {
           style={styles.top_bar}>
           <Text style={[styles.top_text, {color: theme.colors.primary}]}>
             {currentMode === 'login'
-              ? 'Welcome Back'
+              ? t('login.login')
               : currentMode === 'signup'
-              ? 'Create Account'
-              : 'Forgot Password'}
+              ? t('login.signup')
+              : t('login.forgot_password')}
           </Text>
           <Text
             style={{
@@ -368,10 +372,10 @@ const Login: React.FC = () => {
               fontFamily: FONTS.p_regular,
             }}>
             {currentMode === 'login'
-              ? "let's sign you in"
+              ? t('login.login_slogan')
               : currentMode === 'signup'
-              ? 'and start your journey here with us'
-              : 'we gonna help you restore your account it'}
+              ? t('login.signup_slogan')
+              : t('login.forgot_password_slogan')}
           </Text>
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.1)} />
@@ -383,10 +387,11 @@ const Login: React.FC = () => {
           <TextInput
             mode={'outlined'}
             value={email}
-            label={'Email'}
+            label={t('login.email')}
             onChangeText={text => {
               setEmail(text.trim());
             }}
+            keyboardType={'email-address'}
             style={{marginBottom: keyboardOffset}}
           />
           {currentMode !== 'forgot-password' && (
@@ -395,7 +400,7 @@ const Login: React.FC = () => {
               <TextInput
                 mode={'outlined'}
                 value={password}
-                label={'Password'}
+                label={t('login.password')}
                 onChangeText={text => {
                   setPassword(text.trim());
                 }}
@@ -418,7 +423,7 @@ const Login: React.FC = () => {
               <TextInput
                 mode={'outlined'}
                 value={confirmPassword}
-                label={'Confirm Password'}
+                label={t('login.confirm_password')}
                 onChangeText={text => {
                   setConfirmPassword(text.trim());
                 }}
@@ -438,36 +443,35 @@ const Login: React.FC = () => {
           <SpacerV height={heightPercentageToDP(0.5)} />
           <Button mode="contained" onPress={onMainButtonPress}>
             {currentMode === 'login'
-              ? 'Log In'
+              ? t('login.connect')
               : currentMode === 'signup'
-              ? 'Sign Up'
-              : 'Restore Account'}
+              ? t('login.create')
+              : t('login.forgot')}
           </Button>
           <SpacerV height={heightPercentageToDP(0.1)} />
           {currentMode === 'login' ? (
             <Button
               mode="text"
               onPress={() => setCurrentMode('forgot-password')}>
-              Forgot Password?
+              {t('login.forgot_password_interrogation')}
             </Button>
-          ) : currentMode === 'signup' ? (
-            <View style={{flexDirection: 'row'}}>
-              <HelperText type="info">
-                {'By Signing up, you agree to our'}
+          ) : currentMode === 'signup' && (
+            <View style={{flexDirection: 'row', marginHorizontal: -widthPercentageToDP(1.5)}}>
+              <HelperText style={{fontSize: fontValue(11)}} type="info">
+                {t('login.terms_text')}
               </HelperText>
               <HelperText
                 onPress={handleTermsPress}
                 type={'info'}
                 style={{
+                  fontSize: fontValue(11),
                   color: theme.colors.primary,
                   textDecorationLine: 'underline',
                   marginHorizontal: -widthPercentageToDP(5),
                 }}>
-                {'Terms & Conditions'}
+                {t('login.terms')}
               </HelperText>
             </View>
-          ) : (
-            <></>
           )}
         </Animated.View>
         <View style={{flex: 1}}>{/* stub view */}</View>
@@ -479,7 +483,7 @@ const Login: React.FC = () => {
                 onPress={() => {
                   setCurrentMode('signup');
                 }}>
-                {'Create new account'}
+                {t('login.create_account')}
               </Button>
             </View>
             <SpacerV height={heightPercentageToDP(0.5)} />
