@@ -96,6 +96,22 @@ const fetchAchievements = async (uid: string): Promise<Achievement[]> => {
   }
 };
 
+const fetchUserViewsCount = async (uid: string): Promise<number> => {
+  try {
+    const snapshot = await firestore()
+      .collection('codes')
+      .where('views', 'array-contains', uid)
+      .get();
+    return snapshot.size;
+  } catch (error) {
+    if (error instanceof Error) {
+      crashlytics().recordError(error);
+    }
+    console.error('Error fetching user views count:', error);
+    return 0;
+  }
+};
+
 const Profile: React.FC<ProfileProps> = ({uid}) => {
   const theme = useTheme();
 
@@ -238,6 +254,16 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
     return () => unsubscribe();
   }, [mode, profileUID]);
 
+  const [viewCount, setViewCount] = useState(0);
+
+  useEffect(() => {
+    if (profileUID) {
+      fetchUserViewsCount(profileUID).then(vC => {
+        setViewCount(vC);
+      });
+    }
+  }, [profileUID]);
+
   return (
     <BaseView
       needsPaddingTop={false}
@@ -376,7 +402,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                     styles.statNumber,
                     {color: theme.colors.onPrimaryContainer},
                   ]}>
-                  {statistics.views}
+                  {viewCount}
                 </Text>
                 <Text
                   adjustsFontSizeToFit={true}
