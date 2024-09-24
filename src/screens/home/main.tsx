@@ -93,6 +93,38 @@ const Main: React.FC = () => {
     }
   };
 
+  const addView = async (codeId: string) => {
+    const uid = auth().currentUser?.uid;
+    if (!uid) {
+      return;
+    }
+
+    const codeDocRef = firestore().collection('codes').doc(codeId);
+    try {
+      await firestore().runTransaction(async transaction => {
+        const codeDoc = await transaction.get(codeDocRef);
+        if (!codeDoc.exists) {
+          crashlytics().log(
+            'Adding view for codeId `' + codeId + "` isn't available; document doesn't exist"
+          );
+          return;
+        }
+
+        const codeData = codeDoc.data() as CodeData;
+        if (!codeData.views.includes(uid)) {
+          transaction.update(codeDocRef, {
+            views: [...codeData.views, uid],
+          });
+        }
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        crashlytics().recordError(error);
+      }
+      console.error('Error adding view:', error);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('codes')
@@ -191,19 +223,21 @@ const Main: React.FC = () => {
     fetchCommentCounts();
   }, []);
 
-  const incrementViewCount = async (codeId: string) => {
-    try {
-      const codeRef = firestore().collection('codes').doc(codeId);
-      await codeRef.update({
-        views: firestore.FieldValue.increment(1),
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        crashlytics().recordError(error);
-      }
-      console.error('Error incrementing view count:', error);
-    }
-  };
+  /**
+   const incrementViewCount = async (codeId: string) => {
+   try {
+   const codeRef = firestore().collection('codes').doc(codeId);
+   await codeRef.update({
+   views: firestore.FieldValue.increment(1),
+   });
+   } catch (error) {
+   if (error instanceof Error) {
+   crashlytics().recordError(error);
+   }
+   console.error('Error incrementing view count:', error);
+   }
+   };
+   */
 
   const addRecentActivity = async (uid: string, activity: object) => {
     try {
@@ -288,7 +322,7 @@ const Main: React.FC = () => {
         <Card
           mode={'contained'}
           onPress={() => {
-            incrementViewCount(item.id).then(() => {
+            addView(item.id).then(() => {
               navigation.navigate('algo', {codeId: item.id});
             });
           }}>
@@ -310,7 +344,7 @@ const Main: React.FC = () => {
                 <Text
                   style={{fontFamily: FONTS.p_regular}}
                   variant={'labelSmall'}>
-                  {item.views}
+                  {item.views.length}
                 </Text>
               </View>
             )}
