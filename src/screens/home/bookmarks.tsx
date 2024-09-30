@@ -1,17 +1,55 @@
 import React, {useEffect, useState} from 'react';
-import {Appbar, Avatar, Text, Tooltip, useTheme} from 'react-native-paper';
+import {
+  Appbar,
+  Avatar,
+  Button,
+  Card,
+  Dialog,
+  Icon,
+  IconButton,
+  Modal,
+  Portal,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
-import {widthPercentageToDP} from '../../config/dimensions.ts';
-import {StatusBar} from 'react-native';
+import {
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from '../../config/dimensions.ts';
+import {Dimensions, StatusBar, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../config/navigation/types.ts';
+import {useTranslation} from 'react-i18next';
+import {FlatGrid} from 'react-native-super-grid';
+import {CodeData} from '../../types/interfaces.ts';
+import firestore from '@react-native-firebase/firestore';
+import Animated, {
+  SequencedTransition,
+} from 'react-native-reanimated';
+import SpacerV from '../../components/spacer/spacerv.tsx';
 
 const Bookmarks: React.FC = () => {
   const theme = useTheme();
 
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const {t} = useTranslation();
+
   const [photoUrl, setPhotoUrl] = useState('XD');
 
+  const [bookmarks, setBookmarks] = useState<
+    Array<CodeData & {first_name: string; last_name: string}>
+  >([]);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [postIdToDelete, setPostIdToDelete] = useState<string | null>(null);
+
+  const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
@@ -21,6 +59,80 @@ const Bookmarks: React.FC = () => {
     setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('users')
+      .doc(auth().currentUser?.uid)
+      .collection('bookmarks')
+      .onSnapshot(
+        async snapshot => {
+          const bookmarksData = await Promise.all(
+            snapshot.docs.map(async doc => {
+              const bookmarkData = doc.data();
+              const codeData = await getCodeData(bookmarkData.codeId);
+              const userData = await getUserData(codeData.uid);
+              return {...bookmarkData, ...userData, ...codeData, id: doc.id};
+            }),
+          );
+          setBookmarks(bookmarksData as any);
+        },
+        error => {
+          console.error('Error fetching bookmarks: ', error);
+        },
+      );
+
+    return () => unsubscribe();
+  }, []);
+
+  const getCodeData = async (postId: string): Promise<CodeData> => {
+    try {
+      const codeDoc = await firestore().collection('codes').doc(postId).get();
+      return codeDoc.data() as CodeData;
+    } catch (error) {
+      console.error('Error fetching code data:', error);
+      return {} as CodeData;
+    }
+  };
+
+  const getUserData = async (
+    uid: string,
+  ): Promise<{first_name: string; last_name: string}> => {
+    try {
+      const userDoc = await firestore().collection('users').doc(uid).get();
+      const userData = userDoc.data();
+      return {
+        first_name: userData?.first_name || '',
+        last_name: userData?.last_name || '',
+      };
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      return {first_name: '', last_name: ''};
+    }
+  };
+
+  const unbookmarkPost = async () => {
+    const uid = auth().currentUser?.uid;
+    if (!uid || !postIdToDelete) {
+      return;
+    }
+
+    try {
+      await firestore()
+        .collection('users')
+        .doc(uid)
+        .collection('bookmarks')
+        .doc(postIdToDelete)
+        .delete();
+      setBookmarks(
+        bookmarks.filter(bookmark => bookmark.id !== postIdToDelete),
+      );
+      setDialogVisible(false);
+      setPostIdToDelete(null);
+    } catch (error) {
+      console.error('Error deleting bookmark: ', error);
+    }
+  };
+
   return (
     <BaseView
       needsPaddingTop={false}
@@ -28,17 +140,79 @@ const Bookmarks: React.FC = () => {
       needsPaddingBottom={false}>
       <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <SpacerH width={widthPercentageToDP(0.5)} />
-        {photoUrl && photoUrl.length === 2 ? (
+        {photoUrl && photoUrl?.length === 2 ? (
           <Avatar.Text label={photoUrl} size={34} />
         ) : (
           <Avatar.Image source={{uri: photoUrl}} size={34} />
         )}
         <SpacerH width={widthPercentageToDP(0.5)} />
         <Appbar.Content
-          title="Bookmarks"
+          title={t('bookmarks.title')}
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
       </Appbar.Header>
+      <FlatGrid
+        itemDimension={windowWidth / 2 - 20}
+        data={bookmarks}
+        renderItem={({item}) => (
+          <Animated.View layout={SequencedTransition.duration(1000).delay(500)}>
+            <Card>
+              <Card.Title
+                title={`${item.title}`}
+                titleNumberOfLines={2}
+                titleVariant={'labelLarge'}
+                subtitle={`${item.first_name} ${item.last_name}`}
+                subtitleVariant={'labelMedium'}
+                subtitleStyle={{opacity: 0.75}}
+              />
+              <Card.Content>
+                <Text variant="labelSmall" numberOfLines={3}>
+                  {item.description}
+                </Text>
+                <SpacerV height={heightPercentageToDP(0.2)} />
+                <Icon
+                  size={24}
+                  color={theme.colors.primary}
+                  source={
+                    item.language === 'algorithm'
+                      ? 'brain'
+                      : `language-${item.language}`
+                  }
+                />
+              </Card.Content>
+              <Card.Actions>
+                <View style={{flexDirection: 'column', alignItems: 'center'}}>
+                  <IconButton
+                    icon="delete"
+                    iconColor={theme.colors.onPrimary}
+                    containerColor={theme.colors.primary}
+                    size={24}
+                    onPress={() => {
+                      setPostIdToDelete(item.id);
+                      setDialogVisible(true);
+                    }}
+                  />
+                </View>
+              </Card.Actions>
+            </Card>
+          </Animated.View>
+        )}
+      />
+      <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
+        <Dialog.Icon icon="delete-alert-outline" />
+        <Dialog.Title style={{textAlign: 'center'}}>
+          Bookmark deletion
+        </Dialog.Title>
+        <Dialog.Content>
+          <Text variant="bodyMedium">
+            sure you want to remove this bookmark?
+          </Text>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={() => setDialogVisible(false)}>Cancel</Button>
+          <Button onPress={unbookmarkPost}>Delete</Button>
+        </Dialog.Actions>
+      </Dialog>
     </BaseView>
   );
 };
