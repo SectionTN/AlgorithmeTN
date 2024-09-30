@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet} from 'react-native';
-import {Card} from 'react-native-paper';
+import {Card, Text} from 'react-native-paper';
 import BaseView from '../../components/baseview/baseview.tsx';
 import Animated from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
@@ -10,9 +10,13 @@ import {FONTS} from '../../config/misc.ts';
 import {ScrollView} from 'react-native-gesture-handler';
 import {InstructionsProps} from '../../types/interfaces.ts';
 import firestore from '@react-native-firebase/firestore';
+import {useTranslation} from 'react-i18next';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const Instructions: React.FC<InstructionsProps> = ({codeId}) => {
   const [instructions, setInstructions] = useState<string>();
+
+  const { t } = useTranslation();
 
   const fetchInstructions = async (id: string) => {
     try {
@@ -25,7 +29,12 @@ const Instructions: React.FC<InstructionsProps> = ({codeId}) => {
       );
       setInstructions(formattedInstructions);
     } catch (error) {
-      console.error('Error fetching instructions:', error);
+      if (error instanceof Error) {
+        crashlytics().recordError(error);
+      }
+      if (__DEV__) {
+        console.error('Error fetching instructions:', error);
+      }
     }
   };
 
@@ -42,9 +51,13 @@ const Instructions: React.FC<InstructionsProps> = ({codeId}) => {
       <ScrollView>
         <Animated.View style={styles.containerStyle}>
           <Card mode={'contained'}>
-            <Card.Title title={'How it works:'} />
+            <Card.Title title={t('algo.how_it_works') + ':'} />
             <Card.Content>
-              <NumberedList steps={instructions?.split('\n')} />
+              {instructions ? (
+                <NumberedList steps={instructions?.split('\n')} />
+              ) : (
+                  <Text>{t('algo.no_instructions')}</Text>
+              )}
             </Card.Content>
           </Card>
         </Animated.View>
