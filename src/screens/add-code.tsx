@@ -25,6 +25,7 @@ import NetInfo from '@react-native-community/netinfo';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
+import {useTranslation} from 'react-i18next';
 
 const AddCode: React.FC = () => {
   const navigation =
@@ -32,10 +33,12 @@ const AddCode: React.FC = () => {
 
   const theme = useTheme();
 
+  const { t } = useTranslation();
+
   const sections = [
-    {title: 'Science Informatique', value: 'Science Informatique'},
-    {title: 'Science Naturel', value: 'Science Naturel'},
-    {title: 'Économie & Gestion', value: 'Économie & Gestion'},
+    {title: t('add-code.inf'), value: 'Science Informatique'},
+    {title: t('add-code.sc'), value: 'Science Naturel'},
+    {title: t('add-code.eco'), value: 'Économie & Gestion'},
   ];
 
   const languages: {title: string; value: Language; icon: string}[] = [
