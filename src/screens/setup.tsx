@@ -46,16 +46,11 @@ import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {createPasswordHash} from '../utils/hash.ts';
 import {encryptedStorage} from '../config/storage/mmkv.ts';
+import {useTranslation} from 'react-i18next';
 
 type SetupRouteProp = RouteProp<RootStackParamList, 'setup'>;
 
 const initialAchievements = [{title: 'New Member'}];
-
-const initialStatistics = {
-  posts: 0,
-  comments: 0,
-  views: 0,
-};
 
 const pushCollections = async () => {
   const uid = auth().currentUser?.uid;
@@ -70,11 +65,6 @@ const pushCollections = async () => {
       achievementsRef.add(achievement),
     );
 
-    const statisticsPromise = userRef
-      .collection('statistics')
-      .doc('user_stats')
-      .set(initialStatistics);
-
     const recentActivitiesPromise = userRef
       .collection('recent_activities')
       .add({
@@ -82,16 +72,14 @@ const pushCollections = async () => {
         time: firestore.Timestamp.fromDate(new Date()),
       });
 
-    await Promise.all([
-      ...achievementsPromises,
-      statisticsPromise,
-      recentActivitiesPromise,
-    ]);
+    await Promise.all([...achievementsPromises, recentActivitiesPromise]);
   } catch (error) {
     if (error instanceof Error) {
       crashlytics().recordError(error);
     }
-    console.error('Error creating user data in Firestore:', error);
+    if (__DEV__) {
+      console.error('Error creating user data in Firestore:', error);
+    }
   }
 };
 
@@ -102,12 +90,16 @@ const Setup: React.FC = () => {
 
   const route = useRoute<SetupRouteProp>();
 
+  const {t} = useTranslation();
+
   const {username, email, password, osID, osPT, from_where} =
     route.params || {};
 
   const [userPhoto, setUserPhoto] = useState<PhotoType | null>(null);
 
   const [onGoingData, setOnGoingData] = useState(false);
+
+  const [storagePassword, setStoragePassword] = useState<string>('');
 
   const pickerRef = useRef<BottomSheetModal>(null);
   const sheetSnapPoints = useMemo(() => ['27.5%'], []);
@@ -135,10 +127,14 @@ const Setup: React.FC = () => {
   useEffect(() => {
     if (from_where === 'register') {
       if (encryptedStorage.contains('password')) {
-        const hi = encryptedStorage.getString('password');
-        console.log(hi);
+        setStoragePassword(encryptedStorage.getString('password') ?? '');
+        if (__DEV__) {
+          console.log('done loading password from storage');
+        }
       } else {
-        console.log("doesn't contain");
+        if (__DEV__) {
+          console.log("doesn't contain a password");
+        }
       }
     }
   }, [from_where]);
@@ -179,17 +175,23 @@ const Setup: React.FC = () => {
     setOnGoingData(true);
     if (!isConnected) {
       setOnGoingData(false);
-      return alert({title: 'No Internet', preset: 'error'});
+      return alert({title: t('no_internet'), preset: 'error'});
     }
     const modifiedFirstName = lowerToUppercase(memoizedFirstName);
     const modifiedLastName = lowerToUppercase(memoizedLastName);
     if (firstName?.length > 1 && lastName?.length > 1) {
-      alert({title: 'Please Wait', preset: 'spinner', duration: 10});
+      alert({title: t('please_wait'), preset: 'spinner', duration: 10});
       if (!password) {
-        crashlytics().log('password seems to be undefined, crashing the app');
-        return crashlytics().crash();
+        if (!storagePassword) {
+          crashlytics().log(
+            'both params & storage passwords seems to be undefined, crashing the app',
+          );
+          return crashlytics().crash();
+        }
       }
-      const hashedPassword = await createPasswordHash(password);
+      const hashedPassword = await createPasswordHash(
+        password ?? storagePassword,
+      );
       const firebaseParams = {username, email, osID, osPT};
       await pushCollections();
       if (userPhoto) {
@@ -331,7 +333,10 @@ const Setup: React.FC = () => {
       }
     } else {
       setOnGoingData(false);
-      return alert({title: 'Wrong Info', message: 'Please fill a proper name'});
+      return alert({
+        title: t('setup.wrong_info'),
+        message: t('setup.wrong_info_message'),
+      });
     }
   }
 
@@ -342,13 +347,13 @@ const Setup: React.FC = () => {
       needsPaddingBottom={false}>
       <Appbar.Header>
         <Appbar.Content title="" />
-        <Tooltip title="Help">
+        <Tooltip title={t('help')}>
           <Appbar.Action icon="dots-vertical" onPress={() => {}} />
         </Tooltip>
       </Appbar.Header>
       <View style={styles.top_bar}>
         <Text style={[styles.top_text, {color: theme.colors.primary}]}>
-          {'Setup Account'}
+          {t('setup.title')}
         </Text>
         <Text
           style={[
@@ -357,7 +362,7 @@ const Setup: React.FC = () => {
               color: theme.colors.onBackground,
             },
           ]}>
-          {'customize your account so people can know you'}
+          {t('setup.description')}
         </Text>
       </View>
       <SpacerV height={heightPercentageToDP(0.5)} />
@@ -371,8 +376,8 @@ const Setup: React.FC = () => {
             if (userPhoto) {
               setUserPhoto(null);
               alert({
-                title: 'Photo Removed',
-                message: 'now select a new photo if you want',
+                title: t('setup.photo_removed'),
+                message: t('setup.select_new_photo'),
                 preset: 'done',
                 backdropOpacity: 0.1,
               });
@@ -412,7 +417,7 @@ const Setup: React.FC = () => {
               width: '80%',
             }}
             mode="outlined"
-            label="First Name"
+            label={t('setup.firstName')}
             value={firstName}
             multiline={false}
             onChangeText={valueFirstName => {
@@ -425,7 +430,7 @@ const Setup: React.FC = () => {
               width: '80%',
             }}
             mode="outlined"
-            label="Last Name"
+            label={t('setup.lastName')}
             value={lastName}
             multiline={false}
             onChangeText={valueLastName => {
