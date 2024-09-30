@@ -8,6 +8,8 @@ import {RootStackParamList} from '../../config/navigation/types.ts';
 import Code from './code.tsx';
 import Instructions from './instructions.tsx';
 import {StatusBar} from 'react-native';
+import {useBackHandler} from '@react-native-community/hooks';
+import {useTranslation} from 'react-i18next';
 
 const Algo: React.FC = () => {
   const navigation =
@@ -16,6 +18,8 @@ const Algo: React.FC = () => {
   const theme = useTheme();
 
   const [index, setIndex] = React.useState(0);
+
+  const { t } = useTranslation();
 
   const navRoute = useRoute<RouteProp<RootStackParamList, 'algo'>>();
   const {codeId} = navRoute.params!;
@@ -44,6 +48,11 @@ const Algo: React.FC = () => {
     }
   };
 
+  useBackHandler(() => {
+    navigation.goBack();
+    return true;
+  });
+
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
@@ -51,11 +60,11 @@ const Algo: React.FC = () => {
   const getHeaderTitle = () => {
     switch (index) {
       case 0:
-        return 'Code';
+        return t('code.title');
       case 1:
-        return 'Instructions';
+        return t('instructions.title');
       default:
-        return 'Home';
+        return t('home.title');
     }
   };
 
@@ -70,15 +79,19 @@ const Algo: React.FC = () => {
           title={getHeaderTitle()}
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
-        <Tooltip title="Like">
-          <Appbar.Action icon="heart-outline" onPress={() => {}} />
-        </Tooltip>
-        <Tooltip title="Bookmark">
-          <Appbar.Action icon="bookmark-outline" onPress={() => {}} />
-        </Tooltip>
-        <Tooltip title="Share">
-          <Appbar.Action icon="share-outline" onPress={() => {}} />
-        </Tooltip>
+        {false && (
+          <>
+            <Tooltip title="Like">
+              <Appbar.Action icon="heart-outline" onPress={() => {}} />
+            </Tooltip>
+            <Tooltip title="Bookmark">
+              <Appbar.Action icon="bookmark-outline" onPress={() => {}} />
+            </Tooltip>
+            <Tooltip title="Share">
+              <Appbar.Action icon="share-outline" onPress={() => {}} />
+            </Tooltip>
+          </>
+        )}
       </Appbar.Header>
       <BottomNavigation
         navigationState={{index, routes}}
