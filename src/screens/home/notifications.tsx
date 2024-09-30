@@ -7,6 +7,7 @@ import {widthPercentageToDP} from '../../config/dimensions.ts';
 import {Dimensions, StatusBar, StyleSheet} from 'react-native';
 import {FlatGrid} from 'react-native-super-grid';
 import auth from '@react-native-firebase/auth';
+import {NativeViewGestureHandler} from 'react-native-gesture-handler';
 
 const LeftContent = () => (
   <Avatar.Image
@@ -40,7 +41,7 @@ const Notifications: React.FC = () => {
     const RightContent = () => <Text variant={'labelSmall'}>{item.desc}</Text>;
 
     return (
-      <Card mode={'contained'} style={{paddingTop: '1%', paddingBottom: '1%'}}>
+      <Card style={{paddingTop: '1%', paddingBottom: '1%'}}>
         <Card.Title
           title={'Rayen Sbai'}
           titleStyle={{fontFamily: FONTS.p_regular, fontWeight: 'bold'}}
@@ -80,12 +81,15 @@ const Notifications: React.FC = () => {
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
       </Appbar.Header>
-      <FlatGrid
-        spacing={10}
-        itemDimension={windowDimension}
-        data={items}
-        renderItem={renderNotificationItem}
-      />
+      <NativeViewGestureHandler>
+        <FlatGrid
+          spacing={10}
+          itemDimension={windowDimension}
+          data={items}
+          renderItem={renderNotificationItem}
+        />
+      </NativeViewGestureHandler>
+
     </BaseView>
   );
 };
