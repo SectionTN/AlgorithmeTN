@@ -17,7 +17,12 @@ import {
 } from '@gorhom/bottom-sheet';
 
 import {SharedValue} from 'react-native-reanimated';
-import {Divider, Icon, TouchableRipple, useTheme} from 'react-native-paper';
+import {
+  Divider,
+  IconButton,
+  TouchableRipple,
+  useTheme,
+} from 'react-native-paper';
 import {
   fontValue,
   heightPercentageToDP,
@@ -73,12 +78,13 @@ const ImagePickerActionSheet = (props: ActionSheetProps) => {
     <BottomSheetModal
       ref={props.sheetRef}
       index={props.index}
-      snapPoints={props.snapPoints}
+      snapPoints={props.snapPoints as (string | number)[]}
       handleIndicatorStyle={{backgroundColor: theme.colors.surfaceVariant}}
       enablePanDownToClose={true}
       animationConfigs={animationConfigs}
       backdropComponent={renderBackdrop}
       animateOnMount={true}
+      backgroundStyle={{backgroundColor: theme.colors.background}}
       style={sheetStyle}>
       <BottomSheetView
         style={{
@@ -103,11 +109,7 @@ const ImagePickerActionSheet = (props: ActionSheetProps) => {
           style={styles.optionContainer}>
           <>
             <View style={styles.arrowStyle}>
-              <Icon
-                source="camera"
-                color={theme.colors.onBackground}
-                size={24}
-              />
+              <IconButton mode={'contained'} size={24} icon={'camera'} onPress={undefined} />
             </View>
             <Text
               style={[styles.optionText, {color: theme.colors.onBackground}]}>
@@ -123,11 +125,7 @@ const ImagePickerActionSheet = (props: ActionSheetProps) => {
           style={styles.optionContainer}>
           <>
             <View style={styles.arrowStyle}>
-              <Icon
-                source="image"
-                color={theme.colors.onBackground}
-                size={24}
-              />
+              <IconButton mode={'contained'} icon="image" size={24} onPress={undefined} />
             </View>
             <Text
               style={[styles.optionText, {color: theme.colors.onBackground}]}>
