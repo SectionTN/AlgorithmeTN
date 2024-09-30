@@ -38,7 +38,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import getUserData from '../../utils/firebase.ts';
 
 interface ProfileProps {
-  uid: string;
+  uid: string | undefined;
 }
 
 interface RecentActivity {
@@ -318,7 +318,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
             numberOfLines={1}
             style={[styles.bioText, {color: theme.colors.onBackground}]}
             onPress={() => navigation.navigate('edit-bio')}>
-            {bio ?? 'tap to add a biography'}
+            {bio ? bio : 'tap to add a biography'}
           </Text>
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.25)} />
