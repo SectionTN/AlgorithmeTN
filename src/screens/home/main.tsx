@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from 'react';
 import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
@@ -28,10 +28,11 @@ import auth from '@react-native-firebase/auth';
 import {CodeData} from '../../types/interfaces.ts';
 import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
+import {useTranslation} from 'react-i18next';
 
 const LeftContent = (props: any) => <Avatar.Icon {...props} icon="code-tags" />;
 
-const Main: React.FC = () => {
+const Main: React.FC = forwardRef((props, ref) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -40,6 +41,8 @@ const Main: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const windowWidth = Dimensions.get('window').width;
+
+  const {t} = useTranslation();
 
   const [photoUrl, setPhotoUrl] = useState('XD');
 
@@ -50,23 +53,13 @@ const Main: React.FC = () => {
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
     {},
   );
-  const RightContent = (props: any) => (
-    <>
-      <View style={{flexDirection: 'column', alignItems: 'center'}}>
-        <IconButton
-          {...props}
-          icon="eye"
-          iconColor={theme.colors.onPrimary}
-          containerColor={theme.colors.primary}
-          size={20}
-          onPress={undefined}
-        />
-        <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
-          5, 294K
-        </Text>
-      </View>
-      <SpacerH width={widthPercentageToDP(5)} />
-    </>
+
+  const [bookmarkCounts, setBookmarkCounts] = useState<Record<string, number>>(
+    {},
+  );
+
+  const [userBookmarks, setUserBookmarks] = useState<Record<string, boolean>>(
+    {},
   );
 
   useEffect(() => {
@@ -76,6 +69,59 @@ const Main: React.FC = () => {
   useEffect(() => {
     setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
   }, []);
+
+  const fetchBookmarks = useCallback(async () => {
+    try {
+      const usersSnapshot = await firestore().collection('users').get();
+      const bookmarkCounts: Record<string, number> = {};
+
+      for (const userDoc of usersSnapshot.docs) {
+        const bookmarksSnapshot = await userDoc.ref
+          .collection('bookmarks')
+          .get();
+        bookmarksSnapshot.docs.forEach(doc => {
+          const {codeId} = doc.data();
+          if (codeId) {
+            if (!bookmarkCounts[codeId]) {
+              bookmarkCounts[codeId] = 0;
+            }
+            bookmarkCounts[codeId] += 1;
+          }
+        });
+      }
+
+      setBookmarkCounts(bookmarkCounts);
+    } catch (error) {
+      console.error('Error fetching bookmarks:', error);
+    }
+  }, []);
+
+  const fetchUserBookmarks = async () => {
+    const uid = auth().currentUser?.uid;
+    if (!uid) {
+      return;
+    }
+
+    try {
+      const userBookmarksSnapshot = await firestore()
+        .collection('users')
+        .doc(uid)
+        .collection('bookmarks')
+        .get();
+
+      const userBookmarks: Record<string, boolean> = {};
+      userBookmarksSnapshot.docs.forEach(doc => {
+        const {codeId} = doc.data();
+        if (codeId) {
+          userBookmarks[codeId] = true;
+        }
+      });
+
+      setUserBookmarks(userBookmarks);
+    } catch (error) {
+      console.error('Error fetching user bookmarks:', error);
+    }
+  };
 
   const getUserData = async (
     uid: string,
@@ -105,7 +151,9 @@ const Main: React.FC = () => {
         const codeDoc = await transaction.get(codeDocRef);
         if (!codeDoc.exists) {
           crashlytics().log(
-            'Adding view for codeId `' + codeId + "` isn't available; document doesn't exist"
+            'Adding view for codeId `' +
+            codeId +
+            '` isn\'t available; document doesn\'t exist',
           );
           return;
         }
@@ -134,19 +182,10 @@ const Main: React.FC = () => {
             snapshot.docs.map(async doc => {
               const codeData = doc.data() as CodeData;
               const userData = await getUserData(codeData.uid);
-              const bookmarksSnapshot = await firestore()
-                .collection('users')
-                .doc(auth().currentUser?.uid)
-                .collection('bookmarks')
-                .where('codeId', '==', doc.id)
-                .get();
-              const isBookmarked = !bookmarksSnapshot.empty;
               return {
                 ...codeData,
                 id: doc.id,
                 ...userData,
-                bookmarksCount: bookmarksSnapshot.size,
-                isBookmarked,
               };
             }),
           );
@@ -158,8 +197,9 @@ const Main: React.FC = () => {
           console.error('Error fetching codes:', error);
         }
       });
-
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const toggleLike = async (codeId: string, likes: string[]) => {
@@ -256,60 +296,53 @@ const Main: React.FC = () => {
     if (!uid) {
       return;
     }
+    const userDocRef = firestore().collection('users').doc(uid);
+    const bookmarkDocRef = userDocRef.collection('bookmarks').doc(codeId);
     try {
-      const bookmarkRef = firestore()
-        .collection('users')
-        .doc(uid)
-        .collection('bookmarks')
-        .where('codeId', '==', codeId);
-
-      const snapshot = await bookmarkRef.get();
-      if (!snapshot.empty) {
-        await snapshot.docs[0].ref.delete();
+      const bookmarkDoc = await bookmarkDocRef.get();
+      if (bookmarkDoc.exists) {
         await Promise.all([
+          bookmarkDocRef.delete(),
           addRecentActivity(uid, {
             type: 'unbookmark',
             postId: codeId,
             timestamp: firestore.Timestamp.fromDate(new Date()),
           }),
         ]);
+        setUserBookmarks(prev => ({...prev, [codeId]: false}));
       } else {
-        const newBookmarkRef = firestore()
-          .collection('users')
-          .doc(uid)
-          .collection('bookmarks')
-          .doc();
         await Promise.all([
-          newBookmarkRef.set({codeId}),
+          bookmarkDocRef.set({codeId}),
           addRecentActivity(uid, {
             type: 'bookmark',
             postId: codeId,
             timestamp: firestore.Timestamp.fromDate(new Date()),
           }),
         ]);
+        setUserBookmarks(prev => ({...prev, [codeId]: true}));
       }
-
-      setCodes(prevCodes =>
-        prevCodes.map(code =>
-          code.id === codeId
-            ? {
-                ...code,
-                bookmarksCount: !snapshot.empty
-                  ? code.bookmarksCount - 1
-                  : code.bookmarksCount + 1,
-                isBookmarked: snapshot.empty,
-              }
-            : code,
-        ),
-      );
+      fetchBookmarks();
     } catch (error) {
       console.error('Error toggling bookmark:', error);
     }
   };
 
+
+  useEffect(() => {
+    fetchUserBookmarks();
+    fetchBookmarks();
+  }, [fetchBookmarks]);
+
+
+  useImperativeHandle(ref, () => ({
+    fetchUserBookmarks,
+    fetchBookmarks,
+  }));
+
+
   const renderGridItem = ({
-    item,
-  }: {
+                            item,
+                          }: {
     item: CodeData & {first_name: string; last_name: string};
   }) => {
     const uid = auth().currentUser?.uid;
@@ -320,7 +353,6 @@ const Main: React.FC = () => {
     return (
       <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
         <Card
-          mode={'contained'}
           onPress={() => {
             addView(item.id).then(() => {
               navigation.navigate('algo', {codeId: item.id});
@@ -390,7 +422,7 @@ const Main: React.FC = () => {
                 containerColor={theme.colors.primary}
                 size={20}
                 onPress={() => {
-                  navigation.navigate('comments', {postId: item.id});
+                  navigation.navigate('comments', {pid: item.id});
                 }}
               />
               <Text
@@ -401,7 +433,7 @@ const Main: React.FC = () => {
             </View>
             <View style={{flexDirection: 'column', alignItems: 'center'}}>
               <IconButton
-                icon={item.isBookmarked ? 'bookmark' : 'bookmark-outline'}
+                icon={userBookmarks[item.id] ? 'bookmark' : 'bookmark-outline'}
                 iconColor={theme.colors.onPrimary}
                 containerColor={theme.colors.primary}
                 size={20}
@@ -412,7 +444,7 @@ const Main: React.FC = () => {
               <Text
                 style={{fontFamily: FONTS.p_regular}}
                 variant={'labelSmall'}>
-                {item.bookmarksCount}
+                {bookmarkCounts[item.id] || 0}
               </Text>
             </View>
             {/**<View style={{flexDirection: 'column', alignItems: 'center'}}>
@@ -451,7 +483,7 @@ const Main: React.FC = () => {
         )}
         <SpacerH width={widthPercentageToDP(0.5)} />
         <Appbar.Content
-          title="Home"
+          title={t('home.title')}
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
         {__DEV__ && (
@@ -470,7 +502,8 @@ const Main: React.FC = () => {
       <SpacerV height={heightPercentageToDP(0.25)} />
       <View style={styles.searchContainer}>
         <Searchbar
-          placeholder={'Search'}
+          placeholder={t('search')}
+          elevation={1}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -486,7 +519,7 @@ const Main: React.FC = () => {
       />
     </BaseView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   searchContainer: {
