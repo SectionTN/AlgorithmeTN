@@ -41,7 +41,7 @@ const Splash: React.FC = () => {
         navigation.navigate('onboarding');
       }
     }, 1000);
-  }, [navigation]);
+  }, [navigation, onboardingComplete]);
 
   useFocusEffect(
     useCallback(() => {
