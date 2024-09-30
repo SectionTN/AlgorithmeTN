@@ -8,6 +8,7 @@ import {
   Animated,
   ImageRequireSource,
   StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import type {PagerViewOnPageScrollEventData} from 'react-native-pager-view';
 import PagerView from 'react-native-pager-view';
@@ -21,6 +22,7 @@ import auth from '@react-native-firebase/auth';
 import {alert} from '@baronha/ting';
 import {OneSignal} from 'react-native-onesignal';
 import {useTranslation} from 'react-i18next';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const ViewPagerData = [
   {
@@ -131,13 +133,13 @@ const Ticker = ({
   return (
     <View style={styles.tickerContainer}>
       <Animated.View style={{transform: [{translateY}]}}>
-        {ViewPagerData.map(({title}, index) => {
+        {ViewPagerData.map(({}, index) => {
           return (
             <Text
               key={index}
               style={[styles.tickerText, {color: theme.colors.primary}]}
               adjustsFontSizeToFit={true}>
-              {t('step' + (index + 1))}
+              {t('onboarding.step' + (index + 1))}
             </Text>
           );
         })}
@@ -148,8 +150,6 @@ const Ticker = ({
 
 const Item = ({
   imageUri,
-  heading,
-  description,
   scrollOffsetAnimatedValue,
   id,
 }: {
@@ -225,7 +225,7 @@ const Item = ({
                 navigation.navigate('login');
               }
             }}>
-            {t('Continue')}
+            {t('continue')}
           </Button>
         )}
       </View>
@@ -306,9 +306,17 @@ const Onboarding: React.FC = () => {
 
   const theme = useTheme();
 
-  const container = (bgColor: string) => ({
-    flex: 1,
-    backgroundColor: bgColor,
+  const insets = useSafeAreaInsets();
+
+  const style = StyleSheet.create({
+    safeInsets: {
+      flex: 1,
+      backgroundColor: theme.colors.background,
+      paddingTop: 0,
+      paddingBottom: 0,
+      paddingLeft: insets.left,
+      paddingRight: insets.right,
+    },
   });
 
   useEffect(() => {
@@ -316,7 +324,7 @@ const Onboarding: React.FC = () => {
   }, [theme.colors.background]);
 
   return (
-    <View style={container(theme.colors.background)}>
+    <SafeAreaView style={style.safeInsets}>
       <Circle scrollOffsetAnimatedValue={scrollOffsetAnimatedValue} />
       <AnimatedPagerView
         initialPage={0}
@@ -362,7 +370,7 @@ const Onboarding: React.FC = () => {
         scrollOffsetAnimatedValue={scrollOffsetAnimatedValue}
         positionAnimatedValue={positionAnimatedValue}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
