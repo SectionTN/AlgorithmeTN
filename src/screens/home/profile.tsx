@@ -36,6 +36,7 @@ import {isUndefined} from 'lodash';
 import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
 import getUserData from '../../utils/firebase.ts';
+import { useTranslation } from 'react-i18next'
 
 interface ProfileProps {
   uid: string | undefined;
@@ -114,6 +115,8 @@ const fetchUserViewsCount = async (uid: string): Promise<number> => {
 
 const Profile: React.FC<ProfileProps> = ({uid}) => {
   const theme = useTheme();
+
+  const {t} = useTranslation();
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
