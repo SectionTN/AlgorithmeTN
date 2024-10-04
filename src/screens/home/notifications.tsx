@@ -29,15 +29,15 @@ const Notifications: React.FC = () => {
   const { t } = useTranslation();
 
   const [items] = useState([
-    {notif: t('liked_your_post'), desc: '2 min ago'},
-    {notif: t('commented_post'), desc: '5 min ago'},
-    {notif: t('liked_your_post'), desc: '8 min ago'},
-    {notif: t('liked_your_post'), desc: '1 hour ago'},
-    {notif: t('liked_your_post'), desc: '5 hours ago'},
-    {notif: t('liked_your_post'), desc: '12 hours ago'},
-    {notif: t('liked_your_post'), desc: 'yesterday'},
-    {notif: t('liked_your_post'), desc: 'a long time ago'},
-    {notif: t('liked_your_post'), desc: 'a long time ago'},
+    {notif: t('notifications.liked_your_post'), desc: '2 min ago'},
+    {notif: t('notifications.commented_post'), desc: '5 min ago'},
+    {notif: t('notifications.liked_your_post'), desc: '8 min ago'},
+    {notif: t('notifications.liked_your_post'), desc: '1 hour ago'},
+    {notif: t('notifications.liked_your_post'), desc: '5 hours ago'},
+    {notif: t('notifications.liked_your_post'), desc: '12 hours ago'},
+    {notif: t('notifications.'), desc: 'yesterday'},
+    {notif: t('notifications.liked_your_post'), desc: 'a long time ago'},
+    {notif: t('notifications.liked_your_post'), desc: 'a long time ago'},
   ]);
 
   const renderNotificationItem = ({item}) => {

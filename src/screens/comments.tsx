@@ -18,6 +18,7 @@ import BaseView from '../components/baseview/baseview.tsx';
 import {FONTS} from '../config/misc.ts';
 import getUserData from '../utils/firebase.ts';
 import crashlytics from '@react-native-firebase/crashlytics';
+import { useTranslation } from 'react-i18next';
 
 const Comments: React.FC<{route: any}> = ({route}) => {
   const {postId} = route.params;
@@ -29,6 +30,8 @@ const Comments: React.FC<{route: any}> = ({route}) => {
   const [newComment, setNewComment] = useState('');
   const [userDataCache, setUserDataCache] = useState<Record<string, any>>({});
   const currentUserUid = auth().currentUser?.uid;
+
+  const {t} = useTranslation();
 
   useEffect(() => {
     const unsubscribe = firestore()

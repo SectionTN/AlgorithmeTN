@@ -207,7 +207,7 @@ const AddCode: React.FC = () => {
       <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content
-          title="Add Code"
+          title={t('add-code.add_code')}
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
       </Appbar.Header>
@@ -218,7 +218,7 @@ const AddCode: React.FC = () => {
         style={styles.scrollContainer}>
         <SpacerV height={heightPercentageToDP(0.25)} />
         <TextInput
-          label="Code Title"
+          label={t('add-code.code_title')}
           value={title}
           mode={'outlined'}
           multiline={false}
@@ -232,7 +232,7 @@ const AddCode: React.FC = () => {
         />
         <SpacerV height={heightPercentageToDP(0.25)} />
         <TextInput
-          label="Code Description"
+          label={t('add-code.code_desc')}
           value={description}
           mode={'outlined'}
           multiline={true}
@@ -250,7 +250,7 @@ const AddCode: React.FC = () => {
           onDismiss={() => setLevelMenuVisible(false)}
           anchor={
             <Button onPress={() => setLevelMenuVisible(true)}>
-              {level ? `${level} selected` : 'Select a level'}
+              {level ? `${level} selected` : t('add-code.select_level')}
             </Button>
           }>
           <Menu.Item
@@ -290,7 +290,7 @@ const AddCode: React.FC = () => {
               onDismiss={() => setSectionMenuVisible(false)}
               anchor={
                 <Button onPress={() => setSectionMenuVisible(true)}>
-                  {section ? `${section} selected` : 'Select a section'}
+                  {section ? `${section} selected` : t('add-code.select_section')}
                 </Button>
               }>
               {sections.map(sec => (
@@ -314,7 +314,7 @@ const AddCode: React.FC = () => {
             <Button onPress={() => setLanguageMenuVisible(true)}>
               {language !== 'none'
                 ? `${customCapitalize(language)} selected`
-                : 'Select a language'}
+                : t('add-code.select_language')}
             </Button>
           }>
           {languages.map(lang => (
@@ -331,24 +331,24 @@ const AddCode: React.FC = () => {
         </Menu>
         <SpacerV height={heightPercentageToDP(0.25)} />
         <TextInput
-          label="Write Code"
+          label={t('add-code.write_code')}
           mode={'outlined'}
           value={
             codeValue
-              ? 'Click to edit your code.'
-              : 'You haven\'t submitted any code.'
+              ? t('add-code.click_edit_code')
+              : t('add-code.no_submit_code')
           }
           onFocus={() => {
             Keyboard.dismiss();
             if (isEqual(language, 'none')) {
               alert({
-                title: 'Language not selected',
-                message: 'select a language before writing code',
+                title: t('add-code.language_not_select'),
+                message: t('add-code.select_language_before'),
                 preset: 'error',
               });
               return;
             }
-            navigation.navigate('write-code', {
+            navigation.navigate('add-code.write-code', {
               language: language,
               codeValue: codeValue,
             });
@@ -374,7 +374,7 @@ const AddCode: React.FC = () => {
         <SpacerV height={heightPercentageToDP(0.25)} />
         {switchToggled && (
           <TextInput
-            label="Write Instructions"
+            label={t('add-code.write_instructions')}
             mode={'outlined'}
             value={instructions}
             right={<TextInput.Affix text={`${instructions.length}/750`} />}
