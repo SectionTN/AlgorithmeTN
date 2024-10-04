@@ -32,7 +32,7 @@ const Algo: React.FC = () => {
     },
     {
       key: 'instructions',
-      title: 'Instructions',
+      title: t('instructions.title'),
       focusedIcon: 'file-outline',
     },
   ]);
