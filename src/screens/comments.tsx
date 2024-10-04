@@ -120,7 +120,7 @@ const Comments: React.FC<{route: any}> = ({route}) => {
       <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content
-          title="Comments"
+          title={t('comments.title')}
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
       </Appbar.Header>
@@ -134,7 +134,7 @@ const Comments: React.FC<{route: any}> = ({route}) => {
         <TextInput
           style={{flex: 1}}
           mode={'outlined'}
-          placeholder="Add a comment..."
+          placeholder={t('comments.add')}
           value={newComment}
           onChangeText={setNewComment}
           theme={{

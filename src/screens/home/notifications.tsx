@@ -8,6 +8,7 @@ import {Dimensions, StatusBar, StyleSheet} from 'react-native';
 import {FlatGrid} from 'react-native-super-grid';
 import auth from '@react-native-firebase/auth';
 import {NativeViewGestureHandler} from 'react-native-gesture-handler';
+import { useTranslation } from 'react-i18next';
 
 const LeftContent = () => (
   <Avatar.Image
@@ -25,16 +26,18 @@ const Notifications: React.FC = () => {
 
   const windowDimension = Dimensions.get('window').width;
 
+  const { t } = useTranslation();
+
   const [items] = useState([
-    {notif: 'liked your post.', desc: '2 min ago'},
-    {notif: 'commented on your post.', desc: '5 min ago'},
-    {notif: 'liked your post.', desc: '8 min ago'},
-    {notif: 'liked your post', desc: '1 hour ago'},
-    {notif: 'liked your post', desc: '5 hours ago'},
-    {notif: 'liked your post', desc: '12 hours ago'},
-    {notif: 'liked your post', desc: 'yesterday'},
-    {notif: 'liked your post', desc: 'a long time ago'},
-    {notif: 'liked your post', desc: 'a long time ago'},
+    {notif: t('liked_your_post'), desc: '2 min ago'},
+    {notif: t('commented_post'), desc: '5 min ago'},
+    {notif: t('liked_your_post'), desc: '8 min ago'},
+    {notif: t('liked_your_post'), desc: '1 hour ago'},
+    {notif: t('liked_your_post'), desc: '5 hours ago'},
+    {notif: t('liked_your_post'), desc: '12 hours ago'},
+    {notif: t('liked_your_post'), desc: 'yesterday'},
+    {notif: t('liked_your_post'), desc: 'a long time ago'},
+    {notif: t('liked_your_post'), desc: 'a long time ago'},
   ]);
 
   const renderNotificationItem = ({item}) => {
@@ -77,7 +80,7 @@ const Notifications: React.FC = () => {
         )}
         <SpacerH width={widthPercentageToDP(0.5)} />
         <Appbar.Content
-          title="Notifications"
+          title={t('notifications.title')}
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
       </Appbar.Header>

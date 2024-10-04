@@ -271,10 +271,10 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
       needsPaddingBottom={false}>
       <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <Appbar.Content
-          title="Profile"
+          title={t('profile.title')}
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
-        <Tooltip title="Help">
+        <Tooltip title={t('help')}>
           <Menu
             style={{paddingTop: insets.top, paddingRight: insets.right}}
             visible={menuVisible}
@@ -352,7 +352,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           entering={ZoomInLeft}
           exiting={ZoomOutRight}>
           <Card mode={'contained'}>
-            <Card.Title title="Statistics" titleVariant={'titleLarge'} />
+            <Card.Title title={t('profile.stats')} titleVariant={'titleLarge'} />
             <Card.Content style={styles.cardContent}>
               <View style={styles.statItem}>
                 <Text
@@ -419,7 +419,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           <SpacerV height={heightPercentageToDP(0.25)} />
           {/*Achievements Chips*/}
           <Card mode={'contained'}>
-            <Card.Title title="Achievements" titleVariant={'titleLarge'} />
+            <Card.Title title={t('profile.achievements')} titleVariant={'titleLarge'} />
             <Card.Content style={styles.badgeView}>
               {achievements.map(achievement => (
                 <Chip
@@ -436,7 +436,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           <SpacerV height={heightPercentageToDP(0.25)} />
           {/*Recent Activities*/}
           <Card mode={'contained'}>
-            <Card.Title title="Recent Activities" titleVariant={'titleLarge'} />
+            <Card.Title title={t('profile.recent_activities')} titleVariant={'titleLarge'} />
             <Card.Content style={styles.recentActivities}>
               {recentActivities.map(activity => (
                 <Text

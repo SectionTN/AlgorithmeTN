@@ -160,13 +160,13 @@ const Login: React.FC = () => {
   function onMainButtonPress() {
     Keyboard.dismiss();
     // TODO: dismiss any bottom sheet if available
-    alert({title: 'Please Wait', preset: 'spinner'});
+    alert({title: t('please_wait'), preset: 'spinner'});
     switch (currentMode) {
       case 'login':
         if (email.trim().length < 3 || password.trim().length < 3) {
           return alert({
-            title: 'Incorrect Details',
-            message: "Please check out what you've entered",
+            title: t('login.incorrect_details'),
+            message: t('check_entered'),
             preset: 'error',
           });
         }
@@ -200,24 +200,24 @@ const Login: React.FC = () => {
             let errorMessage = '';
             switch (error?.code) {
               case 'auth/invalid-email':
-                errorMessage = 'The email address is not valid.';
+                errorMessage = t('login.invalid_email_address');
                 break;
               case 'auth/user-disabled':
                 errorMessage =
-                  'The user corresponding to the given email has been disabled.';
+                  t('login.account_disabled');
                 break;
               case 'auth/user-not-found':
                 errorMessage =
-                  'There is no user corresponding to the given email.';
+                  t('login.user_not_found');
                 break;
               case 'auth/wrong-password':
-                errorMessage = 'The password is invalid for the given email.';
+                errorMessage = t('login.wrong_password');
                 break;
               case 'auth/invalid-credential':
-                errorMessage = 'The credential is invalid.';
+                errorMessage = t('login.invalid_creds');
                 break;
               default:
-                errorMessage = 'An unknown error occurred.';
+                errorMessage = t('error_occured');
                 break;
             }
             alert({title: 'Error', message: errorMessage, preset: 'error'});
@@ -226,15 +226,15 @@ const Login: React.FC = () => {
       case 'signup':
         if (email.trim().length < 3 || password.trim().length < 3) {
           return alert({
-            title: 'Incorrect Details',
-            message: "Please check out what you've entered",
+            title: t('login.incorrect_details'),
+            message: t('check_entered'),
             preset: 'error',
           });
         }
         if (password.trim() !== confirmPassword.trim()) {
           return alert({
-            title: 'Incorrect Details',
-            message: "Your passwords doesn't match",
+            title: t('login.incorrect_details'),
+            message: t('login.pass_not_match'),
             preset: 'error',
           });
         }
@@ -259,20 +259,20 @@ const Login: React.FC = () => {
             switch (error?.code) {
               case 'auth/email-already-in-use':
                 errorMessage =
-                  'There already exists an account with the given email address.';
+                  t('login.email_in_use');
                 break;
               case 'auth/invalid-email':
-                errorMessage = 'The email address is not valid.';
+                errorMessage = t('login.invalid_email_address');
                 break;
               case 'auth/operation-not-allowed':
                 errorMessage =
-                  'Email & password accounts are not enabled, at the moment.';
+                  t('login.operation_not_allowed');
                 break;
               case 'auth/weak-password':
-                errorMessage = 'The password is not strong enough.';
+                errorMessage = t('login.weak_pass');
                 break;
               default:
-                errorMessage = 'An unknown error occurred.';
+                errorMessage = t("error_occured");
                 break;
             }
             alert({
@@ -285,8 +285,8 @@ const Login: React.FC = () => {
       case 'forgot-password':
         if (email.trim().length < 3) {
           return alert({
-            title: 'Incorrect Details',
-            message: 'Please enter a valid email address.',
+            title: t('login.incorrect_details'),
+            message: t("login.enter_valid_email"),
             preset: 'error',
           });
         }
@@ -294,8 +294,8 @@ const Login: React.FC = () => {
           .sendPasswordResetEmail(email)
           .then(() => {
             alert({
-              title: 'Password Reset',
-              message: 'A password reset email has been sent.',
+              title: t("login.pass_reset"),
+              message: t('login.reset_email'),
               preset: 'done',
             });
             setCurrentMode('login');
@@ -305,14 +305,14 @@ const Login: React.FC = () => {
 
             switch (error?.code) {
               case 'auth/invalid-email':
-                errorMessage = 'The email address is not valid.';
+                errorMessage = t('login.invalid_email_address');
                 break;
               case 'auth/user-not-found':
                 errorMessage =
-                  'There is no user corresponding to the email address.';
+                  t('login.user_not_found');
                 break;
               default:
-                errorMessage = 'An unknown error occurred.';
+                errorMessage = t('error_occured');
                 break;
             }
             alert({
@@ -325,7 +325,7 @@ const Login: React.FC = () => {
       default:
         alert({
           title: 'Error',
-          message: 'Invalid operation mode.',
+          message: t('invalid_operation'),
           preset: 'error',
         });
         break;
@@ -342,7 +342,7 @@ const Login: React.FC = () => {
         needsPaddingBottom={true}>
         <Appbar.Header>
           {currentMode !== 'login' && (
-            <Tooltip title="Go Back">
+            <Tooltip title={t('go_back')}>
               <Appbar.BackAction onPress={() => setCurrentMode('login')} />
             </Tooltip>
           )}
