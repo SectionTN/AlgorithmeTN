@@ -348,7 +348,7 @@ const AddCode: React.FC = () => {
               });
               return;
             }
-            navigation.navigate('add-code.write-code', {
+            navigation.navigate('write-code', {
               language: language,
               codeValue: codeValue,
             });
