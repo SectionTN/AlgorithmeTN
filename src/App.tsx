@@ -10,7 +10,6 @@ import {Appearance, StatusBar, StyleSheet, useColorScheme} from 'react-native';
 import {PaperProvider, MD3DarkTheme, MD3LightTheme} from 'react-native-paper';
 import StackNavigator from './config/navigation/stack.tsx';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {useMaterial3Theme} from '@pchmn/expo-material3-theme';
 import {setup} from '@baronha/ting';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import i18n from './config/i18n/i18n.ts';
@@ -20,6 +19,7 @@ import {useMMKVString} from 'react-native-mmkv';
 import setColorScheme = Appearance.setColorScheme;
 import * as RNLocalize from 'react-native-localize';
 import {changeLanguage} from './config/i18n/changeLanguage.ts';
+import {useMaterial3Theme} from './theme/hooks.ts';
 
 const locales = RNLocalize.getLocales();
 
@@ -30,6 +30,8 @@ function App(): React.JSX.Element {
   const {theme} = useMaterial3Theme({
     fallbackSourceColor: COLORS.yellowLightWarning,
   });
+
+  console.log(theme);
 
   const [themeStatus, setThemeStatus] = useMMKVString('theme');
 
