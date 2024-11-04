@@ -21,7 +21,7 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import { useTranslation } from 'react-i18next';
 
 const Comments: React.FC<{route: any}> = ({route}) => {
-  const {postId} = route.params;
+  const {pid} = route.params;
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useTheme();
@@ -36,7 +36,7 @@ const Comments: React.FC<{route: any}> = ({route}) => {
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('comments')
-      .where('postId', '==', postId)
+      .where('postId', '==', pid)
       .onSnapshot(snapshot => {
         const commentsList: Comment[] = snapshot.docs.map(doc => ({
           id: doc.ref.id,
@@ -55,7 +55,7 @@ const Comments: React.FC<{route: any}> = ({route}) => {
         });
       });
     return () => unsubscribe();
-  }, [postId, userDataCache]);
+  }, [pid, userDataCache]);
 
   const navigateToProfile = (userId: string) => {
     if (userId === currentUserUid) {
@@ -67,7 +67,7 @@ const Comments: React.FC<{route: any}> = ({route}) => {
     const user = auth().currentUser!;
     const commentData: Comment = {
       userId: user.uid,
-      postId,
+      pid,
       comment: newComment.trim(),
     };
 
