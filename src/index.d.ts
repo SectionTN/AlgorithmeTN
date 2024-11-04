@@ -2,7 +2,7 @@ import AlgoTNLogo from '../src/assets/images/logo/AlgoTN.png';
 
 export {AlgoTNLogo};
 
-
+// Material 3 Theme
 export {
   useMaterial3Theme,
   getMaterial3Theme,
