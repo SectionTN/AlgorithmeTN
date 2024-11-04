@@ -20,6 +20,15 @@ import getUserData from '../utils/firebase.ts';
 import crashlytics from '@react-native-firebase/crashlytics';
 import { useTranslation } from 'react-i18next';
 
+interface Comment {
+  id: string;
+  postId: string;
+  userId: string;
+  comment: string;
+}
+
+type NewComment = Omit<Comment, 'id'>;
+
 const Comments: React.FC<{route: any}> = ({route}) => {
   const {pid} = route.params;
   const navigation =
@@ -32,6 +41,7 @@ const Comments: React.FC<{route: any}> = ({route}) => {
   const currentUserUid = auth().currentUser?.uid;
 
   const {t} = useTranslation();
+
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -65,10 +75,10 @@ const Comments: React.FC<{route: any}> = ({route}) => {
 
   const handleAddComment = async () => {
     const user = auth().currentUser!;
-    const commentData: Comment = {
-      userId: user.uid,
-      pid,
+    const commentData: NewComment = {
+      postId: pid,
       comment: newComment.trim(),
+      userId: user.uid,
     };
 
     try {
@@ -82,7 +92,7 @@ const Comments: React.FC<{route: any}> = ({route}) => {
     }
   };
 
-  const renderCommentItem = async ({item}: {item: Comment}) => {
+  const renderCommentItem = ({item}: {item: Comment}) => {
     const userData = userDataCache[item.userId];
 
     if (!userData) {
