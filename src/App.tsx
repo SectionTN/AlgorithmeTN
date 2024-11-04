@@ -31,8 +31,6 @@ function App(): React.JSX.Element {
     fallbackSourceColor: COLORS.yellowLightWarning,
   });
 
-  console.log(theme);
-
   const [themeStatus, setThemeStatus] = useMMKVString('theme');
 
   const [languageStatus, setLanguageStatus] = useMMKVString('language');
