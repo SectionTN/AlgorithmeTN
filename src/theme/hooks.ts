@@ -52,12 +52,8 @@ export function getMaterial3Theme(fallbackSourceColor: string = '#6750A4'): Mate
   if (!isDynamicThemeSupported) {
     return createThemeFromSourceColor(fallbackSourceColor);
   }
-  Material3ThemeModule.getSystemThemeAsync()
+  Material3ThemeModule.getSystemTheme()
     .then((systemSchemes: {light: SystemScheme; dark: SystemScheme} | null) => {
-      const schemes = systemSchemes as {
-        light: SystemScheme;
-        dark: SystemScheme;
-      } | null;
       if (systemSchemes) {
         return createThemeFromSystemSchemes(systemSchemes);
       }
