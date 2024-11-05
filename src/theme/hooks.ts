@@ -6,7 +6,7 @@ import Material3ThemeModule from './NativeModule.ts';
 
 
 export const isDynamicThemeSupported =
-  Platform.OS === 'android' && Platform.Version >= 31;
+  !!Material3ThemeModule && Platform.OS === 'android' && Platform.Version >= 31;
 
 /**
  * Hook to manage material3 theme.
@@ -52,15 +52,14 @@ export function getMaterial3Theme(fallbackSourceColor: string = '#6750A4'): Mate
   if (!isDynamicThemeSupported) {
     return createThemeFromSourceColor(fallbackSourceColor);
   }
-  Material3ThemeModule.getSystemTheme()
-    .then((systemSchemes: {light: SystemScheme; dark: SystemScheme} | null) => {
-      if (systemSchemes) {
-        return createThemeFromSystemSchemes(systemSchemes);
-      }
-    })
-    .catch((error: any) => {
-      console.error('Error fetching system themes:', error);
-    });
+  const systemSchemes = Material3ThemeModule.getSystemTheme() as {
+    light: SystemScheme;
+    dark: SystemScheme;
+  } | null;
+
+  if (systemSchemes) {
+    return createThemeFromSystemSchemes(systemSchemes);
+  }
   return createThemeFromSourceColor(fallbackSourceColor);
 }
 
@@ -89,5 +88,3 @@ export async function getMaterial3ThemeAsync(fallbackSourceColor: string = '#675
 export function createMaterial3Theme(sourceColor: string): Material3Theme {
   return createThemeFromSourceColor(sourceColor);
 }
-
-//export {SystemScheme as Material3Scheme, Material3Theme };
