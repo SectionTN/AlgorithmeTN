@@ -27,9 +27,7 @@ function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colorScheme = useColorScheme();
-  const {theme} = useMaterial3Theme({
-    fallbackSourceColor: COLORS.yellowLightWarning,
-  });
+  const {theme} = useMaterial3Theme();
 
   const [themeStatus, setThemeStatus] = useMMKVString('theme');
 
