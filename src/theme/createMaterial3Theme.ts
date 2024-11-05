@@ -24,16 +24,11 @@ export function createThemeFromSystemSchemes(schemes: {
   light: SystemScheme;
   dark: SystemScheme;
 }): Material3Theme {
-  if (!schemes || !schemes.light || !schemes.light.primary) {
-    // If system schemes are invalid, fall back to the default color
-    return createThemeFromSourceColor('#6750A4');
-  }
   const { light, dark, palettes } = generateSchemesFromSourceColor(schemes.light.primary);
   schemes = {
     light: { ...light, ...schemes.light },
     dark: { ...dark, ...schemes.dark },
   };
-
   return {
     light: { ...schemes.light, ...generateMissingFields(schemes.light, palettes, 'light') } as Material3Scheme,
     dark: { ...schemes.dark, ...generateMissingFields(schemes.dark, palettes, 'dark') } as Material3Scheme,
