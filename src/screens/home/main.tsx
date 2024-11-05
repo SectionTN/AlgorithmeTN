@@ -383,16 +383,19 @@ const Main: React.FC = forwardRef((props, ref) => {
           />
           <Card.Content>
             <Text variant="bodyMedium">{item.description}</Text>
-            <SpacerV height={heightPercentageToDP(0.2)} />
-            <Icon
-              size={24}
-              color={theme.colors.primary}
-              source={
-                item.language === 'algorithm'
-                  ? 'brain'
-                  : `language-${item.language}`
-              }
-            />
+            <SpacerV height={heightPercentageToDP(0.15)} />
+              <Icon
+                size={24}
+                color={theme.colors.primary}
+                source={
+                  item.language === 'algorithm'
+                    ? 'brain'
+                    : `language-${item.language}`
+                }
+              />
+            <SpacerV height={heightPercentageToDP(0.15)} />
+            <Text variant={'bodySmall'} style={{fontStyle: 'italic', color: theme.colors.onBackground, opacity: 0.875}}>
+              {item.section ? `Année: ${item.level} | Section: ${item.section}` : `Année: ${item.level}`}</Text>
           </Card.Content>
           <Card.Actions>
             <View style={{flexDirection: 'column', alignItems: 'center'}}>
