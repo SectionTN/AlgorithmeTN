@@ -7,8 +7,6 @@ import {
   Dialog,
   Icon,
   IconButton,
-  Modal,
-  Portal,
   Text,
   useTheme,
 } from 'react-native-paper';
@@ -21,23 +19,15 @@ import {
 } from '../../config/dimensions.ts';
 import {Dimensions, StatusBar, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../config/navigation/types.ts';
 import {useTranslation} from 'react-i18next';
 import {FlatGrid} from 'react-native-super-grid';
 import {CodeData} from '../../types/interfaces.ts';
 import firestore from '@react-native-firebase/firestore';
-import Animated, {
-  SequencedTransition,
-} from 'react-native-reanimated';
+import Animated, {SequencedTransition} from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 
 const Bookmarks: React.FC = () => {
   const theme = useTheme();
-
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const {t} = useTranslation();
 
@@ -66,15 +56,42 @@ const Bookmarks: React.FC = () => {
       .collection('bookmarks')
       .onSnapshot(
         async snapshot => {
-          const bookmarksData = await Promise.all(
-            snapshot.docs.map(async doc => {
-              const bookmarkData = doc.data();
-              const codeData = await getCodeData(bookmarkData.codeId);
-              const userData = await getUserData(codeData.uid);
-              return {...bookmarkData, ...userData, ...codeData, id: doc.id};
-            }),
-          );
-          setBookmarks(bookmarksData as any);
+          try {
+            const bookmarksData = await Promise.all(
+              snapshot.docs.map(async doc => {
+                const bookmarkData = doc.data();
+                try {
+                  const codeData = await getCodeData(bookmarkData.codeId);
+                  const userData = await getUserData(codeData.uid);
+                  return {
+                    ...bookmarkData,
+                    ...userData,
+                    ...codeData,
+                    id: doc.id,
+                  };
+                } catch (error) {
+                  console.error('Error fetching code or user data: ', error);
+                  await firestore()
+                    .collection('users')
+                    .doc(auth().currentUser?.uid)
+                    .collection('bookmarks')
+                    .doc(doc.id)
+                    .delete();
+                }
+                return null;
+              }),
+            );
+            setBookmarks(
+              bookmarksData.filter(bookmark => bookmark !== null) as Array<
+                CodeData & {
+                  first_name: string;
+                  last_name: string;
+                }
+              >,
+            );
+          } catch (error) {
+            console.error('Error processing bookmarks: ', error);
+          }
         },
         error => {
           console.error('Error fetching bookmarks: ', error);
