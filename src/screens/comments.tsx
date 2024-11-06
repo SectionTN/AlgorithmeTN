@@ -13,18 +13,25 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../config/navigation/types';
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import firestore, {
+  FirebaseFirestoreTypes,
+} from '@react-native-firebase/firestore';
 import BaseView from '../components/baseview/baseview.tsx';
 import {FONTS} from '../config/misc.ts';
 import getUserData from '../utils/firebase.ts';
 import crashlytics from '@react-native-firebase/crashlytics';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
+import moment from 'moment';
+import {fontValue} from '../config/dimensions.ts';
+import {alert} from '@baronha/ting';
+import SpacerV from '../components/spacer/spacerv.tsx';
 
 interface Comment {
   id: string;
   postId: string;
   userId: string;
   comment: string;
+  createdAt: FirebaseFirestoreTypes.Timestamp;
 }
 
 type NewComment = Omit<Comment, 'id'>;
@@ -41,7 +48,6 @@ const Comments: React.FC<{route: any}> = ({route}) => {
   const currentUserUid = auth().currentUser?.uid;
 
   const {t} = useTranslation();
-
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -74,11 +80,18 @@ const Comments: React.FC<{route: any}> = ({route}) => {
   };
 
   const handleAddComment = async () => {
+    if (newComment.trim().length >= 500) {
+      return alert({
+        title: 'Long Comment',
+        message: 'Please make it more shorter',
+      });
+    }
     const user = auth().currentUser!;
     const commentData: NewComment = {
       postId: pid,
       comment: newComment.trim(),
       userId: user.uid,
+      createdAt: firestore.Timestamp.now(),
     };
 
     try {
@@ -92,6 +105,37 @@ const Comments: React.FC<{route: any}> = ({route}) => {
     }
   };
 
+  const renderEmptyComments = () => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2%',
+        }}>
+        <Text
+          style={{
+            fontSize: fontValue(18),
+            fontFamily: FONTS.p_regular,
+            color: theme.colors.onBackground,
+          }}>
+          No Comments, yet.
+        </Text>
+        <SpacerV height={1} />
+        <Text
+          style={{
+            fontSize: fontValue(14),
+            fontFamily: FONTS.p_regular,
+            color: theme.colors.onBackground,
+            opacity: 0.75,
+          }}>
+          will be here, soon!
+        </Text>
+      </View>
+    );
+  };
+
   const renderCommentItem = ({item}: {item: Comment}) => {
     const userData = userDataCache[item.userId];
 
@@ -99,10 +143,14 @@ const Comments: React.FC<{route: any}> = ({route}) => {
       return null;
     }
 
+    const formattedDate = moment(item.createdAt.toDate()).fromNow();
+
     return (
       <Card mode={'contained'} style={styles.commentCard}>
         <View style={styles.commentContainer}>
-          <TouchableOpacity onPress={() => navigateToProfile(item.userId)}>
+          <TouchableOpacity
+            style={{alignContent: 'flex-start'}}
+            onPress={() => navigateToProfile(item.userId)}>
             {userData?.avatar && userData?.avatar?.length !== 2 ? (
               <Avatar.Image source={{uri: userData?.avatar}} size={40} />
             ) : (
@@ -120,6 +168,9 @@ const Comments: React.FC<{route: any}> = ({route}) => {
             </TouchableOpacity>
             <Text style={styles.commentText}>{item.comment}</Text>
           </View>
+          <Text style={{fontSize: fontValue(10), fontFamily: FONTS.p_regular}}>
+            {formattedDate}
+          </Text>
         </View>
       </Card>
     );
@@ -138,17 +189,24 @@ const Comments: React.FC<{route: any}> = ({route}) => {
         />
       </Appbar.Header>
       <FlatList
+        style={styles.flatList}
         data={comments}
         renderItem={renderCommentItem}
+        ListEmptyComponent={renderEmptyComments}
+        contentContainerStyle={
+          comments.length === 0 && styles.flatListEmptyContainer
+        }
         keyExtractor={item => item.id}
         removeClippedSubviews={true}
       />
       <View style={styles.inputContainer}>
         <TextInput
-          style={{flex: 1}}
+          style={{flex: 1, fontFamily: FONTS.p_regular}}
+          contentStyle={{fontFamily: FONTS.p_regular}}
           mode={'outlined'}
           placeholder={t('comments.add')}
           value={newComment}
+          maxLength={500}
           onChangeText={setNewComment}
           theme={{
             roundness: 360,
@@ -170,6 +228,14 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#fff',
   },
+  flatList: {
+    flex: 1,
+  },
+  flatListEmptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignContent: 'center',
+  },
   commentCard: {
     marginVertical: 5,
     marginRight: '2.5%',
@@ -177,7 +243,7 @@ const styles = StyleSheet.create({
   },
   commentContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     padding: 10,
   },
   commentTextContainer: {
@@ -185,11 +251,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   commentAuthor: {
-    fontWeight: 'bold',
+    fontFamily: FONTS.p_bold,
   },
   commentText: {
     marginTop: 5,
     opacity: 0.8,
+    fontFamily: FONTS.p_regular,
   },
   inputContainer: {
     flexDirection: 'row',
