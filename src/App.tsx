@@ -12,18 +12,21 @@ import StackNavigator from './config/navigation/stack.tsx';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {setup} from '@baronha/ting';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import i18n from './config/i18n/i18n.ts';
-import {I18nextProvider} from 'react-i18next';
-import {COLORS} from './config/misc.ts';
+import {I18nextProvider, useTranslation} from 'react-i18next';
 import {useMMKVString} from 'react-native-mmkv';
 import setColorScheme = Appearance.setColorScheme;
 import * as RNLocalize from 'react-native-localize';
 import {changeLanguage} from './config/i18n/changeLanguage.ts';
 import {useMaterial3Theme} from './theme/hooks.ts';
+import moment from 'moment';
+import 'moment/locale/fr';
+import 'moment/locale/en-gb';
+import i18n from './config/i18n/i18n.ts';
 
 const locales = RNLocalize.getLocales();
 
 function App(): React.JSX.Element {
+
   const isDarkMode = useColorScheme() === 'dark';
 
   const colorScheme = useColorScheme();
@@ -32,7 +35,8 @@ function App(): React.JSX.Element {
   const [themeStatus, setThemeStatus] = useMMKVString('theme');
 
   const [languageStatus, setLanguageStatus] = useMMKVString('language');
- // TODO: bug here
+
+  // TODO: bug here
   useEffect(() => {
     if (themeStatus === undefined) {
       setThemeStatus('system');
@@ -48,6 +52,7 @@ function App(): React.JSX.Element {
       setLanguageStatus(locales[0].languageTag);
       changeLanguage(locales[0].languageTag);
     } else if (languageStatus === 'fr') {
+      moment.locale('fr');
       setLanguageStatus(languageStatus as 'fr');
       changeLanguage(languageStatus as 'fr');
     } else {
@@ -55,6 +60,10 @@ function App(): React.JSX.Element {
       changeLanguage(languageStatus as 'en');
     }
   }, [languageStatus, setLanguageStatus]);
+
+  useEffect(() => {
+    moment.locale(i18n.language);
+  }, []);
 
   const paperTheme = useMemo(
     () =>
