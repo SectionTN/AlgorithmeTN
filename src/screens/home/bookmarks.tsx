@@ -25,8 +25,14 @@ import {CodeData} from '../../types/interfaces.ts';
 import firestore from '@react-native-firebase/firestore';
 import Animated, {SequencedTransition} from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../../config/navigation/types.ts';
 
 const Bookmarks: React.FC = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
   const theme = useTheme();
 
   const {t} = useTranslation();
@@ -173,7 +179,7 @@ const Bookmarks: React.FC = () => {
         data={bookmarks}
         renderItem={({item}) => (
           <Animated.View layout={SequencedTransition.duration(1000).delay(500)}>
-            <Card>
+            <Card onPress={() => navigation.navigate('algo', {codeId: item.id})}>
               <Card.Title
                 title={`${item.title}`}
                 titleNumberOfLines={2}
