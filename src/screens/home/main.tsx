@@ -354,6 +354,7 @@ const Main: React.FC = forwardRef((props, ref) => {
       <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
         <Card
           onPress={() => {
+            navigation.preload('algo', { codeId: item.id });
             addView(item.id).then(() => {
               navigation.navigate('algo', {codeId: item.id});
             });

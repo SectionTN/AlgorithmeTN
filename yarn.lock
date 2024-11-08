@@ -3396,18 +3396,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-native-firebase/analytics@npm:^21.3.0":
-  version: 21.3.0
-  resolution: "@react-native-firebase/analytics@npm:21.3.0"
+"@react-native-firebase/analytics@npm:^21.4.0":
+  version: 21.4.0
+  resolution: "@react-native-firebase/analytics@npm:21.4.0"
   peerDependencies:
-    "@react-native-firebase/app": 21.3.0
-  checksum: 5ce34d7a11019e9be615f4a4e70500ed95542f5aed2602056c627fb28bccfa8e16147ed3bc1a1faf1fdcb6b4886a18f4e493a3e4c7fb0187da8ea6eaf40edce6
+    "@react-native-firebase/app": 21.4.0
+  checksum: 10febb66c7cb2b3c142fab7dd3fed723cdc6c0fffdaf5551585c882a903de2e776214923e96200a37bfd137af3902c6660b5d6adddbcffcc988a1753aba5d710
   languageName: node
   linkType: hard
 
-"@react-native-firebase/app@npm:^21.3.0":
-  version: 21.3.0
-  resolution: "@react-native-firebase/app@npm:21.3.0"
+"@react-native-firebase/app@npm:^21.4.0":
+  version: 21.4.0
+  resolution: "@react-native-firebase/app@npm:21.4.0"
   dependencies:
     firebase: 10.13.2
     superstruct: ^0.6.2
@@ -3418,68 +3418,68 @@ __metadata:
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 1119aaad49780fc4171d12bbbdefb20667c698f34a56367feb37cc41d98ddb775289b37aef665cf9d46aa39bb0636c3f93ccd724eab5241776319c3a8547513b
+  checksum: 49a111160190d24623a6fbb694d91717f2e497e6ee3f645a430cbd1f120dad199034865981ce9f20451e1c407526e4dec0e551d5728193408212b47ecc0e3d0a
   languageName: node
   linkType: hard
 
-"@react-native-firebase/auth@npm:^21.3.0":
-  version: 21.3.0
-  resolution: "@react-native-firebase/auth@npm:21.3.0"
+"@react-native-firebase/auth@npm:^21.4.0":
+  version: 21.4.0
+  resolution: "@react-native-firebase/auth@npm:21.4.0"
   dependencies:
     plist: ^3.1.0
   peerDependencies:
-    "@react-native-firebase/app": 21.3.0
+    "@react-native-firebase/app": 21.4.0
     expo: ">=47.0.0"
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 49326b211a6e025a5dbbf84de791d1baeb0c0f38d157726d9c59e8f6bc239750d6ce0eee83086d5790afd0e9460df39a34ee73096a1a276d046deb0800df5007
+  checksum: 99b913bca5cfba3bbeec343ac22e352dfdcb1fed751a4a9c86c0813646e43a32a5717c8ebb354b49b2b2bf25c6cfaf4a8df9479b52b23a8f73856493c92261d7
   languageName: node
   linkType: hard
 
-"@react-native-firebase/crashlytics@npm:^21.3.0":
-  version: 21.3.0
-  resolution: "@react-native-firebase/crashlytics@npm:21.3.0"
+"@react-native-firebase/crashlytics@npm:^21.4.0":
+  version: 21.4.0
+  resolution: "@react-native-firebase/crashlytics@npm:21.4.0"
   dependencies:
     stacktrace-js: ^2.0.2
   peerDependencies:
-    "@react-native-firebase/app": 21.3.0
+    "@react-native-firebase/app": 21.4.0
     expo: ">=47.0.0"
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: d4eed0869a68b2063d1811097d5aff34eda212435a4da3e3371e6a07a190003ccd650332e22062ab699f1b925216fb0f822a46bfacd5c5418ebd6d19b995a227
+  checksum: 7c3e8f91f3316a2cc22ac4c3cdc474d50f50278706dde557194b7b314b42ba5f066a0b815eeeba21d724afa71c11ac5081ad78a82923c0b9bf1c8c3e8ff066a3
   languageName: node
   linkType: hard
 
-"@react-native-firebase/firestore@npm:^21.3.0":
-  version: 21.3.0
-  resolution: "@react-native-firebase/firestore@npm:21.3.0"
+"@react-native-firebase/firestore@npm:^21.4.0":
+  version: 21.4.0
+  resolution: "@react-native-firebase/firestore@npm:21.4.0"
   peerDependencies:
-    "@react-native-firebase/app": 21.3.0
-  checksum: cbadbd842079edfbf7b8614a270ae49078bb4e04900c13f7fd01bd0dd36ea394759d71e9d2cd943ce8a32385974c545e8428a12b69b806093912fa2a3ad5ce5c
+    "@react-native-firebase/app": 21.4.0
+  checksum: d395bd75c002a3a3d5378328a34bcb3ea502fc39a3ecff233f385b8731cce94fd69cceadc5b4fdb5c140e9b12d435f4abd30bb088d5992032ccee911a6043f48
   languageName: node
   linkType: hard
 
-"@react-native-firebase/perf@npm:^21.3.0":
-  version: 21.3.0
-  resolution: "@react-native-firebase/perf@npm:21.3.0"
+"@react-native-firebase/perf@npm:^21.4.0":
+  version: 21.4.0
+  resolution: "@react-native-firebase/perf@npm:21.4.0"
   peerDependencies:
-    "@react-native-firebase/app": 21.3.0
+    "@react-native-firebase/app": 21.4.0
     expo: ">=47.0.0"
   peerDependenciesMeta:
     expo:
       optional: true
-  checksum: 44d67743fa5487b45c6af4409df2bd6dc2a647474c5cd63b2441e06585a6c13087aff6a8ab8e7cce1c22a76d2c05caf2f30c8c72b95c2ead7a3dfe3acadb23d4
+  checksum: 60ac608e45c1d3cdeb2e83041b06090d8024c45e9635a53095daf2bd9ab4227b7bc61693931b94516444e77a42636e6a5c15ead574f8e8b6ec07e518e77ead19
   languageName: node
   linkType: hard
 
-"@react-native-firebase/storage@npm:^21.3.0":
-  version: 21.3.0
-  resolution: "@react-native-firebase/storage@npm:21.3.0"
+"@react-native-firebase/storage@npm:^21.4.0":
+  version: 21.4.0
+  resolution: "@react-native-firebase/storage@npm:21.4.0"
   peerDependencies:
-    "@react-native-firebase/app": 21.3.0
-  checksum: 158ca8183d39721801b1b055dfb4ce4a9b2a84818e3bd4b22c7f82cf7e77650b24dbf89fece90758416861ef8c84bee77dbd03a94da0bd07bcf91ed580c8acb5
+    "@react-native-firebase/app": 21.4.0
+  checksum: c61b03e4ebc3a01d4e13d2d354e000535c3f47889dc20777d91162743aed5bc549b12bf14d40fa54471c9179e1a7c675590fbc17582ad33007d4320e0298ad21
   languageName: node
   linkType: hard
 
@@ -3723,11 +3723,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-navigation/core@npm:^7.0.0-rc.14":
-  version: 7.0.0-rc.14
-  resolution: "@react-navigation/core@npm:7.0.0-rc.14"
+"@react-navigation/core@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@react-navigation/core@npm:7.0.0"
   dependencies:
-    "@react-navigation/routers": ^7.0.0-rc.8
+    "@react-navigation/routers": ^7.0.0
     escape-string-regexp: ^4.0.0
     nanoid: 3.3.7
     query-string: ^7.1.3
@@ -3736,66 +3736,66 @@ __metadata:
     use-sync-external-store: ^1.2.2
   peerDependencies:
     react: "*"
-  checksum: 00e2f9edae9f681c37d9aa5f390b897476e6f613553bc90fb09f062f49911193a032a58657947cb28640ec2273be297648637002b6f5b7c0a821d4286348c696
+  checksum: 50ba544a9e3017d079ab5937d8f274f9e49dead31df22ad96f4c5b275eded5347aa9d3479782fba20c5f7d4cf20a958bfa8f0c0c8f4395587c0d6da814727789
   languageName: node
   linkType: hard
 
-"@react-navigation/elements@npm:^2.0.0-rc.24":
-  version: 2.0.0-rc.24
-  resolution: "@react-navigation/elements@npm:2.0.0-rc.24"
+"@react-navigation/elements@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@react-navigation/elements@npm:2.0.0"
   dependencies:
     color: ^4.2.3
   peerDependencies:
     "@react-native-masked-view/masked-view": ">= 0.2.0"
-    "@react-navigation/native": ^7.0.0-rc.19
+    "@react-navigation/native": ^7.0.0
     react: ">= 18.2.0"
-    react-native: ">= 0.72.0"
+    react-native: "*"
     react-native-safe-area-context: ">= 4.0.0"
   peerDependenciesMeta:
     "@react-native-masked-view/masked-view":
       optional: true
-  checksum: 92f6fd713c738e9ee7bdfbf476f7f2c4351f86ac1b04dd38d349e34ee517539520d7c41180960329f85abbea047bf1206d4f63bb0d70fc7c5c5d6f495003159d
+  checksum: 40f99d71a6335734ec222e4a903bd5fe8e0067bf65ca9e2342bde20ba6682ae94ef64ff1b47ee470e37a42da93bfed2cda751a1a22d3252508350a8fdca6180e
   languageName: node
   linkType: hard
 
-"@react-navigation/native-stack@npm:^7.0.0-rc.27":
-  version: 7.0.0-rc.27
-  resolution: "@react-navigation/native-stack@npm:7.0.0-rc.27"
+"@react-navigation/native-stack@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@react-navigation/native-stack@npm:7.0.0"
   dependencies:
-    "@react-navigation/elements": ^2.0.0-rc.24
+    "@react-navigation/elements": ^2.0.0
     warn-once: ^0.1.1
   peerDependencies:
-    "@react-navigation/native": ^7.0.0-rc.19
+    "@react-navigation/native": ^7.0.0
     react: ">= 18.2.0"
-    react-native: ">= 0.72.0"
+    react-native: "*"
     react-native-safe-area-context: ">= 4.0.0"
-    react-native-screens: ">= 3.21.0"
-  checksum: ce36135cf376efc082027be39d90c9ce93c9cbac4008b64c0559e94650826c189973ba481bb47c6eeff60b760fc051c1a8ed894f0589405f84fa3b453b3afb93
+    react-native-screens: ">= 4.0.0"
+  checksum: f79936afea266f213477320f515322291224f087c82a4dc039107124e395853fe7bd98ae34fc842d581531372fc3185d8c1f0ad0582651fe5fd4a4cd895fab6e
   languageName: node
   linkType: hard
 
-"@react-navigation/native@npm:^7.0.0-rc.19":
-  version: 7.0.0-rc.19
-  resolution: "@react-navigation/native@npm:7.0.0-rc.19"
+"@react-navigation/native@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@react-navigation/native@npm:7.0.0"
   dependencies:
-    "@react-navigation/core": ^7.0.0-rc.14
+    "@react-navigation/core": ^7.0.0
     escape-string-regexp: ^4.0.0
     fast-deep-equal: ^3.1.3
     nanoid: 3.3.7
     use-latest-callback: ^0.2.1
   peerDependencies:
     react: ">= 18.2.0"
-    react-native: ">= 0.72.0"
-  checksum: 55fa22e891bf4398df5f80b72f25504078b6a1457904c46efe1472173113c17cbca27432731fab97ae8dbe58b8e9f72060810af124cf17f643a3da37720bc68d
+    react-native: "*"
+  checksum: e7e6a6a1af09ff18d4bb470c22e38d9b2c27de55d7a3a84ce064c9adb4c4c78ff3b8e88b24fc9588a815d7503cfa49e2247b1ea0fef6b20bee602027b37f5509
   languageName: node
   linkType: hard
 
-"@react-navigation/routers@npm:^7.0.0-rc.8":
-  version: 7.0.0-rc.8
-  resolution: "@react-navigation/routers@npm:7.0.0-rc.8"
+"@react-navigation/routers@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@react-navigation/routers@npm:7.0.0"
   dependencies:
     nanoid: 3.3.7
-  checksum: cb5e7c0b367b38018588cf8c297271691b6a73e7b8e0f7866b9ec322a52db37b09eb971bd6dfe4069b7eebbfe1ff43a4798dbfc2168deaeef8ac5894828b7d2b
+  checksum: a50c89629a55b5924480c4849020adbaeba645b1259c1edf41f3d27e41739ffdc0d2cd28d27cb7fc34f4373b2a737d4e30d2a63fec482f0cf1a295d8967138b6
   languageName: node
   linkType: hard
 
@@ -4375,19 +4375,19 @@ __metadata:
     "@react-native-community/cli-platform-ios": 15.0.0
     "@react-native-community/hooks": ^3.0.0
     "@react-native-community/netinfo": ^11.4.1
-    "@react-native-firebase/analytics": ^21.3.0
-    "@react-native-firebase/app": ^21.3.0
-    "@react-native-firebase/auth": ^21.3.0
-    "@react-native-firebase/crashlytics": ^21.3.0
-    "@react-native-firebase/firestore": ^21.3.0
-    "@react-native-firebase/perf": ^21.3.0
-    "@react-native-firebase/storage": ^21.3.0
+    "@react-native-firebase/analytics": ^21.4.0
+    "@react-native-firebase/app": ^21.4.0
+    "@react-native-firebase/auth": ^21.4.0
+    "@react-native-firebase/crashlytics": ^21.4.0
+    "@react-native-firebase/firestore": ^21.4.0
+    "@react-native-firebase/perf": ^21.4.0
+    "@react-native-firebase/storage": ^21.4.0
     "@react-native/babel-preset": 0.76.1
     "@react-native/eslint-config": 0.76.1
     "@react-native/metro-config": 0.76.1
     "@react-native/typescript-config": 0.76.1
-    "@react-navigation/native": ^7.0.0-rc.19
-    "@react-navigation/native-stack": ^7.0.0-rc.27
+    "@react-navigation/native": ^7.0.0
+    "@react-navigation/native-stack": ^7.0.0
     "@rnx-kit/align-deps": ^3.0.2
     "@types/color": ^4.2.0
     "@types/crypto-js": ^4.2.2
@@ -4415,13 +4415,13 @@ __metadata:
     react-native-image-crop-picker: ^0.41.4
     react-native-localize: ^3.3.0
     react-native-mmkv: ^3.1.0
-    react-native-onesignal: ^5.2.5
+    react-native-onesignal: ^5.2.6
     react-native-pager-view: ^6.4.1
     react-native-paper: ^5.12.5
     react-native-randombytes: ^3.6.1
     react-native-reanimated: ^3.16.1
     react-native-safe-area-context: ^4.14.0
-    react-native-screens: ^3.35.0
+    react-native-screens: ^4.0.0
     react-native-super-grid: ^6.0.1
     react-native-vector-icons: ^10.2.0
     react-native-webview: ^13.12.3
@@ -10084,12 +10084,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-onesignal@npm:^5.2.5":
-  version: 5.2.5
-  resolution: "react-native-onesignal@npm:5.2.5"
+"react-native-onesignal@npm:^5.2.6":
+  version: 5.2.6
+  resolution: "react-native-onesignal@npm:5.2.6"
   dependencies:
     invariant: ^2.2.2
-  checksum: befb3c19378ff208aa81ea70ef49a1e5e14f14eb7ec3a9bb84736fbe7e16ecb273dda95678daf6c30ea12f0f540207c58e1956d8a57efb0c750875f80329b648
+  checksum: 2c5422c90c02d4500a2c2e9421bccca8a7ca1508438f884b83eeb3d86b52b1dc0293548de3586b3006c3ff2a2978edb539e2cf3072e31f019151c6e72bc8cb37
   languageName: node
   linkType: hard
 
@@ -10162,16 +10162,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-screens@npm:^3.35.0":
-  version: 3.35.0
-  resolution: "react-native-screens@npm:3.35.0"
+"react-native-screens@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "react-native-screens@npm:4.0.0"
   dependencies:
     react-freeze: ^1.0.0
     warn-once: ^0.1.0
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: cb8a0c8d8a41a8a1065cc2253e4272a970366a7d80bc54e889b2f48de7ccccd3e828e2701de39c0453a67956ec0cad140fb506324cce04419b5e2eb495c038c2
+  checksum: 9da0f394fa26b7ec30f52fc758d6289b7e5123c7e6446bbce654ae31e07ab6d5488e51c0882a906cddc305b18e3cc96f9bc5631671f4fded38da5ef138b53cfa
   languageName: node
   linkType: hard
 
