@@ -14,6 +14,7 @@ import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import android.content.Context
 import androidx.multidex.MultiDexApplication
 import androidx.multidex.MultiDex
+import org.moon.algotn.navigation.NavigationBarPackage
 import org.moon.algotn.theme.Material3ThemePackage
 
 class MainApplication : MultiDexApplication(), ReactApplication {
@@ -22,9 +23,10 @@ class MainApplication : MultiDexApplication(), ReactApplication {
       object : DefaultReactNativeHost(this) {
         override fun getPackages(): List<ReactPackage> =
             PackageList(this).packages.apply {
-              // Packages that cannot be autolinked yet can be added manually here, for example:
+              // Packages that cannot be auto linked yet can be added manually here, for example:
               // add(MyReactNativePackage())
               add(Material3ThemePackage())
+              add(NavigationBarPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"
