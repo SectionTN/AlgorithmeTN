@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Platform } from 'react-native';
 import {createThemeFromSourceColor, createThemeFromSystemSchemes} from './createMaterial3Theme.ts';
-import {Material3Theme, SystemScheme} from './types';
+import {Material3Theme, SystemScheme} from './types.ts';
 import Material3ThemeModule from './NativeModule.ts';
 
 
