@@ -9,6 +9,6 @@ export {
   getMaterial3ThemeAsync,
   createMaterial3Theme,
   isDynamicThemeSupported,
-} from './theme/hooks';
+} from './modules/theme/hooks';
 
-export type { Material3Theme, Material3Scheme, SystemScheme } from './theme/types';
+export type { Material3Theme, Material3Scheme, SystemScheme } from './modules/theme/types';

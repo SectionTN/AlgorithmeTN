@@ -1,6 +1,6 @@
 import { argbFromHex, Scheme, themeFromSourceColor, TonalPalette } from '@material/material-color-utilities';
 import color from 'color';
-import { Material3Scheme, Material3Theme, SystemScheme } from './types';
+import { Material3Scheme, Material3Theme, SystemScheme } from './types.ts';
 
 const opacity = {
   level1: 0.08,
