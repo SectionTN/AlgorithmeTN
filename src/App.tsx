@@ -5,28 +5,29 @@
  * @format
  */
 
-import React, {useEffect, useMemo} from 'react';
+import React, {useEffect, useLayoutEffect, useMemo} from 'react';
 import {Appearance, StatusBar, StyleSheet, useColorScheme} from 'react-native';
 import {PaperProvider, MD3DarkTheme, MD3LightTheme} from 'react-native-paper';
 import StackNavigator from './config/navigation/stack.tsx';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {setup} from '@baronha/ting';
 import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import {I18nextProvider, useTranslation} from 'react-i18next';
+import {I18nextProvider} from 'react-i18next';
 import {useMMKVString} from 'react-native-mmkv';
 import setColorScheme = Appearance.setColorScheme;
 import * as RNLocalize from 'react-native-localize';
 import {changeLanguage} from './config/i18n/changeLanguage.ts';
-import {useMaterial3Theme} from './theme/hooks.ts';
+import {useMaterial3Theme} from './modules/theme/hooks.ts';
 import moment from 'moment';
 import 'moment/locale/fr';
 import 'moment/locale/en-gb';
 import i18n from './config/i18n/i18n.ts';
+import {changeNavigationBarColor} from './modules/navigation';
+import getColorScheme = Appearance.getColorScheme;
 
 const locales = RNLocalize.getLocales();
 
 function App(): React.JSX.Element {
-
   const isDarkMode = useColorScheme() === 'dark';
 
   const colorScheme = useColorScheme();
@@ -36,18 +37,17 @@ function App(): React.JSX.Element {
 
   const [languageStatus, setLanguageStatus] = useMMKVString('language');
 
-  // TODO: bug here
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (themeStatus === undefined) {
       setThemeStatus('system');
     } else if (themeStatus === 'system') {
-      setColorScheme(undefined);
+      setColorScheme(getColorScheme());
     } else {
       setColorScheme(themeStatus as 'light' | 'dark');
     }
   }, [setThemeStatus, themeStatus]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (languageStatus === undefined) {
       setLanguageStatus(locales[0].languageTag);
       changeLanguage(locales[0].languageTag);
@@ -64,6 +64,17 @@ function App(): React.JSX.Element {
   useEffect(() => {
     moment.locale(i18n.language);
   }, []);
+
+  useLayoutEffect(() => {
+    changeNavigationBarColor(
+      isDarkMode ? theme.dark.elevation.level2 : theme.light.elevation.level2,
+      !isDarkMode,
+      true,
+    );
+    StatusBar.setBackgroundColor(
+      isDarkMode ? theme.dark.elevation.level2 : theme.light.elevation.level2,
+    );
+  }, [isDarkMode, theme.dark.elevation.level2, theme.light.elevation.level2]);
 
   const paperTheme = useMemo(
     () =>
@@ -100,9 +111,7 @@ function App(): React.JSX.Element {
       <PaperProvider theme={paperTheme}>
         <StatusBar
           backgroundColor={
-            isDarkMode
-              ? theme.dark.elevation.level2
-              : theme.light.elevation.level2
+            isDarkMode ? theme.dark.background : theme.light.background
           }
           animated={true}
           barStyle={isDarkMode ? 'light-content' : 'dark-content'}
