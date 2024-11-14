@@ -36,7 +36,7 @@ import {isUndefined} from 'lodash';
 import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
 import getUserData from '../../utils/firebase.ts';
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from 'react-i18next';
 
 interface ProfileProps {
   uid: string | undefined;
@@ -321,7 +321,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
             numberOfLines={1}
             style={[styles.bioText, {color: theme.colors.onBackground}]}
             onPress={() => navigation.navigate('edit-bio')}>
-            {bio ? bio : 'tap to add a biography'}
+            {bio ? bio : t('settings.add_bio')}
           </Text>
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.25)} />
@@ -331,7 +331,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           exiting={FlipOutEasyX}
           style={[styles.badgeView]}>
           <Chip style={styles.chip} icon="brain">
-            {'Algorithms'}
+            {t('algorithm')}
           </Chip>
           <Chip style={styles.chip} icon="language-javascript">
             {'JavaScript'}
@@ -355,7 +355,10 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           entering={ZoomInLeft}
           exiting={ZoomOutRight}>
           <Card mode={'contained'}>
-            <Card.Title title={t('profile.stats')} titleVariant={'titleLarge'} />
+            <Card.Title
+              title={t('profile.stats')}
+              titleVariant={'titleLarge'}
+            />
             <Card.Content style={styles.cardContent}>
               <View style={styles.statItem}>
                 <Text
@@ -374,7 +377,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                     styles.statLabel,
                     {color: theme.colors.onPrimaryContainer},
                   ]}>
-                  Algorithms
+                  {t('algorithm')}
                 </Text>
               </View>
               <View style={styles.statItem}>
@@ -394,7 +397,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                     styles.statLabel,
                     {color: theme.colors.onPrimaryContainer},
                   ]}>
-                  Comments
+                  {t('comments.title').slice(0, -1) + '(s)'}
                 </Text>
               </View>
               <View style={styles.statItem}>
@@ -414,7 +417,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                     styles.statLabel,
                     {color: theme.colors.onPrimaryContainer},
                   ]}>
-                  Views
+                  {t('views').slice(0, -1) + '(s)'}
                 </Text>
               </View>
             </Card.Content>
@@ -422,10 +425,14 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           <SpacerV height={heightPercentageToDP(0.25)} />
           {/*Achievements Chips*/}
           <Card mode={'contained'}>
-            <Card.Title title={t('profile.achievements')} titleVariant={'titleLarge'} />
+            <Card.Title
+              title={t('profile.achievements')}
+              titleVariant={'titleLarge'}
+            />
             <Card.Content style={styles.badgeView}>
               {achievements.map(achievement => (
                 <Chip
+                  key={achievement.id}
                   style={[
                     styles.chip,
                     {backgroundColor: theme.colors.elevation.level3},
@@ -439,10 +446,14 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           <SpacerV height={heightPercentageToDP(0.25)} />
           {/*Recent Activities*/}
           <Card mode={'contained'}>
-            <Card.Title title={t('profile.recent_activities')} titleVariant={'titleLarge'} />
+            <Card.Title
+              title={t('profile.recent_activities')}
+              titleVariant={'titleLarge'}
+            />
             <Card.Content style={styles.recentActivities}>
               {recentActivities.map(activity => (
                 <Text
+                  key={activity.id}
                   variant={'labelMedium'}
                   style={{fontFamily: FONTS.p_regular}}>
                   -{activity.type === 'liked' ? 'liked' : 'unliked'} "
