@@ -105,7 +105,7 @@ const resources = {
         title: 'Profile',
         stats: 'Statistics',
         achievements: 'Achievements',
-        recent_activities: "Recent Activities",
+        recent_activities: 'Recent Activities',
       },
       code: {
         title: 'Code',
@@ -131,13 +131,34 @@ const resources = {
         select_section: 'Select Section',
         select_level: 'Select a level',
         code_title: 'Code Title',
-        code_desc: "Code Description",
-        add_code: 'Add code'
+        code_desc: 'Code Description',
+        add_code: 'Add code',
       },
       comments: {
         title: 'Comments',
-        add: 'Add a comment...'
-      }
+        add: 'Add a comment...',
+      },
+      settings: {
+        title: 'Settings',
+        dark_mode: 'Dark Mode',
+        dark_mode_system: 'System',
+        add_bio: 'tap to add a biography',
+        language: 'Language',
+        account_title: 'Account',
+        profile_title: 'Profile',
+        help_title: 'Help',
+        miscellaneous_title: 'Miscellaneous',
+        language_english: 'English',
+        language_french: 'French',
+        security: 'Security and Privacy',
+        log_out: 'Log out',
+        edit_profile: 'Edit Profile',
+        username: 'Username',
+        privacy_policy: 'Privacy Policy',
+        bug_report: 'Bug Report',
+        about_developer: 'About Developer',
+      },
+      views: 'Views',
     },
   },
   fr: {
@@ -229,7 +250,7 @@ const resources = {
         title: 'Profil',
         stats: 'Statistiques',
         achievements: 'Réalisations',
-        recent_activities: "Activités récentes",
+        recent_activities: 'Activités récentes',
       },
       code: {
         title: 'Code',
@@ -255,14 +276,35 @@ const resources = {
         select_section: 'Sélectionner une section',
         select_level: 'Sélectionner un niveau',
         code_title: 'Titre du code',
-        code_desc: "Description du code",
-        add_code: 'Ajouter le code'
+        code_desc: 'Description du code',
+        add_code: 'Ajouter le code',
       },
       comments: {
         title: 'Commentaires',
-        add: 'Ajouter un commentaire...'
-      }
-    },
+        add: 'Ajouter un commentaire...',
+      },
+      settings: {
+        title: 'Paramètres',
+        add_bio: 'appuyez pour ajouter une biographie',
+        dark_mode: 'Mode sombre',
+        dark_mode_system: 'Système',
+        language: 'Langue',
+        account_title: 'Compte',
+        profile_title: 'Profil',
+        help_title: 'Aide',
+        miscellaneous_title: 'Divers',
+        language_english: 'Anglais',
+        language_french: 'Français',
+        security: 'Sécurité et confidentialité',
+        log_out: 'Se déconnecter',
+        edit_profile: 'Modifier le profil',
+        username: 'Nom d’utilisateur',
+        privacy_policy: 'Politique de confidentialité',
+        bug_report: 'Signaler un bug',
+        about_developer: 'À propos du développeur',
+},
+      views: 'Vues',
+},
   },
 };
 
