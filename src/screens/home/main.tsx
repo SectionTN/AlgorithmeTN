@@ -519,7 +519,6 @@ const Main: React.FC = forwardRef((props, ref) => {
         style={styles.gridView}
         spacing={10}
         renderItem={renderGridItem}
-        removeClippedSubviews={false}
       />
     </BaseView>
   );
