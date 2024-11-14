@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {Keyboard, StyleSheet, View} from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
 import {
@@ -94,6 +94,10 @@ const AddCode: React.FC = () => {
       unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    navigation.preload('write-code');
+  }, [navigation]);
 
 
   function handleButtonPress() {
