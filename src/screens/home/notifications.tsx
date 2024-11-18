@@ -8,16 +8,10 @@ import {Dimensions, StatusBar, StyleSheet} from 'react-native';
 import {FlatGrid} from 'react-native-super-grid';
 import auth from '@react-native-firebase/auth';
 import {NativeViewGestureHandler} from 'react-native-gesture-handler';
-import { useTranslation } from 'react-i18next';
-
-const LeftContent = () => (
-  <Avatar.Image
-    size={50}
-    source={{
-      uri: 'https://api.dicebear.com/9.x/adventurer/png?seed=Garfield',
-    }}
-  />
-);
+import {useTranslation} from 'react-i18next';
+import firestore from '@react-native-firebase/firestore';
+import getUserData from '../../utils/firebase.ts';
+import moment from 'moment';
 
 const Notifications: React.FC = () => {
   const theme = useTheme();
@@ -26,33 +20,81 @@ const Notifications: React.FC = () => {
 
   const windowDimension = Dimensions.get('window').width;
 
-  const { t } = useTranslation();
+  const {t} = useTranslation();
 
-  const [items] = useState([
-    {notif: t('notifications.liked_your_post'), desc: '2 min ago'},
-    {notif: t('notifications.commented_post'), desc: '5 min ago'},
-    {notif: t('notifications.liked_your_post'), desc: '8 min ago'},
-    {notif: t('notifications.liked_your_post'), desc: '1 hour ago'},
-    {notif: t('notifications.liked_your_post'), desc: '5 hours ago'},
-    {notif: t('notifications.liked_your_post'), desc: '12 hours ago'},
-    {notif: t('notifications.'), desc: 'yesterday'},
-    {notif: t('notifications.liked_your_post'), desc: 'a long time ago'},
-    {notif: t('notifications.liked_your_post'), desc: 'a long time ago'},
-  ]);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('notifications')
+      .where('userReceiveId', '==', auth().currentUser?.uid)
+      .onSnapshot(async querySnapshot => {
+        try {
+          console.log(querySnapshot.size);
+          const notificationList = await Promise.all(
+            querySnapshot.docs.map(async doc => {
+              const notificationData = doc.data();
+              const userData = await getUserData(notificationData.userSentID);
+              console.log(userData);
+              return {
+                ...notificationData,
+                id: doc.id,
+                ...userData,
+              };
+            }),
+          );
+          setNotifications(notificationList);
+        } catch (e) {
+          console.error('Error retrieving notifications: ', e);
+        }
+      });
+    return () => unsubscribe();
+  }, []);
+
+  const notificationMessage = (type: string): string => {
+    let message = '';
+    switch (type) {
+      case 'like':
+        message = 'Liked your post.';
+        break;
+      case 'comment':
+        message = 'Liked your comment.';
+        break;
+      default:
+        message = 'An error occurred';
+    }
+    return message;
+  };
 
   const renderNotificationItem = ({item}) => {
-    const RightContent = () => <Text variant={'labelSmall'}>{item.desc}</Text>;
+    const convertedTime = moment(item.createdAt.toDate()).fromNow(true);
+    const RightContent = () => (
+      <Text variant={'labelSmall'}>{convertedTime}</Text>
+    );
+    let LeftContent;
+    if (item.avatar_status === 'photo') {
+      LeftContent = () => (
+        <Avatar.Image
+          size={50}
+          source={{
+            uri: item?.avatar,
+          }}
+        />
+      );
+    } else {
+      LeftContent = () => <Avatar.Text label={item?.avatar} />;
+    }
 
     return (
       <Card style={{paddingTop: '1%', paddingBottom: '1%'}}>
         <Card.Title
-          title={'Rayen Sbai'}
+          title={`${item.first_name} ${item.last_name}`}
           titleStyle={{fontFamily: FONTS.p_regular, fontWeight: 'bold'}}
           titleVariant={'titleMedium'}
           left={LeftContent}
           right={RightContent}
           rightStyle={{padding: '2%'}}
-          subtitle={item.notif}
+          subtitle={notificationMessage(item.notification_type)}
         />
       </Card>
     );
@@ -88,11 +130,10 @@ const Notifications: React.FC = () => {
         <FlatGrid
           spacing={10}
           itemDimension={windowDimension}
-          data={items}
+          data={notifications}
           renderItem={renderNotificationItem}
         />
       </NativeViewGestureHandler>
-
     </BaseView>
   );
 };

@@ -377,7 +377,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                     styles.statLabel,
                     {color: theme.colors.onPrimaryContainer},
                   ]}>
-                  {t('algorithm')}
+                  {t('algorithm') + '(s)'}
                 </Text>
               </View>
               <View style={styles.statItem}>
