@@ -1,4 +1,4 @@
-import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from 'react';
+import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useState} from 'react';
 import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
@@ -62,11 +62,11 @@ const Main: React.FC = forwardRef((props, ref) => {
     {},
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
   }, []);
 
@@ -209,6 +209,11 @@ const Main: React.FC = forwardRef((props, ref) => {
     }
     try {
       const codeRef = firestore().collection('codes').doc(codeId);
+      const codeUIDRef = await firestore().collection('codes').doc(codeId).get();
+      const userCodeUID = codeUIDRef.data()?.uid;
+      if (!userCodeUID) {
+        return;
+      }
       if (likes.includes(uid)) {
         await Promise.all([
           codeRef.update({
@@ -230,6 +235,7 @@ const Main: React.FC = forwardRef((props, ref) => {
           codeRef.update({
             likes: firestore.FieldValue.arrayUnion(uid),
           }),
+          addNotification(userCodeUID, 'like', codeId),
         ]);
       }
     } catch (error) {
@@ -263,22 +269,6 @@ const Main: React.FC = forwardRef((props, ref) => {
     fetchCommentCounts();
   }, []);
 
-  /**
-   const incrementViewCount = async (codeId: string) => {
-   try {
-   const codeRef = firestore().collection('codes').doc(codeId);
-   await codeRef.update({
-   views: firestore.FieldValue.increment(1),
-   });
-   } catch (error) {
-   if (error instanceof Error) {
-   crashlytics().recordError(error);
-   }
-   console.error('Error incrementing view count:', error);
-   }
-   };
-   */
-
   const addRecentActivity = async (uid: string, activity: object) => {
     try {
       await firestore()
@@ -288,6 +278,24 @@ const Main: React.FC = forwardRef((props, ref) => {
         .add(activity);
     } catch (error) {
       console.error('Error adding recent activity:', error);
+    }
+  };
+
+  const addNotification = async (uid: string, notification_type: string, post_id: string) => {
+    const myUID = auth().currentUser?.uid;
+    if (!myUID && !notification_type && !post_id && !uid) {
+      return;
+    }
+    try {
+      await firestore().collection('notifications').add({
+        userReceiveId: uid,
+        postId: post_id,
+        notification_type: notification_type,
+        userSentID: uid,
+        createdAt: firestore.Timestamp.now(),
+      });
+    } catch (e) {
+      console.error('Error adding notification:', e);
     }
   };
 
