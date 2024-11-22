@@ -1,4 +1,4 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Keyboard, StyleSheet, View} from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
 import {
@@ -81,7 +81,7 @@ const AddCode: React.FC = () => {
 
   useEffect(() => {
     if (params?.codeValue) {
-      setCodeValue(params.codeValue);
+      setCodeValue(params?.codeValue);
     }
   }, [params?.codeValue]);
 
@@ -96,8 +96,10 @@ const AddCode: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    navigation.preload('write-code');
-  }, [navigation]);
+    if (language !== 'none') {
+      navigation.preload('write-code');
+    }
+  }, [language, navigation]);
 
 
   function handleButtonPress() {
