@@ -1,3 +1,4 @@
+import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 interface CodeData {
   id: string;
   uid: string;
@@ -21,8 +22,22 @@ interface InstructionsProps {
   codeId: string;
 }
 
+interface NotificationData {
+  id: string;
+  notification_type: string;
+  postId: string
+  createdAt: FirebaseFirestoreTypes.Timestamp
+  userReceiveId: string;
+  userSentID: string;
+  avatar_status: 'photo' | 'text';
+  avatar: string;
+  first_name: string;
+  last_name: string;
+}
+
+
 interface CodeProps {
   codeId: string;
 }
 
-export type {CodeData, CodeProps, InstructionsProps};
+export type {CodeData, CodeProps, NotificationData, InstructionsProps};

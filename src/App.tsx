@@ -5,24 +5,24 @@
  * @format
  */
 
-import React, {useEffect, useLayoutEffect, useMemo} from 'react';
-import {Appearance, StatusBar, StyleSheet, useColorScheme} from 'react-native';
-import {PaperProvider, MD3DarkTheme, MD3LightTheme} from 'react-native-paper';
+import React, { useEffect, useLayoutEffect, useMemo } from 'react';
+import { Appearance, StatusBar, StyleSheet, useColorScheme } from 'react-native';
+import { PaperProvider, MD3DarkTheme, MD3LightTheme } from 'react-native-paper';
 import StackNavigator from './config/navigation/stack.tsx';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {setup} from '@baronha/ting';
-import {BottomSheetModalProvider} from '@gorhom/bottom-sheet';
-import {I18nextProvider} from 'react-i18next';
-import {useMMKVString} from 'react-native-mmkv';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { setup } from '@baronha/ting';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { I18nextProvider } from 'react-i18next';
+import { useMMKVString } from 'react-native-mmkv';
 import setColorScheme = Appearance.setColorScheme;
 import * as RNLocalize from 'react-native-localize';
-import {changeLanguage} from './config/i18n/changeLanguage.ts';
-import {useMaterial3Theme} from './modules/theme/hooks.ts';
+import { changeLanguage } from './config/i18n/changeLanguage.ts';
+import { useMaterial3Theme } from './modules/theme/hooks.ts';
 import moment from 'moment';
 import 'moment/locale/fr';
 import 'moment/locale/en-gb';
 import i18n from './config/i18n/i18n.ts';
-import {changeNavigationBarColor} from './modules/navigation';
+import { changeNavigationBarColor } from './modules/navigation';
 import getColorScheme = Appearance.getColorScheme;
 
 const locales = RNLocalize.getLocales();
@@ -31,7 +31,7 @@ function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const colorScheme = useColorScheme();
-  const {theme} = useMaterial3Theme();
+  const { theme } = useMaterial3Theme();
 
   const [themeStatus, setThemeStatus] = useMMKVString('theme');
 
@@ -79,8 +79,8 @@ function App(): React.JSX.Element {
   const paperTheme = useMemo(
     () =>
       colorScheme === 'dark'
-        ? {...MD3DarkTheme, colors: theme.dark}
-        : {...MD3LightTheme, colors: theme.light},
+        ? { ...MD3DarkTheme, colors: theme.dark }
+        : { ...MD3LightTheme, colors: theme.light },
     [colorScheme, theme],
   );
   const toastInitOption = {
