@@ -1,8 +1,6 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive",
-
         "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": true,
+          "source.fixAll.eslint": "always",
       },
       "editor.formatOnSave": false
       

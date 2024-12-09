@@ -27,113 +27,102 @@ import getColorScheme = Appearance.getColorScheme;
 
 const locales = RNLocalize.getLocales();
 
-function App(): React.JSX.Element {
+const useThemeSetup = () => {
   const isDarkMode = useColorScheme() === 'dark';
-
   const colorScheme = useColorScheme();
   const { theme } = useMaterial3Theme();
-
   const [themeStatus, setThemeStatus] = useMMKVString('theme');
 
+  useLayoutEffect(() => {
+    if (!themeStatus) {
+      setThemeStatus('system');
+    } else {
+      setColorScheme(themeStatus === 'system' ? getColorScheme() : themeStatus as 'light' | 'dark');
+    }
+  }, [themeStatus, setThemeStatus]);
+
+  useLayoutEffect(() => {
+    const backgroundColor = isDarkMode ? theme.dark.elevation.level2 : theme.light.elevation.level2;
+    changeNavigationBarColor(backgroundColor, !isDarkMode, true);
+    StatusBar.setBackgroundColor(backgroundColor);
+  }, [isDarkMode, theme.dark.elevation.level2, theme.light.elevation.level2]);
+
+  return { isDarkMode, colorScheme, theme };
+};
+
+function App(): React.JSX.Element {
+  const { isDarkMode, colorScheme, theme } = useThemeSetup();
   const [languageStatus, setLanguageStatus] = useMMKVString('language');
 
   useLayoutEffect(() => {
-    if (themeStatus === undefined) {
-      setThemeStatus('system');
-    } else if (themeStatus === 'system') {
-      setColorScheme(getColorScheme());
-    } else {
-      setColorScheme(themeStatus as 'light' | 'dark');
-    }
-  }, [setThemeStatus, themeStatus]);
-
-  useLayoutEffect(() => {
-    if (languageStatus === undefined) {
-      setLanguageStatus(locales[0].languageTag);
-      changeLanguage(locales[0].languageTag);
-    } else if (languageStatus === 'fr') {
-      moment.locale('fr');
-      setLanguageStatus(languageStatus as 'fr');
-      changeLanguage(languageStatus as 'fr');
-    } else {
-      setLanguageStatus(languageStatus as 'en');
-      changeLanguage(languageStatus as 'en');
-    }
+    const initLanguage = () => {
+      if (!languageStatus) {
+        const newLang = locales[0].languageTag;
+        setLanguageStatus(newLang);
+        changeLanguage(newLang);
+      } else {
+        const lang = languageStatus as 'fr' | 'en-US';
+        if (lang === 'fr') {
+          moment.locale('fr');
+        }
+        setLanguageStatus(lang);
+        changeLanguage(lang);
+      }
+    };
+    initLanguage();
   }, [languageStatus, setLanguageStatus]);
 
-  useEffect(() => {
-    moment.locale(i18n.language);
-  }, []);
-
-  useLayoutEffect(() => {
-    changeNavigationBarColor(
-      isDarkMode ? theme.dark.elevation.level2 : theme.light.elevation.level2,
-      !isDarkMode,
-      true,
-    );
-    StatusBar.setBackgroundColor(
-      isDarkMode ? theme.dark.elevation.level2 : theme.light.elevation.level2,
-    );
-  }, [isDarkMode, theme.dark.elevation.level2, theme.light.elevation.level2]);
-
   const paperTheme = useMemo(
-    () =>
-      colorScheme === 'dark'
-        ? { ...MD3DarkTheme, colors: theme.dark }
-        : { ...MD3LightTheme, colors: theme.light },
-    [colorScheme, theme],
+    () => ({
+      ...(colorScheme === 'dark' ? MD3DarkTheme : MD3LightTheme),
+      colors: colorScheme === 'dark' ? theme.dark : theme.light,
+    }),
+    [colorScheme, theme]
   );
-  const toastInitOption = {
-    toast: {
-      messageColor: isDarkMode
-        ? theme.dark.onBackground
-        : theme.light.onBackground,
-      titleColor: isDarkMode ? theme.dark.primary : theme.light.primary,
-      backgroundColor: isDarkMode
-        ? theme.dark.surfaceContainerLow
-        : theme.light.surfaceContainerLow,
-    },
-    alert: {
-      titleColor: isDarkMode ? theme.dark.primary : theme.light.primary,
-      messageColor: isDarkMode
-        ? theme.dark.onBackground
-        : theme.light.onBackground,
-      backgroundColor: isDarkMode
-        ? theme.dark.surfaceContainerLow
-        : theme.light.surfaceContainerLow,
-    },
-  };
 
-  setup(toastInitOption);
+  const toastInitOption = useMemo(
+    () => ({
+      toast: {
+        messageColor: isDarkMode ? theme.dark.onBackground : theme.light.onBackground,
+        titleColor: isDarkMode ? theme.dark.primary : theme.light.primary,
+        backgroundColor: isDarkMode ? theme.dark.surfaceContainerLow : theme.light.surfaceContainerLow,
+      },
+      alert: {
+        titleColor: isDarkMode ? theme.dark.primary : theme.light.primary,
+        messageColor: isDarkMode ? theme.dark.onBackground : theme.light.onBackground,
+        backgroundColor: isDarkMode ? theme.dark.surfaceContainerLow : theme.light.surfaceContainerLow,
+      },
+    }),
+    [isDarkMode, theme]
+  );
+
+
+  useEffect(() => {
+    setup(toastInitOption);
+  }, [toastInitOption]);
 
   return (
-    <>
-      <PaperProvider theme={paperTheme}>
-        <StatusBar
-          backgroundColor={
-            isDarkMode ? theme.dark.background : theme.light.background
-          }
-          animated={true}
-          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-          translucent={true}
-        />
-        <I18nextProvider i18n={i18n}>
-          <GestureHandlerRootView
-            style={[
-              styles.GHRV,
-              {
-                backgroundColor: isDarkMode
-                  ? theme.dark.background
-                  : theme.light.background,
-              },
-            ]}>
-            <BottomSheetModalProvider>
-              <StackNavigator />
-            </BottomSheetModalProvider>
-          </GestureHandlerRootView>
-        </I18nextProvider>
-      </PaperProvider>
-    </>
+    <PaperProvider theme={paperTheme}>
+      <StatusBar
+        backgroundColor={isDarkMode ? theme.dark.background : theme.light.background}
+        animated={true}
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        translucent={true}
+      />
+      <I18nextProvider i18n={i18n}>
+        <GestureHandlerRootView
+          style={[
+            styles.GHRV,
+            {
+              backgroundColor: isDarkMode ? theme.dark.background : theme.light.background,
+            },
+          ]}>
+          <BottomSheetModalProvider>
+            <StackNavigator />
+          </BottomSheetModalProvider>
+        </GestureHandlerRootView>
+      </I18nextProvider>
+    </PaperProvider>
   );
 }
 

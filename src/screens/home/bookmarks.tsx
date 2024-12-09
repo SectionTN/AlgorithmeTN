@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Appbar,
   Avatar,
@@ -7,27 +7,28 @@ import {
   Dialog,
   Icon,
   IconButton,
+  Portal,
   Text,
   useTheme,
 } from 'react-native-paper';
 import BaseView from '../../components/baseview/baseview.tsx';
-import {FONTS} from '../../config/misc.ts';
+import { FONTS } from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/dimensions.ts';
-import {Dimensions, StatusBar, View} from 'react-native';
+import { Dimensions, StatusBar, StyleSheet, View } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {useTranslation} from 'react-i18next';
-import {FlatGrid} from 'react-native-super-grid';
-import {CodeData} from '../../types/interfaces.ts';
+import { useTranslation } from 'react-i18next';
+import { FlatGrid } from 'react-native-super-grid';
+import { CodeData } from '../../types/interfaces.ts';
 import firestore from '@react-native-firebase/firestore';
-import Animated, {SequencedTransition} from 'react-native-reanimated';
+import Animated, { SequencedTransition } from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../config/navigation/types.ts';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../config/navigation/types.ts';
 
 const Bookmarks: React.FC = () => {
   const navigation =
@@ -35,12 +36,12 @@ const Bookmarks: React.FC = () => {
 
   const theme = useTheme();
 
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const [photoUrl, setPhotoUrl] = useState('XD');
 
   const [bookmarks, setBookmarks] = useState<
-    Array<CodeData & {first_name: string; last_name: string}>
+    Array<CodeData & { first_name: string; last_name: string }>
   >([]);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [postIdToDelete, setPostIdToDelete] = useState<string | null>(null);
@@ -119,7 +120,7 @@ const Bookmarks: React.FC = () => {
 
   const getUserData = async (
     uid: string,
-  ): Promise<{first_name: string; last_name: string}> => {
+  ): Promise<{ first_name: string; last_name: string }> => {
     try {
       const userDoc = await firestore().collection('users').doc(uid).get();
       const userData = userDoc.data();
@@ -129,7 +130,7 @@ const Bookmarks: React.FC = () => {
       };
     } catch (error) {
       console.error('Error fetching user data:', error);
-      return {first_name: '', last_name: ''};
+      return { first_name: '', last_name: '' };
     }
   };
 
@@ -138,6 +139,7 @@ const Bookmarks: React.FC = () => {
     if (!uid || !postIdToDelete) {
       return;
     }
+
 
     try {
       await firestore()
@@ -156,37 +158,41 @@ const Bookmarks: React.FC = () => {
     }
   };
 
+  function dismissDialog(): void {
+    setDialogVisible(false);
+  }
+
   return (
     <BaseView
       needsPaddingTop={false}
       avoidingView={false}
       needsPaddingBottom={false}>
-      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.elevation.level2 }}>
         <SpacerH width={widthPercentageToDP(0.5)} />
         {photoUrl && photoUrl?.length === 2 ? (
           <Avatar.Text label={photoUrl} size={34} />
         ) : (
-          <Avatar.Image source={{uri: photoUrl}} size={34} />
+          <Avatar.Image source={{ uri: photoUrl }} size={34} />
         )}
         <SpacerH width={widthPercentageToDP(0.5)} />
         <Appbar.Content
           title={t('bookmarks.title')}
-          titleStyle={{fontFamily: FONTS.p_regular}}
+          titleStyle={{ fontFamily: FONTS.p_regular }}
         />
       </Appbar.Header>
       <FlatGrid
         itemDimension={windowWidth / 2 - 20}
         data={bookmarks}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <Animated.View layout={SequencedTransition.duration(1000).delay(500)}>
-            <Card onPress={() => navigation.navigate('algo', {codeId: item.id})}>
+            <Card onPress={() => navigation.navigate('algo', { codeId: item.id })}>
               <Card.Title
                 title={`${item.title}`}
                 titleNumberOfLines={2}
                 titleVariant={'labelLarge'}
                 subtitle={`${item.first_name} ${item.last_name}`}
                 subtitleVariant={'labelMedium'}
-                subtitleStyle={{opacity: 0.75}}
+                subtitleStyle={{ opacity: 0.75 }}
               />
               <Card.Content>
                 <Text variant="labelSmall" numberOfLines={3}>
@@ -204,7 +210,7 @@ const Bookmarks: React.FC = () => {
                 />
               </Card.Content>
               <Card.Actions>
-                <View style={{flexDirection: 'column', alignItems: 'center'}}>
+                <View style={styles.deleteButton}>
                   <IconButton
                     icon="delete"
                     iconColor={theme.colors.onPrimary}
@@ -221,23 +227,37 @@ const Bookmarks: React.FC = () => {
           </Animated.View>
         )}
       />
-      <Dialog visible={dialogVisible} onDismiss={() => setDialogVisible(false)}>
+      <Portal>
+      <Dialog visible={dialogVisible} dismissable={true} onDismiss={dismissDialog}>
         <Dialog.Icon icon="delete-alert-outline" />
-        <Dialog.Title style={{textAlign: 'center'}}>
-          Bookmark deletion
+        <Dialog.Title style={styles.dialogTitle}>
+          {t('bookmarks.dialog.title')}
         </Dialog.Title>
         <Dialog.Content>
           <Text variant="bodyMedium">
-            sure you want to remove this bookmark?
+            {t('bookmarks.dialog.message')}
           </Text>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={() => setDialogVisible(false)}>Cancel</Button>
-          <Button onPress={unbookmarkPost}>Delete</Button>
-        </Dialog.Actions>
-      </Dialog>
+          <Button onPress={() => setDialogVisible(false)}>
+            {t('bookmarks.dialog.cancel')}
+          </Button>
+          <Button onPress={unbookmarkPost}>{t('bookmarks.dialog.confirm')}</Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </BaseView>
   );
 };
+
+const styles = StyleSheet.create({
+  dialogTitle: {
+    textAlign: 'center',
+  },
+  deleteButton: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+});
 
 export default Bookmarks;

@@ -1,4 +1,12 @@
-import React, {forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useState} from 'react';
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useState,
+  useMemo,
+} from 'react';
 import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
@@ -11,15 +19,19 @@ import {
   Text,
   Tooltip,
   useTheme,
+  ActivityIndicator,
 } from 'react-native-paper';
-import {FlatGrid} from 'react-native-super-grid';
+import {FlatGrid, FlatGridProps} from 'react-native-super-grid';
 import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/dimensions.ts';
-import Animated, {SlideInLeft, SlideOutRight} from 'react-native-reanimated';
+import Animated, {
+  SlideInLeft,
+  SlideOutRight,
+} from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -30,9 +42,21 @@ import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {useTranslation} from 'react-i18next';
 
-const LeftContent = (props: any) => <Avatar.Icon {...props} icon="code-tags" />;
+const LeftContent = (props: JSX.IntrinsicAttributes & {size?: number}) => (
+  <Avatar.Icon {...props} icon="code-tags" />
+);
 
-const Main: React.FC = forwardRef((props, ref) => {
+type CodeDataWithName = CodeData & {first_name: string; last_name: string};
+
+const AnimatedFlatGrid =
+  Animated.createAnimatedComponent<FlatGridProps<CodeDataWithName>>(FlatGrid);
+
+interface MainRef {
+  fetchUserBookmarks: () => Promise<void>;
+  fetchBookmarks: () => Promise<void>;
+}
+
+const Main = forwardRef<MainRef>((_, ref) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -46,9 +70,7 @@ const Main: React.FC = forwardRef((props, ref) => {
 
   const [photoUrl, setPhotoUrl] = useState('XD');
 
-  const [codes, setCodes] = useState<
-    (CodeData & {first_name: string; last_name: string})[]
-  >([]);
+  const [codes, setCodes] = useState<CodeDataWithName[]>([]);
 
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
     {},
@@ -62,6 +84,10 @@ const Main: React.FC = forwardRef((props, ref) => {
     {},
   );
 
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const CODES_PER_PAGE = 10;
+
   useLayoutEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
@@ -69,59 +95,6 @@ const Main: React.FC = forwardRef((props, ref) => {
   useLayoutEffect(() => {
     setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
   }, []);
-
-  const fetchBookmarks = useCallback(async () => {
-    try {
-      const usersSnapshot = await firestore().collection('users').get();
-      const bookmarkCounts: Record<string, number> = {};
-
-      for (const userDoc of usersSnapshot.docs) {
-        const bookmarksSnapshot = await userDoc.ref
-          .collection('bookmarks')
-          .get();
-        bookmarksSnapshot.docs.forEach(doc => {
-          const {codeId} = doc.data();
-          if (codeId) {
-            if (!bookmarkCounts[codeId]) {
-              bookmarkCounts[codeId] = 0;
-            }
-            bookmarkCounts[codeId] += 1;
-          }
-        });
-      }
-
-      setBookmarkCounts(bookmarkCounts);
-    } catch (error) {
-      console.error('Error fetching bookmarks:', error);
-    }
-  }, []);
-
-  const fetchUserBookmarks = async () => {
-    const uid = auth().currentUser?.uid;
-    if (!uid) {
-      return;
-    }
-
-    try {
-      const userBookmarksSnapshot = await firestore()
-        .collection('users')
-        .doc(uid)
-        .collection('bookmarks')
-        .get();
-
-      const userBookmarks: Record<string, boolean> = {};
-      userBookmarksSnapshot.docs.forEach(doc => {
-        const {codeId} = doc.data();
-        if (codeId) {
-          userBookmarks[codeId] = true;
-        }
-      });
-
-      setUserBookmarks(userBookmarks);
-    } catch (error) {
-      console.error('Error fetching user bookmarks:', error);
-    }
-  };
 
   const getUserData = async (
     uid: string,
@@ -139,7 +112,7 @@ const Main: React.FC = forwardRef((props, ref) => {
     }
   };
 
-  const addView = async (codeId: string) => {
+  const addView = async (codeId: string): Promise<void> => {
     const uid = auth().currentUser?.uid;
     if (!uid) {
       return;
@@ -152,8 +125,8 @@ const Main: React.FC = forwardRef((props, ref) => {
         if (!codeDoc.exists) {
           crashlytics().log(
             'Adding view for codeId `' +
-            codeId +
-            '` isn\'t available; document doesn\'t exist',
+              codeId +
+              "` isn't available; document doesn't exist",
           );
           return;
         }
@@ -176,6 +149,8 @@ const Main: React.FC = forwardRef((props, ref) => {
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('codes')
+      .orderBy('createdAt', 'desc')
+      .limit(CODES_PER_PAGE * page)
       .onSnapshot(async snapshot => {
         try {
           const codesList = await Promise.all(
@@ -194,22 +169,62 @@ const Main: React.FC = forwardRef((props, ref) => {
           if (error instanceof Error) {
             crashlytics().recordError(error);
           }
-          console.error('Error fetching codes:', error);
+          console.error('Error in codes listener:', error);
         }
       });
-    return () => {
-      unsubscribe();
-    };
+
+    return () => unsubscribe();
+  }, [page]);
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('comments')
+      .onSnapshot(async snapshot => {
+        const counts: Record<string, number> = {};
+        snapshot.docs.forEach(doc => {
+          const {postId} = doc.data();
+          if (postId) {
+            counts[postId] = (counts[postId] || 0) + 1;
+          }
+        });
+        setCommentCounts(counts);
+      });
+
+    return () => unsubscribe();
   }, []);
 
-  const toggleLike = async (codeId: string, likes: string[]) => {
+  const filteredCodesData = useMemo(() => {
+    return codes.filter(code => {
+      const searchLower = searchQuery.toLowerCase();
+      return (
+        code.title.toLowerCase().includes(searchLower) ||
+        code.description.toLowerCase().includes(searchLower) ||
+        code.language.toLowerCase().includes(searchLower) ||
+        `${code.first_name} ${code.last_name}`
+          .toLowerCase()
+          .includes(searchLower)
+      );
+    });
+  }, [codes, searchQuery]);
+
+  const handleLoadMore = () => {
+    if (!loading && codes.length === CODES_PER_PAGE * page) {
+      setLoading(true);
+      setPage(prevPage => prevPage + 1);
+    }
+  };
+
+  const toggleLike = async (codeId: string, likes: string[]): Promise<void> => {
     const uid = auth().currentUser?.uid;
     if (!uid) {
       return;
     }
     try {
       const codeRef = firestore().collection('codes').doc(codeId);
-      const codeUIDRef = await firestore().collection('codes').doc(codeId).get();
+      const codeUIDRef = await firestore()
+        .collection('codes')
+        .doc(codeId)
+        .get();
       const userCodeUID = codeUIDRef.data()?.uid;
       if (!userCodeUID) {
         return;
@@ -269,7 +284,10 @@ const Main: React.FC = forwardRef((props, ref) => {
     fetchCommentCounts();
   }, []);
 
-  const addRecentActivity = async (uid: string, activity: object) => {
+  const addRecentActivity = async (
+    uid: string,
+    activity: Record<string, any>,
+  ): Promise<void> => {
     try {
       await firestore()
         .collection('users')
@@ -281,9 +299,13 @@ const Main: React.FC = forwardRef((props, ref) => {
     }
   };
 
-  const addNotification = async (uid: string, notification_type: string, post_id: string) => {
+  const addNotification = async (
+    uid: string,
+    notification_type: string,
+    post_id: string,
+  ): Promise<void> => {
     const myUID = auth().currentUser?.uid;
-    if (!myUID && !notification_type && !post_id && !uid) {
+    if (!myUID || !notification_type || !post_id || !uid) {
       return;
     }
     try {
@@ -304,21 +326,25 @@ const Main: React.FC = forwardRef((props, ref) => {
     if (!uid) {
       return;
     }
+
+    const isCurrentlyBookmarked = userBookmarks[codeId];
+    const currentCount = bookmarkCounts[codeId] || 0;
+
+    setUserBookmarks(prev => ({
+      ...prev,
+      [codeId]: !isCurrentlyBookmarked,
+    }));
+
+    setBookmarkCounts(prev => ({
+      ...prev,
+      [codeId]: isCurrentlyBookmarked ? currentCount - 1 : currentCount + 1,
+    }));
+
     const userDocRef = firestore().collection('users').doc(uid);
     const bookmarkDocRef = userDocRef.collection('bookmarks').doc(codeId);
+
     try {
-      const bookmarkDoc = await bookmarkDocRef.get();
-      if (bookmarkDoc.exists) {
-        await Promise.all([
-          bookmarkDocRef.delete(),
-          addRecentActivity(uid, {
-            type: 'unbookmark',
-            postId: codeId,
-            timestamp: firestore.Timestamp.fromDate(new Date()),
-          }),
-        ]);
-        setUserBookmarks(prev => ({...prev, [codeId]: false}));
-      } else {
+      if (!isCurrentlyBookmarked) {
         await Promise.all([
           bookmarkDocRef.set({codeId}),
           addRecentActivity(uid, {
@@ -327,42 +353,137 @@ const Main: React.FC = forwardRef((props, ref) => {
             timestamp: firestore.Timestamp.fromDate(new Date()),
           }),
         ]);
-        setUserBookmarks(prev => ({...prev, [codeId]: true}));
+      } else {
+        await Promise.all([
+          bookmarkDocRef.delete(),
+          addRecentActivity(uid, {
+            type: 'unbookmark',
+            postId: codeId,
+            timestamp: firestore.Timestamp.fromDate(new Date()),
+          }),
+        ]);
       }
-      fetchBookmarks();
     } catch (error) {
       console.error('Error toggling bookmark:', error);
+      setUserBookmarks(prev => ({
+        ...prev,
+        [codeId]: isCurrentlyBookmarked,
+      }));
+      setBookmarkCounts(prev => ({
+        ...prev,
+        [codeId]: currentCount,
+      }));
     }
   };
 
-
   useEffect(() => {
-    fetchUserBookmarks();
-    fetchBookmarks();
-  }, [fetchBookmarks]);
+    const uid = auth().currentUser?.uid;
+    if (!uid) {
+      return;
+    }
 
+    const unsubscribeUserBookmarks = firestore()
+      .collection('users')
+      .doc(uid)
+      .collection('bookmarks')
+      .onSnapshot(snapshot => {
+        const bookmarks: Record<string, boolean> = {};
+        snapshot.docs.forEach(doc => {
+          const {codeId} = doc.data();
+          if (codeId) {
+            bookmarks[codeId] = true;
+          }
+        });
+        setUserBookmarks(bookmarks);
+      });
+
+    const unsubscribeBookmarkCounts = firestore()
+      .collectionGroup('bookmarks')
+      .onSnapshot(snapshot => {
+        const counts: Record<string, number> = {};
+        snapshot.docs.forEach(doc => {
+          const {codeId} = doc.data();
+          if (codeId) {
+            counts[codeId] = (counts[codeId] || 0) + 1;
+          }
+        });
+        setBookmarkCounts(counts);
+      });
+
+    return () => {
+      unsubscribeUserBookmarks();
+      unsubscribeBookmarkCounts();
+    };
+  }, []);
 
   useImperativeHandle(ref, () => ({
-    fetchUserBookmarks,
-    fetchBookmarks,
+    fetchUserBookmarks: async () => {
+      const uid = auth().currentUser?.uid;
+      if (!uid) {
+        return;
+      }
+
+      try {
+        const snapshot = await firestore()
+          .collection('users')
+          .doc(uid)
+          .collection('bookmarks')
+          .get();
+
+        const bookmarks: Record<string, boolean> = {};
+        snapshot.docs.forEach(doc => {
+          const {codeId} = doc.data();
+          if (codeId) {
+            bookmarks[codeId] = true;
+          }
+        });
+        setUserBookmarks(bookmarks);
+      } catch (error) {
+        console.error('Error fetching user bookmarks:', error);
+      }
+    },
+    fetchBookmarks: async () => {
+      try {
+        const snapshot = await firestore().collectionGroup('bookmarks').get();
+
+        const counts: Record<string, number> = {};
+        snapshot.docs.forEach(doc => {
+          const {codeId} = doc.data();
+          if (codeId) {
+            counts[codeId] = (counts[codeId] || 0) + 1;
+          }
+        });
+        setBookmarkCounts(counts);
+      } catch (error) {
+        console.error('Error fetching bookmarks:', error);
+      }
+    },
   }));
 
-
-  const renderGridItem = ({
-                            item,
-                          }: {
-    item: CodeData & {first_name: string; last_name: string};
-  }) => {
+  const renderGridItem = ({item}: {item: CodeDataWithName}) => {
     const uid = auth().currentUser?.uid;
     const liked = uid ? item.likes.includes(uid) : false;
-
     const commentCount = commentCounts[item.id] || 0;
+
+    const rightContent = () => (
+      <View style={{flexDirection: 'column', alignItems: 'center'}}>
+        <IconButton
+          icon="eye"
+          iconColor={theme.colors.onPrimary}
+          containerColor={theme.colors.primary}
+          size={20}
+        />
+        <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
+          {item.views.length}
+        </Text>
+      </View>
+    );
 
     return (
       <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
         <Card
           onPress={() => {
-            navigation.preload('algo', { codeId: item.id });
+            navigation.preload('algo', {codeId: item.id});
             addView(item.id).then(() => {
               navigation.navigate('algo', {codeId: item.id});
             });
@@ -373,38 +494,32 @@ const Main: React.FC = forwardRef((props, ref) => {
             titleStyle={{fontFamily: FONTS.p_regular}}
             subtitleStyle={{fontFamily: FONTS.p_regular}}
             left={LeftContent}
-            right={() => (
-              <View style={{flexDirection: 'column', alignItems: 'center'}}>
-                <IconButton
-                  icon="eye"
-                  iconColor={theme.colors.onPrimary}
-                  containerColor={theme.colors.primary}
-                  size={20}
-                  onPress={undefined}
-                />
-                <Text
-                  style={{fontFamily: FONTS.p_regular}}
-                  variant={'labelSmall'}>
-                  {item.views.length}
-                </Text>
-              </View>
-            )}
+            right={rightContent}
           />
           <Card.Content>
             <Text variant="bodyMedium">{item.description}</Text>
             <SpacerV height={heightPercentageToDP(0.15)} />
-              <Icon
-                size={24}
-                color={theme.colors.primary}
-                source={
-                  item.language === 'algorithm'
-                    ? 'brain'
-                    : `language-${item.language}`
-                }
-              />
+            <Icon
+              size={24}
+              color={theme.colors.primary}
+              source={
+                item.language === 'algorithm'
+                  ? 'brain'
+                  : `language-${item.language}`
+              }
+            />
             <SpacerV height={heightPercentageToDP(0.15)} />
-            <Text variant={'bodySmall'} style={{fontStyle: 'italic', color: theme.colors.onBackground, opacity: 0.875}}>
-              {item.section ? `Année: ${item.level} | Section: ${item.section}` : `Année: ${item.level}`}</Text>
+            <Text
+              variant={'bodySmall'}
+              style={{
+                fontStyle: 'italic',
+                color: theme.colors.onBackground,
+                opacity: 0.875,
+              }}>
+              {item.section
+                ? `Année: ${item.level} | Section: ${item.section}`
+                : `Année: ${item.level}`}
+            </Text>
           </Card.Content>
           <Card.Actions>
             <View style={{flexDirection: 'column', alignItems: 'center'}}>
@@ -481,6 +596,13 @@ const Main: React.FC = forwardRef((props, ref) => {
     );
   };
 
+  const ListFooterComponent = useCallback(() => {
+    if (!loading) {
+      return null;
+    }
+    return <ActivityIndicator size="large" color={theme.colors.primary} />;
+  }, [loading, theme.colors.primary]);
+
   return (
     <BaseView
       needsPaddingTop={false}
@@ -521,12 +643,21 @@ const Main: React.FC = forwardRef((props, ref) => {
         />
       </View>
       <SpacerV height={heightPercentageToDP(0.1)} />
-      <FlatGrid
+      <AnimatedFlatGrid
         itemDimension={windowWidth}
-        data={codes}
+        data={filteredCodesData}
         style={styles.gridView}
         spacing={10}
         renderItem={renderGridItem}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={5}
+        windowSize={3}
+        initialNumToRender={5}
+        updateCellsBatchingPeriod={50}
+        ListFooterComponent={ListFooterComponent}
+        keyExtractor={item => item.id}
       />
     </BaseView>
   );

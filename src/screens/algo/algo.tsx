@@ -1,14 +1,13 @@
 import BaseView from '../../components/baseview/baseview.tsx';
 import {Appbar, BottomNavigation, Tooltip, useTheme} from 'react-native-paper';
 import {FONTS} from '../../config/misc.ts';
-import React, {useEffect} from 'react';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import React, {useCallback, useEffect} from 'react';
+import {RouteProp, useFocusEffect, useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import Code from './code.tsx';
 import Instructions from './instructions.tsx';
-import {StatusBar} from 'react-native';
-import {useBackHandler} from '@react-native-community/hooks';
+import {BackHandler, StatusBar} from 'react-native';
 import {useTranslation} from 'react-i18next';
 
 const Algo: React.FC = () => {
@@ -48,10 +47,21 @@ const Algo: React.FC = () => {
     }
   };
 
-  useBackHandler(() => {
-    navigation.goBack();
-    return true;
-  });
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+          return true;
+        }
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [navigation])
+  );
 
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);

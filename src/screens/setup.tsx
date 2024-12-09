@@ -35,7 +35,7 @@ import {BottomSheetModal, useBottomSheetModal} from '@gorhom/bottom-sheet';
 import {alert} from '@baronha/ting';
 import {openCamera} from 'react-native-image-crop-picker';
 import ImagePickerActionSheet from '../components/modals/image-picker-action-sheet.tsx';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import {RouteProp, useFocusEffect, useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../config/navigation/types.ts';
 import NetInfo from '@react-native-community/netinfo';
@@ -143,11 +143,24 @@ const Setup: React.FC = () => {
     StatusBar.setBackgroundColor(theme.colors.background);
   }, [theme.colors.background]);
 
-  useBackHandler(() => {
-    BackHandler.exitApp();
-    return true;
-  });
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+          return true;
+        } else {
+          BackHandler.exitApp();
+          return true;
+        }
+      };
 
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [navigation])
+  );
   /**
    * Functions
    */
