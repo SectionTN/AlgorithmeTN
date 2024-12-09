@@ -25,6 +25,7 @@ import moment from 'moment';
 import { fontValue } from '../config/dimensions.ts';
 import { alert } from '@baronha/ting';
 import SpacerV from '../components/spacer/spacerv.tsx';
+import { NativeViewGestureHandler } from 'react-native-gesture-handler';
 
 interface Comment {
   id: string;
@@ -192,6 +193,7 @@ const Comments: React.FC<{ route: any }> = ({ route }) => {
           titleStyle={{ fontFamily: FONTS.p_regular }}
         />
       </Appbar.Header>
+      <NativeViewGestureHandler>
       <FlatList
         style={styles.flatList}
         data={comments}
@@ -202,7 +204,8 @@ const Comments: React.FC<{ route: any }> = ({ route }) => {
         }
         keyExtractor={item => item.id}
         removeClippedSubviews={true}
-      />
+        />
+      </NativeViewGestureHandler>
       <View style={styles.inputContainer}>
         <TextInput
           style={{ flex: 1, fontFamily: FONTS.p_regular }}

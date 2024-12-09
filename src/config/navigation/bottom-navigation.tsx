@@ -1,11 +1,12 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {BottomNavigation, useTheme} from 'react-native-paper';
 import Main from '../../screens/home/main.tsx';
 import Profile from '../../screens/home/profile.tsx';
 import Notifications from '../../screens/home/notifications.tsx';
 import Bookmarks from '../../screens/home/bookmarks.tsx';
-import {StatusBar} from 'react-native';
+import {BackHandler, StatusBar} from 'react-native';
 import {useTranslation} from 'react-i18next';
+import { useFocusEffect } from '@react-navigation/native';
 
 const HomeScene = (props: any) => <Main ref={props.mainRef} />;
 const BookmarksScene = () => <Bookmarks />;
@@ -61,6 +62,21 @@ const HomeRender: React.FC = () => {
       mainRef.current.fetchUserBookmarks();
     }
   }, [index]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+          BackHandler.exitApp();
+          return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );
+
 
   useEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);

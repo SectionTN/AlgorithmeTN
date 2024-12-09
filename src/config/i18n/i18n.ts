@@ -1,7 +1,7 @@
 import i18n from 'i18next';
-import {initReactI18next} from 'react-i18next';
+import { initReactI18next } from 'react-i18next';
 import * as RNLocalize from 'react-native-localize';
-import {LanguageDetectorModule} from 'i18next';
+import { LanguageDetectorModule } from 'i18next';
 
 const locales = RNLocalize.getLocales();
 
@@ -94,6 +94,12 @@ const resources = {
       },
       bookmarks: {
         title: 'Bookmarks',
+        dialog: {
+          title: 'Remove Bookmark',
+          message: 'Are you sure you want to remove this bookmark?',
+          cancel: 'Cancel',
+          confirm: 'Confirm',
+        },
       },
       notifications: {
         title: 'Notifications',
@@ -159,6 +165,24 @@ const resources = {
         about_developer: 'About Developer',
       },
       views: 'Views',
+      'pending-review':  {
+      title: 'Pending Review',
+      accept: 'Accept',
+      deny: 'Deny',
+      accept_dialog: {
+        title: 'Accept Code',
+        message: 'Are you sure you want to accept this code?',
+        cancel: 'Cancel',
+        confirm: 'Confirm',
+      },
+      deny_dialog: {
+        title: 'Deny Code',
+        message: 'Are you sure you want to deny this code?',
+        cancel: 'Cancel',
+        confirm: 'Confirm',
+      },
+      by: 'by',
+    },
     },
   },
   fr: {
@@ -240,6 +264,12 @@ const resources = {
       },
       bookmarks: {
         title: 'Favoris',
+        dialog: {
+          title: 'Supprimer le favori',
+          message: 'Voulez-vous vraiment supprimer ce favori?',
+          cancel: 'Annuler',
+          confirm: 'Confirmer',
+        },
       },
       notifications: {
         title: 'Notifications',
@@ -302,9 +332,27 @@ const resources = {
         privacy_policy: 'Politique de confidentialité',
         bug_report: 'Signaler un bug',
         about_developer: 'À propos du développeur',
-},
+      },
       views: 'Vues',
-},
+      'pending-review': {
+        title: 'En attente de validation',
+        accept: 'Accepter',
+        deny: 'Refuser',
+        by: 'par',
+        accept_dialog: {
+          title: 'Accepter le code',
+          message: 'Êtes-vous sûr de vouloir accepter ce code?',
+          cancel: 'Annuler',
+          confirm: 'Confirmer',
+        },
+        deny_dialog: {
+          title: 'Refuser le code',
+          message: 'Êtes-vous sûr de vouloir refuser ce code?',
+          cancel: 'Annuler',
+          confirm: 'Confirmer',
+        },
+      },
+    },
   },
 };
 

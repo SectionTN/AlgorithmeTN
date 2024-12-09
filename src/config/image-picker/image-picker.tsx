@@ -11,7 +11,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 export const AvatarPicker = {
   width: 1024,
   height: 1024,
-  cropping: true,
+  cropping: __DEV__ ? false : true,
   mediaType: 'photo',
 } as any;
 

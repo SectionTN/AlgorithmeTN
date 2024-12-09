@@ -1,5 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  BackHandler,
   EmitterSubscription,
   Keyboard,
   Linking,
@@ -24,7 +25,6 @@ import {
 } from '../config/dimensions.ts';
 import {COLORS, FONTS} from '../config/misc.ts';
 import SpacerV from '../components/spacer/spacerv.tsx';
-import {useBackHandler} from '@react-native-community/hooks';
 import Animated, {
   FadeInDown,
   FadeInUp,
@@ -33,7 +33,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import auth from '@react-native-firebase/auth';
 import {alert} from '@baronha/ting';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../config/navigation/types.ts';
 import {generateRandomString} from '../utils/algo-utils.ts';
@@ -82,13 +82,28 @@ const Login: React.FC = () => {
    * Hooks
    */
 
-  useBackHandler(() => {
-    if (currentMode === 'signup' || currentMode === 'forgot-password') {
-      setCurrentMode('login');
-      return true;
-    }
-    return false;
-  });
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (currentMode === 'signup' || currentMode === 'forgot-password') {
+          setCurrentMode('login');
+          return true;
+        } else {
+          BackHandler.exitApp();
+          return true;
+        }
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [currentMode])
+  );
+
+
+
 
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const keyboardDidShowListener = useRef<EmitterSubscription | null>(null);
@@ -140,7 +155,7 @@ const Login: React.FC = () => {
       setSubscribed(optedIn || false);
 
       if (__DEV__) {
-        console.log(token, optedIn, id);
+        console.log(pushToken, userId, isSubscribed);
       }
     } catch (e) {
       if (__DEV__) {
@@ -151,7 +166,7 @@ const Login: React.FC = () => {
         crashlytics().recordError(e);
       }
     }
-  }, []);
+  }, [isSubscribed, pushToken, userId]);
 
   useEffect(() => {
     initializeDevice();
@@ -272,7 +287,7 @@ const Login: React.FC = () => {
                 errorMessage = t('login.weak_pass');
                 break;
               default:
-                errorMessage = t("error_occured");
+                errorMessage = t('error_occured');
                 break;
             }
             alert({
@@ -286,7 +301,7 @@ const Login: React.FC = () => {
         if (email.trim().length < 3) {
           return alert({
             title: t('login.incorrect_details'),
-            message: t("login.enter_valid_email"),
+            message: t('login.enter_valid_email'),
             preset: 'error',
           });
         }
@@ -294,7 +309,7 @@ const Login: React.FC = () => {
           .sendPasswordResetEmail(email)
           .then(() => {
             alert({
-              title: t("login.pass_reset"),
+              title: t('login.pass_reset'),
               message: t('login.reset_email'),
               preset: 'done',
             });

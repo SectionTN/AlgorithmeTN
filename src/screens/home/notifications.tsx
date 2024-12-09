@@ -13,6 +13,7 @@ import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firest
 import getUserData from '../../utils/firebase.ts';
 import moment from 'moment';
 import { NotificationData } from '../../types/interfaces.ts';
+import { sortBy } from 'lodash';
 
 interface AvatarProps {
   avatarStatus: 'photo' | 'text';
@@ -26,9 +27,9 @@ interface TimeProps {
 
 const LeftContent: React.FC<AvatarProps> = ({ avatarStatus, avatar }) => {
   if (avatarStatus === 'photo' && avatar) {
-    return <Avatar.Image source={{ uri: avatar }} />;
+    return <Avatar.Image source={{ uri: avatar }} size={48} />;
   } else {
-    return <Avatar.Text label={avatar} />;
+    return <Avatar.Text label={avatar} size={48} />;
   }
 };
 
@@ -120,7 +121,7 @@ const Notifications: React.FC = () => {
   }, [theme.colors.elevation.level2]);
 
   useEffect(() => {
-    setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
+    setPhotoUrl(auth().currentUser?.photoURL ?? 'XD');
   }, []);
 
   return (
@@ -145,7 +146,7 @@ const Notifications: React.FC = () => {
         <FlatGrid
           spacing={10}
           itemDimension={windowDimension}
-          data={notifications}
+          data={sortBy(notifications, 'createdAt').reverse()}
           renderItem={renderNotificationItem}
         />
       </NativeViewGestureHandler>

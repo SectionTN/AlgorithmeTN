@@ -1,12 +1,23 @@
-import React, {useState, useEffect} from 'react';
-import {Text, Button, Dialog, Paragraph} from 'react-native-paper';
+import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
+import { Text, Button, Dialog, Paragraph, Appbar, useTheme } from 'react-native-paper';
 import BaseView from '../components/baseview/baseview';
-import {View, FlatList} from 'react-native';
+import { View, FlatList, StyleSheet, StatusBar, BackHandler } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import getUserData from '../utils/firebase.ts';
-import {CodeData} from '../types/interfaces.ts';
+import { CodeData } from '../types/interfaces.ts';
+import { useTranslation } from 'react-i18next';
+import { FONTS } from '../config/misc.ts';
+import { RootStackParamList } from '../config/navigation/types.ts';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { upperFirst } from 'lodash';
 
 const PendingReview: React.FC = () => {
+
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const theme = useTheme();
+  const { t } = useTranslation();
+
   const [data, setData] = useState<CodeData[]>([]);
   const [selectedItem, setSelectedItem] = useState<CodeData | null>(null);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
@@ -35,6 +46,10 @@ const PendingReview: React.FC = () => {
     }
   }, []);
 
+  useLayoutEffect(() => {
+    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+  }, [theme.colors.elevation.level2]);
+
   const addBadgeIfNotExist = async (uid: string, language: string) => {
     if (!uid || language === 'none') {
       return;
@@ -54,7 +69,7 @@ const PendingReview: React.FC = () => {
 
   const handleAction = async () => {
     if (selectedItem) {
-      const {id, ...codeData} = selectedItem;
+      const { id, ...codeData } = selectedItem;
       if (action === 'accept') {
         await Promise.all([
           firestore().collection('codes').doc(id).set(codeData),
@@ -69,51 +84,123 @@ const PendingReview: React.FC = () => {
     }
   };
 
+  const renderEmptyItem = () => {
+    return (
+      <View style={[
+        styles.card,
+        styles.emptyContainer,
+        { backgroundColor: theme.colors.elevation.level1 },
+      ]}>
+        <Text style={{ textAlign: 'center' }}>
+          No pending posts, yet!
+        </Text>
+      </View>
+    );
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+          return true;
+        }
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [navigation])
+  );
+
+
+  const renderItem = ({ item }: { item: CodeData }) => (
+    <View style={[styles.card, { backgroundColor: theme.colors.elevation.level1 }]}>
+      <View style={styles.headerContainer}>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={[styles.language, { color: theme.colors.primary }]}>
+            {upperFirst(item.language)}
+          </Text>
+        </View>
+        <Text style={[styles.author, { color: theme.colors.onSurfaceVariant }]}>
+          {`${t('pending-review.by')} ${item.first_name} ${item.last_name}`}
+        </Text>
+      </View>
+
+      <Text
+        style={[styles.description, { color: theme.colors.onSurfaceVariant }]}
+        numberOfLines={3}
+      >
+        {item.description}
+      </Text>
+
+      <View style={styles.buttonContainer}>
+        <Button
+          mode="contained"
+          style={[styles.button, { backgroundColor: theme.colors.primary }]}
+          labelStyle={styles.buttonLabel}
+          onPress={() => {
+            setSelectedItem(item);
+            setAction('accept');
+            setIsDialogVisible(true);
+          }}>
+          {t('pending-review.accept')}
+        </Button>
+        <Button
+          mode="contained"
+          style={[styles.button, { backgroundColor: theme.colors.error }]}
+          labelStyle={styles.buttonLabel}
+          onPress={() => {
+            setSelectedItem(item);
+            setAction('deny');
+            setIsDialogVisible(true);
+          }}>
+          {t('pending-review.deny')}
+        </Button>
+      </View>
+    </View>
+  );
+
   return __DEV__ ? (
     <BaseView
-      needsPaddingTop={true}
+      needsPaddingTop={false}
       needsPaddingBottom={false}
       avoidingView={false}>
-      <View style={{flex: 1}}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.elevation.level2 }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content
+          title={'Pending Review'}
+          titleStyle={{ fontFamily: FONTS.p_regular }}
+        />
+      </Appbar.Header>
+      <View style={{ flex: 1 }}>
         <FlatList
           data={data}
           keyExtractor={item => item.id}
-          renderItem={({item}) => (
-            <View style={{padding: 10, borderBottomWidth: 1}}>
-              <Text>{item.title}</Text>
-              <Text>{item.description}</Text>
-              <Text>{`Author: ${item.first_name} ${item.last_name}`}</Text>
-              <Button
-                onPress={() => {
-                  setSelectedItem(item);
-                  setAction('accept');
-                  setIsDialogVisible(true);
-                }}>
-                Accept
-              </Button>
-              <Button
-                onPress={() => {
-                  setSelectedItem(item);
-                  setAction('deny');
-                  setIsDialogVisible(true);
-                }}>
-                Deny
-              </Button>
-            </View>
-          )}
+          renderItem={renderItem}
+          ListEmptyComponent={renderEmptyItem}
+          contentContainerStyle={styles.listContainer}
         />
         <Dialog
           visible={isDialogVisible}
           onDismiss={() => setIsDialogVisible(false)}>
           <Dialog.Title>
-            {action === 'accept' ? 'Accept' : 'Deny'} Code?
+            {action === 'accept' ? t('pending-review.accept_dialog.title') : t('pending-review.deny_dialog.title')}
           </Dialog.Title>
           <Dialog.Content>
-            <Paragraph>Are you sure you want to {action} this code?</Paragraph>
+            <Paragraph>
+              {action === 'accept' ? t('pending-review.accept_dialog.message') : t('pending-review.deny_dialog.message')}
+            </Paragraph>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setIsDialogVisible(false)}>Cancel</Button>
-            <Button onPress={handleAction}>Confirm</Button>
+            <Button onPress={() => setIsDialogVisible(false)}>
+              {action === 'accept' ? t('pending-review.accept_dialog.cancel') : t('pending-review.deny_dialog.cancel')}
+            </Button>
+            <Button onPress={handleAction}>
+              {action === 'accept' ? t('pending-review.accept_dialog.confirm') : t('pending-review.deny_dialog.confirm')}
+              </Button>
           </Dialog.Actions>
         </Dialog>
       </View>
@@ -123,11 +210,73 @@ const PendingReview: React.FC = () => {
       needsPaddingTop={true}
       needsPaddingBottom={false}
       avoidingView={false}>
-      <Text style={{textAlign: 'center'}}>
+      <Text style={{ textAlign: 'center' }}>
         womp womp, you don't have access here
       </Text>
     </BaseView>
   );
 };
+
+const styles = StyleSheet.create({
+  listContainer: {
+    padding: 16,
+  },
+  card: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  headerContainer: {
+    marginBottom: 12,
+  },
+  titleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  title: {
+    fontSize: 18,
+    fontFamily: FONTS.p_regular,
+    flex: 1,
+  },
+  language: {
+    fontSize: 14,
+    fontFamily: FONTS.p_regular,
+    paddingLeft: 8,
+  },
+  author: {
+    fontSize: 14,
+    fontFamily: FONTS.p_regular,
+  },
+  description: {
+    fontSize: 14,
+    fontFamily: FONTS.p_regular,
+    marginBottom: 16,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  button: {
+    minWidth: 100,
+  },
+  buttonLabel: {
+    fontSize: 14,
+    fontFamily: FONTS.p_regular,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '50%',
+  },
+});
 
 export default PendingReview;

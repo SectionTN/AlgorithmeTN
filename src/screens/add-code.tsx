@@ -189,7 +189,7 @@ const AddCode: React.FC = () => {
       uid,
       likes: [],
       views: [],
-      createdAt: firestore.FieldValue.serverTimestamp(),
+      createdAt: firestore.Timestamp.now(),
     };
     firestore()
       .collection('pending_codes')

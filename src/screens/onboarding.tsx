@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,12 +9,13 @@ import {
   ImageRequireSource,
   StatusBar,
   SafeAreaView,
+  BackHandler,
 } from 'react-native';
 import type {PagerViewOnPageScrollEventData} from 'react-native-pager-view';
 import PagerView from 'react-native-pager-view';
 import {FONTS} from '../config/misc.ts';
 import {Button, MD3Theme, useTheme} from 'react-native-paper';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {RootStackParamList} from '../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {storage} from '../config/storage/mmkv.ts';
@@ -278,7 +279,7 @@ const Pagination = ({
       />
       {ViewPagerData.map(item => {
         return (
-          <View key={item.key} style={styles.paginationDotContainer}>
+          <View key={item.id} style={styles.paginationDotContainer}>
             <View
               style={[
                 styles.paginationDot,
@@ -307,6 +308,20 @@ const Onboarding: React.FC = () => {
   const theme = useTheme();
 
   const insets = useSafeAreaInsets();
+
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+          BackHandler.exitApp();
+          return true;
+      };
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );
 
   const style = StyleSheet.create({
     safeInsets: {
