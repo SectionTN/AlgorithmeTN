@@ -256,7 +256,7 @@ const Settings: React.FC = () => {
             />
           </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'}>
+          <Card mode={'contained'} onPress={() => navigation.navigate('about-developer')}>
             <Card.Title
               title={t('settings.about_developer')}
               titleStyle={{paddingTop: '1%'}}
