@@ -23,8 +23,8 @@ import BaseView from '../components/baseview/baseview.tsx';
 import {useTranslation} from 'react-i18next';
 import {useMMKVBoolean} from 'react-native-mmkv';
 import auth from '@react-native-firebase/auth';
-import { useFocusEffect } from '@react-navigation/native';
-import { BackHandler } from 'react-native';
+import {useFocusEffect} from '@react-navigation/native';
+import {BackHandler} from 'react-native';
 
 const Splash: React.FC = () => {
   const navigation =
@@ -39,12 +39,15 @@ const Splash: React.FC = () => {
   const translateY = useSharedValue(0);
   const opacity = useSharedValue(1);
 
-  const animationValues = useMemo(() => ({
-    scaleX,
-    scaleY,
-    translateY,
-    opacity,
-  }), [scaleX, scaleY, translateY, opacity]);
+  const animationValues = useMemo(
+    () => ({
+      scaleX,
+      scaleY,
+      translateY,
+      opacity,
+    }),
+    [scaleX, scaleY, translateY, opacity],
+  );
 
   const handleNavigation = useCallback(() => {
     const currentUser = auth().currentUser;
@@ -52,33 +55,44 @@ const Splash: React.FC = () => {
       if (currentUser.displayName && currentUser.photoURL) {
         navigation.navigate('home');
       } else {
-        auth().signOut().then(() => navigation.navigate('login'));
+        auth()
+          .signOut()
+          .then(() => navigation.navigate('login'));
       }
     } else {
       navigation.navigate(onboardingComplete ? 'login' : 'onboarding');
     }
   }, [navigation, onboardingComplete]);
 
-  const runAnimations = useCallback((
-    scaleX: SharedValue<number>,
-    scaleY: SharedValue<number>,
-    opacity: SharedValue<number>,
-    translateY: SharedValue<number>
-  ) => {
-    'worklet';
-    scaleX.value = withDelay(30, withTiming(0.08, {duration: 275}));
-    scaleY.value = withDelay(30, withTiming(0.08, {duration: 275}));
-    opacity.value = withTiming(0, {duration: 275});
-    translateY.value = withDelay(0, withTiming(heightPercentageToDP(-5.5), {duration: 250}));
-    translateY.value = withDelay(300, withTiming(heightPercentageToDP(5.5), {duration: 375}));
-    scaleX.value = withSpring(0.08);
-    scaleY.value = withSpring(0.08);
-    scaleX.value = withSpring(0);
-    scaleY.value = withSpring(0);
-    opacity.value = withSpring(1);
-    scaleX.value = withDelay(750, withTiming(0.08, {duration: 250}));
-    scaleY.value = withDelay(750, withTiming(0.08, {duration: 250}));
-  }, []);
+  const runAnimations = useCallback(
+    (
+      scaleX: SharedValue<number>,
+      scaleY: SharedValue<number>,
+      opacity: SharedValue<number>,
+      translateY: SharedValue<number>,
+    ) => {
+      'worklet';
+      scaleX.value = withDelay(30, withTiming(0.08, {duration: 275}));
+      scaleY.value = withDelay(30, withTiming(0.08, {duration: 275}));
+      opacity.value = withTiming(0, {duration: 275});
+      translateY.value = withDelay(
+        0,
+        withTiming(heightPercentageToDP(-5.5), {duration: 250}),
+      );
+      translateY.value = withDelay(
+        300,
+        withTiming(heightPercentageToDP(5.5), {duration: 375}),
+      );
+      scaleX.value = withSpring(0.08);
+      scaleY.value = withSpring(0.08);
+      scaleX.value = withSpring(0);
+      scaleY.value = withSpring(0);
+      opacity.value = withSpring(1);
+      scaleX.value = withDelay(750, withTiming(0.08, {duration: 250}));
+      scaleY.value = withDelay(750, withTiming(0.08, {duration: 250}));
+    },
+    [],
+  );
 
   useEffect(() => {
     const timer = setTimeout(handleNavigation, 2000);
@@ -91,23 +105,29 @@ const Splash: React.FC = () => {
         animationValues.scaleX,
         animationValues.scaleY,
         animationValues.opacity,
-        animationValues.translateY
+        animationValues.translateY,
       );
     }, 1500);
     return () => clearTimeout(timer);
   }, [runAnimations, animationValues]);
 
-  const viewAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{translateY: animationValues.translateY.value}],
-  }), []);
+  const viewAnimatedStyle = useAnimatedStyle(
+    () => ({
+      transform: [{translateY: animationValues.translateY.value}],
+    }),
+    [],
+  );
 
-  const imageAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {scaleX: animationValues.scaleX.value},
-      {scaleY: animationValues.scaleY.value},
-    ],
-    opacity: animationValues.opacity.value,
-  }), []);
+  const imageAnimatedStyle = useAnimatedStyle(
+    () => ({
+      transform: [
+        {scaleX: animationValues.scaleX.value},
+        {scaleY: animationValues.scaleY.value},
+      ],
+      opacity: animationValues.opacity.value,
+    }),
+    [],
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -125,7 +145,7 @@ const Splash: React.FC = () => {
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [navigation])
+    }, [navigation]),
   );
 
   return (
