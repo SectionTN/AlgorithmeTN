@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Appbar,
   Avatar,
@@ -10,6 +10,7 @@ import {
   Portal,
   Text,
   useTheme,
+  ActivityIndicator,
 } from 'react-native-paper';
 import BaseView from '../../components/baseview/baseview.tsx';
 import { FONTS } from '../../config/misc.ts';
@@ -35,16 +36,16 @@ const Bookmarks: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const theme = useTheme();
-
   const { t } = useTranslation();
-
   const [photoUrl, setPhotoUrl] = useState('XD');
-
   const [bookmarks, setBookmarks] = useState<
     Array<CodeData & { first_name: string; last_name: string }>
   >([]);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [postIdToDelete, setPostIdToDelete] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const BOOKMARKS_PER_PAGE = 10;
 
   const windowWidth = Dimensions.get('window').width;
 
@@ -61,6 +62,7 @@ const Bookmarks: React.FC = () => {
       .collection('users')
       .doc(auth().currentUser?.uid)
       .collection('bookmarks')
+      .limit(BOOKMARKS_PER_PAGE * page)
       .onSnapshot(
         async snapshot => {
           try {
@@ -98,15 +100,25 @@ const Bookmarks: React.FC = () => {
             );
           } catch (error) {
             console.error('Error processing bookmarks: ', error);
+          } finally {
+            setLoading(false);
           }
         },
         error => {
-          console.error('Error fetching bookmarks: ', error);
+          console.error('Error retrieving bookmarks: ', error);
+          setLoading(false);
         },
       );
 
     return () => unsubscribe();
-  }, []);
+  }, [page]);
+
+  const handleLoadMore = () => {
+    if (!loading && bookmarks.length === BOOKMARKS_PER_PAGE * page) {
+      setLoading(true);
+      setPage(prevPage => prevPage + 1);
+    }
+  };
 
   const getCodeData = async (postId: string): Promise<CodeData> => {
     try {
@@ -140,7 +152,6 @@ const Bookmarks: React.FC = () => {
       return;
     }
 
-
     try {
       await firestore()
         .collection('users')
@@ -161,6 +172,13 @@ const Bookmarks: React.FC = () => {
   function dismissDialog(): void {
     setDialogVisible(false);
   }
+
+  const ListFooterComponent = useCallback(() => {
+    if (!loading) {
+      return null;
+    }
+    return <ActivityIndicator size="large" color={theme.colors.primary} />;
+  }, [loading, theme.colors.primary]);
 
   return (
     <BaseView
@@ -226,23 +244,26 @@ const Bookmarks: React.FC = () => {
             </Card>
           </Animated.View>
         )}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={ListFooterComponent}
       />
       <Portal>
-      <Dialog visible={dialogVisible} dismissable={true} onDismiss={dismissDialog}>
-        <Dialog.Icon icon="delete-alert-outline" />
-        <Dialog.Title style={styles.dialogTitle}>
-          {t('bookmarks.dialog.title')}
-        </Dialog.Title>
-        <Dialog.Content>
-          <Text variant="bodyMedium">
-            {t('bookmarks.dialog.message')}
-          </Text>
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={() => setDialogVisible(false)}>
-            {t('bookmarks.dialog.cancel')}
-          </Button>
-          <Button onPress={unbookmarkPost}>{t('bookmarks.dialog.confirm')}</Button>
+        <Dialog visible={dialogVisible} dismissable={true} onDismiss={dismissDialog}>
+          <Dialog.Icon icon="delete-alert-outline" />
+          <Dialog.Title style={styles.dialogTitle}>
+            {t('bookmarks.dialog.title')}
+          </Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">
+              {t('bookmarks.dialog.message')}
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setDialogVisible(false)}>
+              {t('bookmarks.dialog.cancel')}
+            </Button>
+            <Button onPress={unbookmarkPost}>{t('bookmarks.dialog.confirm')}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
