@@ -35,6 +35,7 @@ import analytics from '@react-native-firebase/analytics';
 import PendingReview from '../../screens/pending-review.tsx';
 import Comments from '../../screens/comments.tsx';
 import Profile from '../../screens/home/profile.tsx';
+import AboutDeveloper from '../../screens/settings/about-developer.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -175,6 +176,10 @@ const StackNavigator: React.FC = () => {
           component={Profile}
           options={{gestureEnabled: false, headerShown: false}}
         />
+        <Stack.Screen
+        name={'about-developer'}
+        component={AboutDeveloper}
+        options={{gestureEnabled: false, headerShown: false}} />
       </Stack.Navigator>
     </NavigationContainer>
   );

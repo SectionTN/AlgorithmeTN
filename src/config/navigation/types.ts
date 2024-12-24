@@ -13,7 +13,8 @@ type routeNamesType =
   | 'add-bio'
   | 'edit-username'
   | 'bug-report'
-  | 'change-language';
+  | 'change-language'
+  | 'about-developer';
 
 type RootStackParamList = {
   [key in routeNamesType]: object | undefined;
@@ -72,7 +73,8 @@ type RootStackParamList = {
   comments: {
     pid?: string
   } | undefined;
-  profile: {uid?: string} | undefined
+  profile: {uid?: string} | undefined;
+  'about-developer': {} | undefined;
 };
 
 export type {routeNamesType, RootStackParamList};
