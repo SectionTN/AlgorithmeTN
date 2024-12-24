@@ -71,7 +71,7 @@ const Login: React.FC = () => {
   const [currentMode, setCurrentMode] = useState<string>('login');
 
   /**
-   * Utils?
+   * Utils
    */
 
   const handleTermsPress = async () => {
