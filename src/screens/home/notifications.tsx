@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import BaseView from '../../components/baseview/baseview.tsx';
-import { Appbar, Avatar, Card, Text, useTheme } from 'react-native-paper';
+import { Appbar, Avatar, Card, Text, useTheme, ActivityIndicator } from 'react-native-paper';
 import { FONTS } from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import { widthPercentageToDP } from '../../config/dimensions.ts';
@@ -14,6 +14,7 @@ import getUserData from '../../utils/firebase.ts';
 import moment from 'moment';
 import { NotificationData } from '../../types/interfaces.ts';
 import { sortBy } from 'lodash';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 interface AvatarProps {
   avatarStatus: 'photo' | 'text';
@@ -23,7 +24,6 @@ interface AvatarProps {
 interface TimeProps {
   createdAt: FirebaseFirestoreTypes.Timestamp;
 }
-
 
 const LeftContent: React.FC<AvatarProps> = ({ avatarStatus, avatar }) => {
   if (avatarStatus === 'photo' && avatar) {
@@ -38,43 +38,64 @@ const RightContent: React.FC<TimeProps> = ({ createdAt }) => {
   return <Text variant={'labelSmall'}>{convertedTime}</Text>;
 };
 
-
 const Notifications: React.FC = () => {
   const theme = useTheme();
-
-  const [photoUrl, setPhotoUrl] = useState('XD');
-
-  const windowDimension = Dimensions.get('window').width;
-
   const { t } = useTranslation();
-
+  const [photoUrl, setPhotoUrl] = useState('XD');
+  const windowDimension = Dimensions.get('window').width;
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const NOTIFICATIONS_PER_PAGE = 10;
 
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('notifications')
       .where('userReceiveId', '==', auth().currentUser?.uid)
-      .onSnapshot(async querySnapshot => {
-        try {
-          console.log(querySnapshot.size);
-          const notificationList = await Promise.all(
-            querySnapshot.docs.map(async doc => {
-              const notificationData = doc.data();
-              const userData = await getUserData(notificationData.userSentID);
-              return {
-                ...notificationData,
-                id: doc.id,
-                ...userData,
-              };
-            }),
-          );
-          setNotifications(notificationList as NotificationData[]);
-        } catch (e) {
-          console.error('Error retrieving notifications: ', e);
-        }
-      });
+      .orderBy('createdAt', 'desc')
+      .limit(NOTIFICATIONS_PER_PAGE * page)
+      .onSnapshot(
+        async snapshot => {
+          try {
+            const notificationList = await Promise.all(
+              snapshot.docs.map(async doc => {
+                const notificationData = doc.data();
+                const userData = await getUserData(notificationData.userSentID);
+                return {
+                  ...notificationData,
+                  id: doc.id,
+                  ...userData,
+                };
+              }),
+            );
+            setNotifications(notificationList as NotificationData[]);
+          } catch (e) {
+            if (e instanceof Error) {
+              crashlytics().recordError(e);
+            }
+            console.error('Error retrieving notifications: ', e);
+          } finally {
+            setLoading(false);
+          }
+        },
+        error => {
+          if (error instanceof Error) {
+            crashlytics().recordError(error);
+          }
+          console.error('Error retrieving notifications: ', error);
+          setLoading(false);
+        },
+      );
+
     return () => unsubscribe();
-  }, []);
+  }, [page]);
+
+  const handleLoadMore = () => {
+    if (!loading && notifications.length === NOTIFICATIONS_PER_PAGE * page) {
+      setLoading(true);
+      setPage(prevPage => prevPage + 1);
+    }
+  };
 
   const notificationMessage = (type: string): string => {
     let message = '';
@@ -98,7 +119,6 @@ const Notifications: React.FC = () => {
   const renderRightContent = (createdAt: FirebaseFirestoreTypes.Timestamp) => (
     <RightContent createdAt={createdAt} />
   );
-
 
   const renderNotificationItem = ({ item }: { item: NotificationData }) => {
     return (
@@ -124,6 +144,13 @@ const Notifications: React.FC = () => {
     setPhotoUrl(auth().currentUser?.photoURL ?? 'XD');
   }, []);
 
+  const ListFooterComponent = useCallback(() => {
+    if (!loading) {
+      return null;
+    }
+    return <ActivityIndicator size="large" color={theme.colors.primary} />;
+  }, [loading, theme.colors.primary]);
+
   return (
     <BaseView
       needsPaddingTop={false}
@@ -148,6 +175,9 @@ const Notifications: React.FC = () => {
           itemDimension={windowDimension}
           data={sortBy(notifications, 'createdAt').reverse()}
           renderItem={renderNotificationItem}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={ListFooterComponent}
         />
       </NativeViewGestureHandler>
     </BaseView>
@@ -155,3 +185,4 @@ const Notifications: React.FC = () => {
 };
 
 export default Notifications;
+
