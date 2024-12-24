@@ -1,7 +1,8 @@
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import {initReactI18next} from 'react-i18next';
 import * as RNLocalize from 'react-native-localize';
-import { LanguageDetectorModule } from 'i18next';
+import {LanguageDetectorModule} from 'i18next';
+import {Title} from 'react-native-paper';
 
 const locales = RNLocalize.getLocales();
 
@@ -60,21 +61,24 @@ const resources = {
         create_account: 'Create new account',
         incorrect_details: 'Incorrect Details',
         invalid_email_address: 'The email address is not valid.',
-        account_disabled: 'The user corresponding to the given email has been disabled.',
+        account_disabled:
+          'The user corresponding to the given email has been disabled.',
         user_not_found: 'There is no user corresponding to the given email.',
         wrong_password: 'The password is invalid for the given email.',
         invalid_creds: 'The credential is invalid.',
-        operation_not_allowed: 'Email & password accounts are not enabled, at the moment.',
+        operation_not_allowed:
+          'Email & password accounts are not enabled, at the moment.',
         weak_pass: 'The password is not strong enough',
-        pass_not_match: 'Your password doesn\'t match.',
-        email_in_use: 'There already exists an account with the given email address.',
+        pass_not_match: "Your password doesn't match.",
+        email_in_use:
+          'There already exists an account with the given email address.',
         enter_valid_email: 'Please enter a valid email.',
         pass_reset: 'Password Reset',
         reset_email: 'A password reset email has been sent.',
       },
       invalid_operation: 'Invalid Operation',
       error_occured: 'An unknown error occurred.',
-      check_entered: 'Please check out what you\'ve entered',
+      check_entered: "Please check out what you've entered",
       help: 'Help',
       no_internet: 'No Internet',
       please_wait: 'Please Wait',
@@ -105,7 +109,6 @@ const resources = {
         title: 'Notifications',
         liked_your_post: 'liked your post.',
         commented_post: 'commented on your post.',
-
       },
       profile: {
         title: 'Profile',
@@ -128,7 +131,7 @@ const resources = {
         inf: 'Computer Science',
         eco: 'Economy & Management',
         write_code: 'Write Code',
-        no_submit_code: 'You haven\'t submitted any code',
+        no_submit_code: "You haven't submitted any code",
         click_edit_code: 'Click to edit code',
         write_instructions: 'Write Instructions',
         language_not_select: 'Language not selected',
@@ -165,24 +168,29 @@ const resources = {
         about_developer: 'About Developer',
       },
       views: 'Views',
-      'pending-review':  {
-      title: 'Pending Review',
-      accept: 'Accept',
-      deny: 'Deny',
-      accept_dialog: {
-        title: 'Accept Code',
-        message: 'Are you sure you want to accept this code?',
-        cancel: 'Cancel',
-        confirm: 'Confirm',
+      'pending-review': {
+        title: 'Pending Review',
+        accept: 'Accept',
+        deny: 'Deny',
+        accept_dialog: {
+          title: 'Accept Code',
+          message: 'Are you sure you want to accept this code?',
+          cancel: 'Cancel',
+          confirm: 'Confirm',
+        },
+        deny_dialog: {
+          title: 'Deny Code',
+          message: 'Are you sure you want to deny this code?',
+          cancel: 'Cancel',
+          confirm: 'Confirm',
+        },
+        by: 'by',
       },
-      deny_dialog: {
-        title: 'Deny Code',
-        message: 'Are you sure you want to deny this code?',
-        cancel: 'Cancel',
-        confirm: 'Confirm',
+      'about-developer': {
+        title: 'About developer',
+        shortDescription: 'a hobbyist android developer',
+        longDescription: 'Hi, I am M. Rayen Sbai, a hobbyist Android developer from Tunisia. I started programming at the age of 14, and since then, I have been passionate about creating engaging apps and exploring new technologies. Currently, I am learning Unity to expand my skills in game development. With experience in React Native, Java, JavaScript, TypeScript and more, I enjoy building intuitive and functional applications.',
       },
-      by: 'by',
-    },
     },
   },
   fr: {
@@ -230,17 +238,21 @@ const resources = {
         create_account: 'Créer un nouveau compte',
         incorrect_details: 'Détails incorrects',
         invalid_email_address: "L'adresse e-mail n'est pas valide.",
-        account_disabled: "L'utilisateur correspondant à l'e-mail donné a été désactivé.",
-        user_not_found: "Il n'y a pas d'utilisateur correspondant à l'e-mail donné.",
+        account_disabled:
+          "L'utilisateur correspondant à l'e-mail donné a été désactivé.",
+        user_not_found:
+          "Il n'y a pas d'utilisateur correspondant à l'e-mail donné.",
         wrong_password: "Le mot de passe est invalide pour l'e-mail donné.",
         invalid_creds: 'Les identifiants sont invalides.',
-        operation_not_allowed: 'Les comptes par e-mail et mot de passe ne sont pas activés pour le moment.',
+        operation_not_allowed:
+          'Les comptes par e-mail et mot de passe ne sont pas activés pour le moment.',
         weak_pass: "Le mot de passe n'est pas assez fort",
         pass_not_match: 'Votre mot de passe ne correspond pas.',
         email_in_use: 'Il existe déjà un compte avec cette adresse e-mail.',
         enter_valid_email: 'Veuillez entrer une adresse e-mail valide.',
         pass_reset: 'Réinitialisation du mot de passe',
-        reset_email: 'Un e-mail de réinitialisation du mot de passe a été envoyé.',
+        reset_email:
+          'Un e-mail de réinitialisation du mot de passe a été envoyé.',
       },
       invalid_operation: 'Opération invalide',
       error_occured: 'Une erreur inconnue est survenue.',
@@ -251,11 +263,13 @@ const resources = {
       search: 'Rechercher',
       setup: {
         title: 'Paramétrer le compte',
-        description: 'Personnalisez votre compte pour que les gens puissent vous connaître',
+        description:
+          'Personnalisez votre compte pour que les gens puissent vous connaître',
         firstName: 'Prénom',
         lastName: 'Nom de famille',
         photo_removed: 'Photo retirée',
-        select_new_photo: 'Sélectionnez maintenant une nouvelle photo si vous le souhaitez',
+        select_new_photo:
+          'Sélectionnez maintenant une nouvelle photo si vous le souhaitez',
         wrong_info: 'Informations incorrectes',
         wrong_info_message: 'Veuillez saisir un nom approprié',
       },
@@ -302,7 +316,8 @@ const resources = {
         write_instructions: 'Écrire les instructions',
         language_not_select: 'Langue non sélectionnée',
         select_language: 'Sélectionner une langue',
-        select_language_before: 'Sélectionnez une langue avant d\'écrire le code.',
+        select_language_before:
+          "Sélectionnez une langue avant d'écrire le code.",
         select_section: 'Sélectionner une section',
         select_level: 'Sélectionner un niveau',
         code_title: 'Titre du code',
@@ -351,6 +366,13 @@ const resources = {
           cancel: 'Annuler',
           confirm: 'Confirmer',
         },
+      },
+      'about-developer': {
+        title: 'À propos du développeur',
+        shortDescription: 'un développeur Android amateur',
+        longDescription:
+          "Salut, je suis M. Rayen Sbai, un développeur Android amateur originaire de Tunisie. J'ai commencé à programmer à l'âge de 14 ans, et depuis, je suis passionné par la création d'applications captivantes et l'exploration de nouvelles technologies. Actuellement, j'apprends Unity pour élargir mes compétences en développement de jeux. Avec de l'expérience en React Native, Java, JavaScript et TypeScript et plus, j'apprécie de concevoir des applications intuitives et fonctionnelles.",
+
       },
     },
   },
