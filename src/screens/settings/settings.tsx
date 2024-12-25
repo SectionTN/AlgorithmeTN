@@ -35,6 +35,7 @@ import {useMMKVString} from 'react-native-mmkv';
 import firestore from '@react-native-firebase/firestore';
 import {MidnightPhoto} from '../../utils/const.ts';
 import {useTranslation} from 'react-i18next';
+import {getApplicationName, getVersion} from 'react-native-device-info';
 
 const Settings: React.FC = () => {
   const navigation =
@@ -233,7 +234,11 @@ const Settings: React.FC = () => {
           <Card
             onPress={() => navigation.navigate('edit-username')}
             mode={'contained'}>
-            <Card.Title title={t('settings.username')} subtitle={username} left={AtIcon} />
+            <Card.Title
+              title={t('settings.username')}
+              subtitle={username}
+              left={AtIcon}
+            />
           </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />
           <Text variant={'titleMedium'}>{t('settings.help_title')}</Text>
@@ -256,7 +261,9 @@ const Settings: React.FC = () => {
             />
           </Card>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'} onPress={() => navigation.navigate('about-developer')}>
+          <Card
+            mode={'contained'}
+            onPress={() => navigation.navigate('about-developer')}>
             <Card.Title
               title={t('settings.about_developer')}
               titleStyle={{paddingTop: '1%'}}
@@ -264,7 +271,15 @@ const Settings: React.FC = () => {
             />
           </Card>
         </Animated.View>
-        <SpacerV height={heightPercentageToDP(0.5)} />
+        <SpacerV height={heightPercentageToDP(0.25)} />
+        <Text
+          style={{
+            textAlign: 'center',
+            fontFamily: FONTS.p_regular,
+            color: theme.colors.onBackground,
+            opacity: 0.8,
+          }}>{`${getApplicationName()} - ${getVersion()}`}</Text>
+        <SpacerV height={heightPercentageToDP(0.25)} />
       </ScrollView>
     </BaseView>
   );
