@@ -36,6 +36,7 @@ import PendingReview from '../../screens/pending-review.tsx';
 import Comments from '../../screens/comments.tsx';
 import Profile from '../../screens/home/profile.tsx';
 import AboutDeveloper from '../../screens/settings/about-developer.tsx';
+import ConfirmAccount from '../../screens/confirm-account.tsx';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -66,7 +67,7 @@ const StackNavigator: React.FC = () => {
           navigationRef?.current?.getCurrentRoute()?.name;
 
         if (previousRouteName !== currentRouteName) {
-          await analytics()?.logScreenView({
+          await analytics().logScreenView({
             screen_name: currentRouteName,
             screen_class: currentRouteName,
           });
@@ -177,9 +178,15 @@ const StackNavigator: React.FC = () => {
           options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
-        name={'about-developer'}
-        component={AboutDeveloper}
-        options={{gestureEnabled: false, headerShown: false}} />
+          name={'about-developer'}
+          component={AboutDeveloper}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
+        <Stack.Screen
+          name={'confirm-account'}
+          component={ConfirmAccount}
+          options={{gestureEnabled: false, headerShown: false}}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
