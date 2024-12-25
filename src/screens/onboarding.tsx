@@ -309,18 +309,17 @@ const Onboarding: React.FC = () => {
 
   const insets = useSafeAreaInsets();
 
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-          BackHandler.exitApp();
-          return true;
+        BackHandler.exitApp();
+        return true;
       };
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [])
+    }, []),
   );
 
   const style = StyleSheet.create({
@@ -361,8 +360,7 @@ const Onboarding: React.FC = () => {
             },
             useNativeDriver: true,
           },
-        )}
-        useNext={false}>
+        )}>
         {ViewPagerData.map((item, index) => (
           <View collapsable={false} key={index}>
             <Item
