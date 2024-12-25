@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {StatusBar, StyleSheet, View} from 'react-native';
 import {
@@ -32,11 +32,13 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import {ScrollView} from 'react-native-gesture-handler';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
-import {isUndefined} from 'lodash';
-import firestore from '@react-native-firebase/firestore';
-import crashlytics from '@react-native-firebase/crashlytics';
+import {isUndefined, upperFirst} from 'lodash';
+import firestore, {
+  FirebaseFirestoreTypes,
+} from '@react-native-firebase/firestore';
+import crashlytics, {log} from '@react-native-firebase/crashlytics';
 import getUserData from '../../utils/firebase.ts';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 
 interface ProfileProps {
   uid: string | undefined;
@@ -53,6 +55,12 @@ interface RecentActivity {
 interface Achievement {
   id: string;
   title: string;
+}
+
+interface Badges {
+  id: string;
+  language: string;
+  time: FirebaseFirestoreTypes.Timestamp;
 }
 
 interface Statistics {
@@ -144,6 +152,8 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
   });
   const [achievements, setAchievements] = useState<Achievement[]>([]);
 
+  const [badges, setBadges] = useState<Badges[]>([]);
+
   const insets = useSafeAreaInsets();
 
   const [profileUID, setProfileUID] = useState<string | undefined>('');
@@ -224,10 +234,25 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
   }, [mode, profileUID, uid]);
 
   useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('users')
+      .doc(profileUID)
+      .collection('badges')
+      .onSnapshot(querySnapshot => {
+        const badgesQuery = querySnapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id,
+        })) as Badges[];
+        setBadges(badgesQuery);
+      });
+    return () => unsubscribe();
+  }, [profileUID]);
+
+  useLayoutEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
   }, [theme.colors.elevation.level2]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
   }, []);
 
@@ -330,24 +355,18 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           entering={FlipInEasyX}
           exiting={FlipOutEasyX}
           style={[styles.badgeView]}>
-          <Chip style={styles.chip} icon="brain">
-            {t('algorithm')}
-          </Chip>
-          <Chip style={styles.chip} icon="language-javascript">
-            {'JavaScript'}
-          </Chip>
-          <Chip style={styles.chip} icon="language-python">
-            {'Python'}
-          </Chip>
-          <Chip style={styles.chip} icon="language-html5">
-            {'HTML5'}
-          </Chip>
-          <Chip style={styles.chip} icon="language-css3">
-            {'CSS3'}
-          </Chip>
-          <Chip style={styles.chip} icon="language-php">
-            {'PHP'}
-          </Chip>
+          {badges.map(badge => (
+            <Chip
+              key={badge.id}
+              style={styles.chip}
+              icon={
+                badge.language === 'algorithm'
+                  ? 'brain'
+                  : `language-${badge.language}`
+              }>
+              {upperFirst(badge.language)}
+            </Chip>
+          ))}
         </Animated.View>
         <SpacerV height={heightPercentageToDP(0.25)} />
         <Animated.View
