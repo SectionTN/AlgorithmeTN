@@ -6,8 +6,6 @@ import BaseView from '../../components/baseview/baseview';
 import {FONTS} from '../../config/misc';
 import {
   fontValue,
-  getNavigationBarHeight,
-  getStatusBarHeight,
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/dimensions';
@@ -18,8 +16,7 @@ import SpacerV from '../../components/spacer/spacerv';
 import TextReveal from '../../components/text-reveal/text-reveal';
 import SpacerH from '../../components/spacer/spacerh';
 import Animated, {FadeInUp} from 'react-native-reanimated';
-import { AppodealInterstitialEvent } from 'react-native-appodeal';
-import { alert } from '@baronha/ting';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const AboutDeveloper: React.FC = () => {
   const theme = useTheme();
@@ -33,7 +30,9 @@ const AboutDeveloper: React.FC = () => {
 
   useLayoutEffect(() => {
     StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-  });
+  }, [theme.colors.elevation.level2]);
+
+  const insets = useSafeAreaInsets();
 
   return (
     <BaseView
@@ -56,8 +55,7 @@ const AboutDeveloper: React.FC = () => {
           styles.large_box,
           {backgroundColor: theme.colors.surfaceVariant},
         ]}>
-        <Pressable
-          style={styles.avatarContainer}>
+        <Pressable style={styles.avatarContainer}>
           <Avatar.Image
             size={67.5}
             source={{
@@ -76,13 +74,18 @@ const AboutDeveloper: React.FC = () => {
         </View>
       </View>
       <View style={{flex: 1}}>{/* STUB VIEW */}</View>
-      <Animated.View entering={FadeInUp} style={[styles.descriptionContainer, {backgroundColor: theme.colors.surfaceVariant}]}>
+      <Animated.View
+        entering={FadeInUp}
+        style={[
+          styles.descriptionContainer,
+          {backgroundColor: theme.colors.surfaceVariant},
+        ]}>
         <Text style={styles.description}>
           {t('about-developer.longDescription')}
         </Text>
       </Animated.View>
       <View style={{flex: 1}}>{/* STUB VIEW */}</View>
-      <View style={styles.socialContainer}>
+      <View style={[styles.socialContainer, {marginBottom: insets.bottom}]}>
         <IconButton
           icon="github"
           mode="contained"
@@ -154,7 +157,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: widthPercentageToDP(2),
-    marginBottom: Math.max(getNavigationBarHeight() - getStatusBarHeight(), 10),
   },
 });
 
