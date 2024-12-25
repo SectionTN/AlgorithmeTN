@@ -189,7 +189,18 @@ const resources = {
       'about-developer': {
         title: 'About developer',
         shortDescription: 'a hobbyist android developer',
-        longDescription: 'Hi, I am M. Rayen Sbai, a hobbyist Android developer from Tunisia. I started programming at the age of 14, and since then, I have been passionate about creating engaging apps and exploring new technologies. Currently, I am learning Unity to expand my skills in game development. With experience in React Native, Java, JavaScript, TypeScript and more, I enjoy building intuitive and functional applications.',
+        longDescription:
+          'Hi, I am M. Rayen Sbai, a hobbyist Android developer from Tunisia. I started programming at the age of 14, and since then, I have been passionate about creating engaging apps and exploring new technologies. Currently, I am learning Unity to expand my skills in game development. With experience in React Native, Java, JavaScript, TypeScript and more, I enjoy building intuitive and functional applications.',
+      },
+      'confirm-account': {
+        title: 'Confirm Account',
+        description: 'Please confirm your account to continue',
+        check_confirmation_mail: 'Please check the confirmatin mail at',
+        wait_for_mail: 'wait it may take some time to be there',
+        spam_notice:
+          "You can try resending the mail, before that. check the 'spam' folder. if you successfully verified your mail, go back here and we do the rest for you",
+        resend_mail_after: 'Resend mail after',
+        resend_verification_mail: 'Resend verification mail',
       },
     },
   },
@@ -372,7 +383,18 @@ const resources = {
         shortDescription: 'un développeur Android amateur',
         longDescription:
           "Salut, je suis M. Rayen Sbai, un développeur Android amateur originaire de Tunisie. J'ai commencé à programmer à l'âge de 14 ans, et depuis, je suis passionné par la création d'applications captivantes et l'exploration de nouvelles technologies. Actuellement, j'apprends Unity pour élargir mes compétences en développement de jeux. Avec de l'expérience en React Native, Java, JavaScript et TypeScript et plus, j'apprécie de concevoir des applications intuitives et fonctionnelles.",
-
+      },
+      'confirm-account': {
+        title: "Confirmer l'inscription",
+        description: 'Veuillez confirmer votre compte pour continuer',
+        check_confirmation_mail:
+          'Veuillez vérifier le courrier de confirmation à',
+        wait_for_mail:
+          'attends, cela peut prendre un certain temps pour y arriver',
+        spam_notice:
+          "Vous pouvez essayer de renvoyer le mail, avant cela. vérifiez le dossier 'spam'. si vous avez vérifié votre e-mail avec succès, revenez ici et nous ferons le reste pour vous",
+        resend_mail_after: 'Renvoyer le mail après',
+        resend_verification_mail: 'Renvoyer le mail de vérification',
       },
     },
   },
