@@ -14,7 +14,8 @@ type routeNamesType =
   | 'edit-username'
   | 'bug-report'
   | 'change-language'
-  | 'about-developer';
+  | 'about-developer'
+  | 'confirm-account';
 
 type RootStackParamList = {
   [key in routeNamesType]: object | undefined;
@@ -70,11 +71,14 @@ type RootStackParamList = {
   'bug-report': {} | undefined;
   'change-language': {} | undefined;
   'pending-review': {} | undefined;
-  comments: {
-    pid?: string
-  } | undefined;
+  comments:
+    | {
+        pid?: string;
+      }
+    | undefined;
   profile: {uid?: string} | undefined;
   'about-developer': {} | undefined;
+  'confirm-account': {} | undefined;
 };
 
 export type {routeNamesType, RootStackParamList};
