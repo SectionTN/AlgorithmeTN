@@ -28,10 +28,7 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/dimensions.ts';
-import Animated, {
-  SlideInLeft,
-  SlideOutRight,
-} from 'react-native-reanimated';
+import Animated, {SlideInLeft, SlideOutRight} from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -145,6 +142,24 @@ const Main = forwardRef<MainRef>((_, ref) => {
       console.error('Error adding view:', error);
     }
   };
+
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged(async user => {
+      if (user) {
+        try {
+          await user.getIdToken(true);
+        } catch (error) {
+          await auth().signOut();
+          navigation.reset({
+            index: 0,
+            routes: [{name: 'login'}],
+          });
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigation]);
 
   useEffect(() => {
     const unsubscribe = firestore()
