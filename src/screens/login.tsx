@@ -52,8 +52,7 @@ const Login: React.FC = () => {
 
   const theme = useTheme();
 
-  const { t } = useTranslation();
-
+  const {t} = useTranslation();
 
   /**
    * Login variables
@@ -82,7 +81,6 @@ const Login: React.FC = () => {
    * Hooks
    */
 
-
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
@@ -99,11 +97,8 @@ const Login: React.FC = () => {
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [currentMode])
+    }, [currentMode]),
   );
-
-
-
 
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const keyboardDidShowListener = useRef<EmitterSubscription | null>(null);
@@ -189,24 +184,51 @@ const Login: React.FC = () => {
           .signInWithEmailAndPassword(email, password)
           .then(async () => {
             if (auth().currentUser) {
-              const userData = await firestore()
-                .collection('users')
-                .doc(auth().currentUser?.uid)
-                .get();
-              if (userData.exists) {
-                navigation.navigate('home');
-              } else {
-                const username = auth()
-                  ?.currentUser?.uid?.substring(0, 4)
-                  .concat(generateRandomString(6));
+              try {
+                const userData = await firestore()
+                  .collection('users')
+                  .doc(auth().currentUser?.uid)
+                  .get();
+
                 encryptedStorage.set('password', password);
-                navigation.navigate('setup', {
-                  username: username,
-                  email: auth()?.currentUser?.email,
-                  password: password,
-                  osID: userId,
-                  osPT: pushToken,
-                  from_where: 'register',
+
+                if (userData.exists && auth().currentUser?.emailVerified) {
+                  navigation.navigate('home');
+                } else if (!auth().currentUser?.emailVerified) {
+                  const username = auth()
+                    .currentUser?.uid?.substring(0, 4)
+                    .concat(generateRandomString(6));
+
+                  navigation.navigate('confirm-account', {
+                    username: username,
+                    email: auth().currentUser?.email,
+                    password: password,
+                    osID: userId,
+                    osPT: pushToken,
+                    from_where: 'register',
+                  });
+                } else {
+                  const username = auth()
+                    .currentUser?.uid?.substring(0, 4)
+                    .concat(generateRandomString(6));
+
+                  navigation.navigate('setup', {
+                    username: username,
+                    email: auth().currentUser?.email,
+                    password: password,
+                    osID: userId,
+                    osPT: pushToken,
+                    from_where: 'register',
+                  });
+                }
+              } catch (error) {
+                if (error instanceof Error) {
+                  crashlytics().recordError(error);
+                }
+                alert({
+                  title: 'Error',
+                  message: t('error_occured'),
+                  preset: 'error',
                 });
               }
             }
@@ -218,12 +240,10 @@ const Login: React.FC = () => {
                 errorMessage = t('login.invalid_email_address');
                 break;
               case 'auth/user-disabled':
-                errorMessage =
-                  t('login.account_disabled');
+                errorMessage = t('login.account_disabled');
                 break;
               case 'auth/user-not-found':
-                errorMessage =
-                  t('login.user_not_found');
+                errorMessage = t('login.user_not_found');
                 break;
               case 'auth/wrong-password':
                 errorMessage = t('login.wrong_password');
@@ -255,33 +275,46 @@ const Login: React.FC = () => {
         }
         auth()
           .createUserWithEmailAndPassword(email, password)
-          .then(() => {
-            const username = auth()
-              ?.currentUser?.uid?.substring(0, 4)
-              .concat(generateRandomString(6));
-            encryptedStorage.set('password', password);
-            navigation.navigate('setup', {
-              username: username,
-              email: auth()?.currentUser?.email,
-              password: password,
-              osID: userId,
-              osPT: pushToken,
-              from_where: 'register',
-            });
+          .then(async () => {
+            try {
+              encryptedStorage.set('password', password);
+
+              await auth().currentUser?.sendEmailVerification();
+
+              const username = auth()
+                ?.currentUser?.uid?.substring(0, 4)
+                .concat(generateRandomString(6));
+
+              navigation.navigate('confirm-account', {
+                username: username,
+                email: auth().currentUser?.email,
+                password: password,
+                osID: userId,
+                osPT: pushToken,
+                from_where: 'register',
+              });
+            } catch (error) {
+              if (error instanceof Error) {
+                crashlytics().recordError(error);
+              }
+              alert({
+                title: 'Error',
+                message: t('error_occured'),
+                preset: 'error',
+              });
+            }
           })
           .catch(error => {
             let errorMessage = '';
             switch (error?.code) {
               case 'auth/email-already-in-use':
-                errorMessage =
-                  t('login.email_in_use');
+                errorMessage = t('login.email_in_use');
                 break;
               case 'auth/invalid-email':
                 errorMessage = t('login.invalid_email_address');
                 break;
               case 'auth/operation-not-allowed':
-                errorMessage =
-                  t('login.operation_not_allowed');
+                errorMessage = t('login.operation_not_allowed');
                 break;
               case 'auth/weak-password':
                 errorMessage = t('login.weak_pass');
@@ -323,8 +356,7 @@ const Login: React.FC = () => {
                 errorMessage = t('login.invalid_email_address');
                 break;
               case 'auth/user-not-found':
-                errorMessage =
-                  t('login.user_not_found');
+                errorMessage = t('login.user_not_found');
                 break;
               default:
                 errorMessage = t('error_occured');
@@ -470,23 +502,29 @@ const Login: React.FC = () => {
               onPress={() => setCurrentMode('forgot-password')}>
               {t('login.forgot_password_interrogation')}
             </Button>
-          ) : currentMode === 'signup' && (
-            <View style={{flexDirection: 'row', marginHorizontal: -widthPercentageToDP(1.5)}}>
-              <HelperText style={{fontSize: fontValue(11)}} type="info">
-                {t('login.terms_text')}
-              </HelperText>
-              <HelperText
-                onPress={handleTermsPress}
-                type={'info'}
+          ) : (
+            currentMode === 'signup' && (
+              <View
                 style={{
-                  fontSize: fontValue(11),
-                  color: theme.colors.primary,
-                  textDecorationLine: 'underline',
-                  marginHorizontal: -widthPercentageToDP(5),
+                  flexDirection: 'row',
+                  marginHorizontal: -widthPercentageToDP(1.5),
                 }}>
-                {t('login.terms')}
-              </HelperText>
-            </View>
+                <HelperText style={{fontSize: fontValue(11)}} type="info">
+                  {t('login.terms_text')}
+                </HelperText>
+                <HelperText
+                  onPress={handleTermsPress}
+                  type={'info'}
+                  style={{
+                    fontSize: fontValue(11),
+                    color: theme.colors.primary,
+                    textDecorationLine: 'underline',
+                    marginHorizontal: -widthPercentageToDP(5),
+                  }}>
+                  {t('login.terms')}
+                </HelperText>
+              </View>
+            )
           )}
         </Animated.View>
         <View style={{flex: 1}}>{/* stub view */}</View>
