@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import {
   Avatar,
   Text,
@@ -9,23 +9,23 @@ import {
   TextInput,
   IconButton,
 } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../config/navigation/types';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {RootStackParamList} from '../config/navigation/types';
 import auth from '@react-native-firebase/auth';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
 import BaseView from '../components/baseview/baseview.tsx';
-import { FONTS } from '../config/misc.ts';
+import {FONTS} from '../config/misc.ts';
 import getUserData from '../utils/firebase.ts';
 import crashlytics from '@react-native-firebase/crashlytics';
-import { useTranslation } from 'react-i18next';
+import {useTranslation} from 'react-i18next';
 import moment from 'moment';
-import { fontValue } from '../config/dimensions.ts';
-import { alert } from '@baronha/ting';
+import {fontValue} from '../config/dimensions.ts';
+import {alert} from '@baronha/ting';
 import SpacerV from '../components/spacer/spacerv.tsx';
-import { NativeViewGestureHandler } from 'react-native-gesture-handler';
+import {NativeViewGestureHandler} from 'react-native-gesture-handler';
 
 interface Comment {
   id: string;
@@ -37,8 +37,8 @@ interface Comment {
 
 type NewComment = Omit<Comment, 'id'>;
 
-const Comments: React.FC<{ route: any }> = ({ route }) => {
-  const { pid } = route.params;
+const Comments: React.FC<{route: any}> = ({route}) => {
+  const {pid} = route.params;
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useTheme();
@@ -48,7 +48,7 @@ const Comments: React.FC<{ route: any }> = ({ route }) => {
   const [userDataCache, setUserDataCache] = useState<Record<string, any>>({});
   const currentUserUid = auth().currentUser?.uid;
 
-  const { t } = useTranslation();
+  const {t} = useTranslation();
 
   useEffect(() => {
     const unsubscribe = firestore()
@@ -76,7 +76,7 @@ const Comments: React.FC<{ route: any }> = ({ route }) => {
 
   const navigateToProfile = (userId: string) => {
     if (userId === currentUserUid) {
-      navigation.navigate('profile', { uid: userId ?? undefined });
+      navigation.navigate('profile', {uid: userId ?? undefined});
     }
   };
 
@@ -137,7 +137,7 @@ const Comments: React.FC<{ route: any }> = ({ route }) => {
     );
   };
 
-  const renderCommentItem = ({ item }: { item: Comment }) => {
+  const renderCommentItem = ({item}: {item: Comment}) => {
     const userData = userDataCache[item.userId];
 
     if (!userData) {
@@ -146,16 +146,14 @@ const Comments: React.FC<{ route: any }> = ({ route }) => {
 
     const formattedDate = moment(item.createdAt.toDate()).fromNow(true);
 
-
-
     return (
       <Card mode={'contained'} style={styles.commentCard}>
         <View style={styles.commentContainer}>
           <TouchableOpacity
-            style={{ alignContent: 'flex-start' }}
+            style={{alignContent: 'flex-start'}}
             onPress={() => navigateToProfile(item.userId)}>
             {userData?.avatar && userData?.avatar?.length !== 2 ? (
-              <Avatar.Image source={{ uri: userData?.avatar }} size={40} />
+              <Avatar.Image source={{uri: userData?.avatar}} size={40} />
             ) : (
               <Avatar.Text
                 label={`${userData?.first_name[0]}${userData?.last_name[0]}`}
@@ -171,8 +169,9 @@ const Comments: React.FC<{ route: any }> = ({ route }) => {
             </TouchableOpacity>
             <Text style={styles.commentText}>{item.comment}</Text>
           </View>
-          <View style={{ alignSelf: 'center'}}>
-            <Text style={{ fontSize: fontValue(10), fontFamily: FONTS.p_regular }}>
+          <View style={{alignSelf: 'center'}}>
+            <Text
+              style={{fontSize: fontValue(10), fontFamily: FONTS.p_regular}}>
               {formattedDate}
             </Text>
           </View>
@@ -186,30 +185,34 @@ const Comments: React.FC<{ route: any }> = ({ route }) => {
       avoidingView={true}
       needsPaddingTop={false}
       needsPaddingBottom={true}>
-      <Appbar.Header style={{ backgroundColor: theme.colors.elevation.level2 }}>
+      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content
           title={t('comments.title')}
-          titleStyle={{ fontFamily: FONTS.p_regular }}
+          titleStyle={{fontFamily: FONTS.p_regular}}
         />
       </Appbar.Header>
       <NativeViewGestureHandler>
-      <FlatList
-        style={styles.flatList}
-        data={comments}
-        renderItem={renderCommentItem}
-        ListEmptyComponent={renderEmptyComments}
-        contentContainerStyle={
-          comments.length === 0 && styles.flatListEmptyContainer
-        }
-        keyExtractor={item => item.id}
-        removeClippedSubviews={true}
+        <FlatList
+          style={styles.flatList}
+          data={comments}
+          renderItem={renderCommentItem}
+          ListEmptyComponent={renderEmptyComments}
+          contentContainerStyle={
+            comments.length === 0 && styles.flatListEmptyContainer
+          }
+          keyExtractor={item => item.id}
+          removeClippedSubviews={true}
         />
       </NativeViewGestureHandler>
-      <View style={styles.inputContainer}>
+      <View
+        style={[
+          styles.inputContainer,
+          {backgroundColor: theme.colors.surface},
+        ]}>
         <TextInput
-          style={{ flex: 1, fontFamily: FONTS.p_regular }}
-          contentStyle={{ fontFamily: FONTS.p_regular }}
+          style={{flex: 1, fontFamily: FONTS.p_regular}}
+          contentStyle={{fontFamily: FONTS.p_regular}}
           mode={'outlined'}
           placeholder={t('comments.add')}
           value={newComment}
@@ -272,7 +275,6 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
-    backgroundColor: '#fff',
   },
 });
 
