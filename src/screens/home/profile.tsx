@@ -175,7 +175,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
       .collection('users')
       .doc(profileUID)
       .collection('recent_activities')
-      .orderBy('timestamp', 'desc')
+      .orderBy('time', 'desc')
       .limit(3)
       .onSnapshot(
         async querySnapshot => {
@@ -185,12 +185,14 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           })) as RecentActivity[];
           const activitiesWithTitles = await Promise.all(
             activities.map(async activity => {
-              const codeDoc = await firestore()
-                .collection('codes')
-                .doc(activity.postId)
-                .get();
-              if (codeDoc.exists) {
-                activity.title = codeDoc.data()?.title;
+              if (activity.type === 'liked' || activity.type === 'unliked') {
+                const codeDoc = await firestore()
+                  .collection('codes')
+                  .doc(activity.postId)
+                  .get();
+                if (codeDoc.exists) {
+                  activity.title = codeDoc.data()?.title;
+                }
               }
               return activity;
             }),
@@ -291,6 +293,27 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
       });
     }
   }, [profileUID]);
+
+  const activtyTranslator = (activity: RecentActivity) => {
+    switch (activity.type) {
+      case 'liked':
+        return `${t('profile.liked')} "${
+          activity.title ?? `${t('profile.someone')}`
+        }" ${t('profile.post')}.`;
+      case 'unliked':
+        return `${t('profile.unliked')} "${
+          activity.title ?? `${t('profile.someone')}`
+        }" ${t('profile.post')}.`;
+      case 'account_created':
+        return t('profile.created_account');
+      case 'commented':
+        return `${t('profile.commented')} "${
+          activity.title ?? `${t('profile.someone')}`
+        }" ${t('profile.post')}.`;
+      default:
+        return t('profile.did_something');
+    }
+  };
 
   return (
     <BaseView
@@ -457,7 +480,9 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                     {backgroundColor: theme.colors.elevation.level3},
                   ]}
                   icon="medal">
-                  {achievement.title}
+                  {achievement.title === 'New Member'
+                    ? t('profile.new_member')
+                    : achievement.title}
                 </Chip>
               ))}
             </Card.Content>
@@ -475,8 +500,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                   key={activity.id}
                   variant={'labelMedium'}
                   style={{fontFamily: FONTS.p_regular}}>
-                  -{activity.type === 'liked' ? 'liked' : 'unliked'} "
-                  {activity.title}" post.
+                  {`- ${activtyTranslator(activity)}`}
                 </Text>
               ))}
             </Card.Content>
