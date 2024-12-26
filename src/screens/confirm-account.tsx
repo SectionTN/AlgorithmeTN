@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {BackHandler, StyleSheet, View} from 'react-native';
 import {
   Appbar,
   useTheme,
@@ -7,7 +7,12 @@ import {
   ActivityIndicator,
   Button,
 } from 'react-native-paper';
-import {useNavigation} from '@react-navigation/native';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../config/navigation/types';
 import {useTranslation} from 'react-i18next';
@@ -23,6 +28,8 @@ import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 import auth from '@react-native-firebase/auth';
 import crashlytics from '@react-native-firebase/crashlytics';
 
+type ConfirmAccountRouteProp = RouteProp<RootStackParamList, 'confirm-account'>;
+
 const ConfirmAccount: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -33,6 +40,24 @@ const ConfirmAccount: React.FC = () => {
   const [countdown, setCountdown] = useState(120);
   const [isResending, setIsResending] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+
+  const route = useRoute<ConfirmAccountRouteProp>();
+
+  const {username, email, password, osID, osPT, from_where} =
+    route.params || {};
+
+  useFocusEffect(
+    useCallback(() => {
+      const onBackPress = () => {
+        return true;
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, []),
+  );
 
   useEffect(() => {
     if (isVerified) {
@@ -46,7 +71,22 @@ const ConfirmAccount: React.FC = () => {
           await reloadedUser.reload();
           if (reloadedUser.emailVerified) {
             setIsVerified(true);
-            // navigation.navigate('home');
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'setup',
+                  params: {
+                    username,
+                    email,
+                    password: password || undefined,
+                    osID,
+                    osPT,
+                    from_where: from_where || 'register',
+                  },
+                },
+              ],
+            });
             clearInterval(checkVerification);
           }
         } catch (error) {
@@ -68,7 +108,22 @@ const ConfirmAccount: React.FC = () => {
         const freshUser = auth().currentUser;
         if (freshUser?.emailVerified) {
           setIsVerified(true);
-          // navigation.navigate('home');
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'setup',
+                params: {
+                  username,
+                  email,
+                  password: password || undefined,
+                  osID,
+                  osPT,
+                  from_where: from_where || 'register',
+                },
+              },
+            ],
+          });
           clearInterval(checkVerification);
         }
       } catch (error) {
@@ -84,7 +139,16 @@ const ConfirmAccount: React.FC = () => {
         clearInterval(checkVerification);
       }
     };
-  }, [navigation, isVerified]);
+  }, [
+    navigation,
+    isVerified,
+    username,
+    email,
+    password,
+    osID,
+    osPT,
+    from_where,
+  ]);
 
   const resendVerificationEmail = useCallback(async () => {
     try {
