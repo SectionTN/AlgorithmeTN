@@ -27,7 +27,7 @@ type RootStackParamList = {
     | {
         username: string | undefined;
         email: string | null | undefined;
-        password: string;
+        password?: string;
         osID: string | undefined;
         osPT: string | undefined;
         from_where: string;
@@ -78,7 +78,16 @@ type RootStackParamList = {
     | undefined;
   profile: {uid?: string} | undefined;
   'about-developer': {} | undefined;
-  'confirm-account': {} | undefined;
+  'confirm-account':
+    | {
+        username: string | undefined;
+        email: string | null | undefined;
+        password: string | undefined;
+        osID: string | undefined;
+        osPT: string | undefined;
+        from_where: string;
+      }
+    | undefined;
 };
 
 export type {routeNamesType, RootStackParamList};
