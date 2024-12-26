@@ -30,12 +30,16 @@ import {
 import {FONTS} from '../config/misc.ts';
 import SpacerV from '../components/spacer/spacerv.tsx';
 import {isEmpty} from 'lodash';
-import {useBackHandler} from '@react-native-community/hooks';
 import {BottomSheetModal, useBottomSheetModal} from '@gorhom/bottom-sheet';
 import {alert} from '@baronha/ting';
 import {openCamera} from 'react-native-image-crop-picker';
 import ImagePickerActionSheet from '../components/modals/image-picker-action-sheet.tsx';
-import {RouteProp, useFocusEffect, useNavigation, useRoute} from '@react-navigation/native';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../config/navigation/types.ts';
 import NetInfo from '@react-native-community/netinfo';
@@ -159,7 +163,7 @@ const Setup: React.FC = () => {
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [navigation])
+    }, [navigation]),
   );
   /**
    * Functions
