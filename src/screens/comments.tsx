@@ -51,6 +51,26 @@ const Comments: React.FC<{route: any}> = ({route}) => {
   const {t} = useTranslation();
 
   useEffect(() => {
+    // Remove comments that are not associated with a code
+    const unsubscribe = firestore()
+      .collection('comments')
+      .onSnapshot(querySnapshot => {
+        querySnapshot.docs.forEach(async comment => {
+          const commentData = comment.data();
+          const codeExists = await firestore()
+            .collection('codes')
+            .doc(commentData.postId)
+            .get();
+          if (!codeExists.exists) {
+            firestore().collection('comments').doc(comment.id).delete();
+          }
+        });
+      });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = firestore()
       .collection('comments')
       .where('postId', '==', pid)
