@@ -36,7 +36,7 @@ import {isUndefined, upperFirst} from 'lodash';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
-import crashlytics, {log} from '@react-native-firebase/crashlytics';
+import crashlytics from '@react-native-firebase/crashlytics';
 import getUserData from '../../utils/firebase.ts';
 import {useTranslation} from 'react-i18next';
 
@@ -71,19 +71,36 @@ interface Statistics {
 
 const fetchStatistics = async (uid: string): Promise<Statistics> => {
   try {
-    const doc = await firestore()
-      .collection('users')
-      .doc(uid)
-      .collection('statistics')
-      .doc('user_stats')
+    // Get total algorithms posted
+    const algorithmsDocs = await firestore()
+      .collection('codes')
+      .where('uid', '==', uid)
       .get();
-    if (doc.exists) {
-      return doc.data() as Statistics;
-    } else {
-      return {posts: 0, comments: 0, views: 0};
-    }
+    const postsCount = algorithmsDocs.size;
+
+    // Get total comments made
+    const commentsDocs = await firestore()
+      .collection('comments')
+      .where('userId', '==', uid)
+      .get();
+    const commentsCount = commentsDocs.size;
+
+    // Get total views received
+    const viewsCount = algorithmsDocs.docs.reduce((total, doc) => {
+      const views = doc.data().views || [];
+      return total + views.length;
+    }, 0);
+
+    return {
+      posts: postsCount,
+      comments: commentsCount,
+      views: viewsCount,
+    };
   } catch (error) {
-    console.error('Error fetching user statistics', error);
+    if (error instanceof Error) {
+      crashlytics().recordError(error);
+    }
+    console.error('Error fetching user statistics:', error);
     return {posts: 0, comments: 0, views: 0};
   }
 };
@@ -294,6 +311,61 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
     }
   }, [profileUID]);
 
+  const badgeTranslator = (language: string) => {
+    switch (language) {
+      case 'algorithm':
+        return t('algorithm');
+      case 'python':
+        return 'Python';
+      case 'java':
+        return 'Java';
+      case 'javascript':
+        return 'JavaScript';
+      case 'typescript':
+        return 'TypeScript';
+      case 'c':
+        return 'C';
+      case 'cpp':
+        return 'C++';
+      case 'csharp':
+        return 'C#';
+      case 'html5':
+        return 'HTML5';
+      case 'css3':
+        return 'CSS3';
+      case 'sql':
+        return 'SQL';
+      case 'php':
+        return 'PHP';
+      case 'ruby':
+        return 'Ruby';
+      case 'swift':
+        return 'Swift';
+      case 'kotlin':
+        return 'Kotlin';
+      case 'go':
+        return 'Go';
+      case 'rust':
+        return 'Rust';
+      case 'scala':
+        return 'Scala';
+      case 'r':
+        return 'R';
+      case 'shell':
+        return 'Shell';
+      case 'perl':
+        return 'Perl';
+      case 'lua':
+        return 'Lua';
+      case 'matlab':
+        return 'Matlab';
+      case 'scratch':
+        return 'Scratch';
+      case 'solidity':
+        return 'Solidity';
+    }
+  };
+
   const activtyTranslator = (activity: RecentActivity) => {
     switch (activity.type) {
       case 'liked':
@@ -372,7 +444,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
             {bio ? bio : t('settings.add_bio')}
           </Text>
         </Animated.View>
-        <SpacerV height={heightPercentageToDP(0.25)} />
+        <SpacerV height={heightPercentageToDP(0.1)} />
         {/*Language Chips*/}
         <Animated.View
           entering={FlipInEasyX}
@@ -381,13 +453,13 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           {badges.map(badge => (
             <Chip
               key={badge.id}
-              style={styles.chip}
+              style={styles.chipBadge}
               icon={
                 badge.language === 'algorithm'
                   ? 'brain'
                   : `language-${badge.language}`
               }>
-              {upperFirst(badge.language)}
+              {badgeTranslator(badge.language)}
             </Chip>
           ))}
         </Animated.View>
@@ -471,12 +543,12 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
               title={t('profile.achievements')}
               titleVariant={'titleLarge'}
             />
-            <Card.Content style={styles.badgeView}>
+            <Card.Content style={styles.achievementsView}>
               {achievements.map(achievement => (
                 <Chip
                   key={achievement.id}
                   style={[
-                    styles.chip,
+                    styles.chipAch,
                     {backgroundColor: theme.colors.elevation.level3},
                   ]}
                   icon="medal">
@@ -538,15 +610,31 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.p_regular,
   },
   badgeView: {
-    paddingLeft: '2%',
-    paddingRight: '2%',
+    margin: '1%',
+    paddingHorizontal: '1%',
+    paddingVertical: '1%',
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
+    gap: 8,
   },
-  chip: {
-    marginBottom: '2%',
+  achievementsView: {
+    margin: '1%',
+    paddingHorizontal: '1%',
+    paddingVertical: '1%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  chipBadge: {
+    marginBottom: '0.5%',
+    width: widthPercentageToDP(28),
+  },
+  chipAch: {
+    marginBottom: '0.5%',
   },
   statisticsHolder: {
     paddingRight: '2%',
