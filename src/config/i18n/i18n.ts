@@ -192,6 +192,7 @@ const resources = {
           cancel: 'Cancel',
           confirm: 'Confirm',
         },
+        'accept-success': 'Code accepted successfully',
         by: 'by',
       },
       'about-developer': {
@@ -393,6 +394,7 @@ const resources = {
           cancel: 'Annuler',
           confirm: 'Confirmer',
         },
+        'accept-success': 'Code accepté avec succès',
       },
       'about-developer': {
         title: 'À propos du développeur',
