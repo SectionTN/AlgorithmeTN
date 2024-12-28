@@ -55,17 +55,18 @@ const EditProfile: React.FC = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [avatarReference, setAvatarReference] = useState('');
+  const [avatarStatus, setAvatarStatus] = useState<'photo' | 'text'>('text');
 
   const [oldFirstname, setOldFirstname] = React.useState('');
   const [oldLastname, setOldLastName] = React.useState('');
 
   const onFirstnameTextChange = (firstnameText: string) => {
-    if (nameRegex.test(firstnameText)) {
+    if (nameRegex.test(firstnameText) || firstnameText === '') {
       setFirstName(firstnameText);
     }
   };
   const onLastnameTextChange = (lastnameText: string) => {
-    if (nameRegex.test(lastnameText)) {
+    if (nameRegex.test(lastnameText) || lastnameText === '') {
       setLastName(lastnameText);
     }
   };
@@ -96,6 +97,7 @@ const EditProfile: React.FC = () => {
       .onSnapshot(documentSnapshot => {
         if (documentSnapshot.exists) {
           setAvatarReference(documentSnapshot.data()?.avatar);
+          setAvatarStatus(documentSnapshot.data()?.avatar_status);
           setOldFirstname(documentSnapshot.data()?.first_name);
           setOldLastName(documentSnapshot.data()?.last_name);
           setFirstName(documentSnapshot.data()?.first_name);
@@ -202,6 +204,9 @@ const EditProfile: React.FC = () => {
             firstName?.trim(),
           )} ${lowerToUppercase(lastName?.trim())}`,
         });
+        if (avatarStatus === 'text') {
+          await pushAvatarAsName();
+        }
         setOldFirstname(firstName);
         setOldLastName(lastName);
         alert({
@@ -217,6 +222,27 @@ const EditProfile: React.FC = () => {
           message: 'An error occurred when updating your profile',
           preset: 'error',
         });
+      });
+  }
+
+  async function pushAvatarAsName() {
+    await firestore()
+      .collection('users')
+      .doc(auth()?.currentUser?.uid)
+      .update({
+        avatar: `${firstName?.trim()[0].toUpperCase()}${lastName
+          ?.trim()[0]
+          .toUpperCase()}`,
+      })
+      .finally(async () => {
+        await auth()?.currentUser?.updateProfile({
+          photoURL: `${firstName?.trim()[0].toUpperCase()}${lastName
+            ?.trim()[0]
+            .toUpperCase()}`,
+        });
+      })
+      .catch(error => {
+        crashlytics().recordError(error);
       });
   }
 
@@ -300,7 +326,7 @@ const EditProfile: React.FC = () => {
           justifyContent: 'center',
           alignSelf: 'center',
         }}>
-        {avatarReference && avatarReference.length > 2 ? (
+        {(avatarReference && avatarReference.length > 2) || userPhoto ? (
           <Avatar.Image
             size={70}
             source={{uri: userPhoto ? userPhoto.path : avatarReference}}
