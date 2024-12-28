@@ -1,22 +1,31 @@
-import React, { useState, useEffect, useLayoutEffect, useCallback } from 'react';
-import { Text, Button, Dialog, Paragraph, Appbar, useTheme } from 'react-native-paper';
+import React, {useState, useEffect, useLayoutEffect, useCallback} from 'react';
+import {
+  Text,
+  Button,
+  Dialog,
+  Paragraph,
+  Appbar,
+  useTheme,
+} from 'react-native-paper';
 import BaseView from '../components/baseview/baseview';
-import { View, FlatList, StyleSheet, StatusBar, BackHandler } from 'react-native';
+import {View, FlatList, StyleSheet, StatusBar, BackHandler} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import getUserData from '../utils/firebase.ts';
-import { CodeData } from '../types/interfaces.ts';
-import { useTranslation } from 'react-i18next';
-import { FONTS } from '../config/misc.ts';
-import { RootStackParamList } from '../config/navigation/types.ts';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { upperFirst } from 'lodash';
+import {CodeData} from '../types/interfaces.ts';
+import {useTranslation} from 'react-i18next';
+import {FONTS} from '../config/misc.ts';
+import {RootStackParamList} from '../config/navigation/types.ts';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {upperFirst, omit} from 'lodash';
+import {alert} from '@baronha/ting';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const PendingReview: React.FC = () => {
-
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useTheme();
-  const { t } = useTranslation();
+  const {t} = useTranslation();
 
   const [data, setData] = useState<CodeData[]>([]);
   const [selectedItem, setSelectedItem] = useState<CodeData | null>(null);
@@ -69,31 +78,50 @@ const PendingReview: React.FC = () => {
 
   const handleAction = async () => {
     if (selectedItem) {
-      const { id, ...codeData } = selectedItem;
-      if (action === 'accept') {
-        await Promise.all([
-          firestore().collection('codes').doc(id).set(codeData),
-          addBadgeIfNotExist(codeData.uid, codeData.language),
-        ]);
+      try {
+        const {id, ...fullCodeData} = selectedItem;
+        if (action === 'accept') {
+          const codeData = omit(fullCodeData, ['first_name', 'last_name']);
+
+          await Promise.all([
+            firestore().collection('codes').doc(id).set(codeData),
+            addBadgeIfNotExist(codeData.uid, codeData.language),
+          ]);
+
+          alert({
+            title: t('success'),
+            message: t('pending-review.accept_success'),
+            preset: 'done',
+          });
+        }
+        await firestore().collection('pending_codes').doc(id).delete();
+        setData(data.filter(item => item.id !== id));
+      } catch (error) {
+        if (error instanceof Error) {
+          crashlytics().recordError(error);
+        }
+        alert({
+          title: t('error'),
+          message: t('error_occurred'),
+          preset: 'error',
+        });
+      } finally {
+        setIsDialogVisible(false);
+        setSelectedItem(null);
+        setAction(null);
       }
-      await firestore().collection('pending_codes').doc(id).delete();
-      setData(data.filter(item => item.id !== id));
-      setIsDialogVisible(false);
-      setSelectedItem(null);
-      setAction(null);
     }
   };
 
   const renderEmptyItem = () => {
     return (
-      <View style={[
-        styles.card,
-        styles.emptyContainer,
-        { backgroundColor: theme.colors.elevation.level1 },
-      ]}>
-        <Text style={{ textAlign: 'center' }}>
-          No pending posts, yet!
-        </Text>
+      <View
+        style={[
+          styles.card,
+          styles.emptyContainer,
+          {backgroundColor: theme.colors.elevation.level1},
+        ]}>
+        <Text style={{textAlign: 'center'}}>No pending posts, yet!</Text>
       </View>
     );
   };
@@ -111,35 +139,34 @@ const PendingReview: React.FC = () => {
 
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
-    }, [navigation])
+    }, [navigation]),
   );
 
-
-  const renderItem = ({ item }: { item: CodeData }) => (
-    <View style={[styles.card, { backgroundColor: theme.colors.elevation.level1 }]}>
+  const renderItem = ({item}: {item: CodeData}) => (
+    <View
+      style={[styles.card, {backgroundColor: theme.colors.elevation.level1}]}>
       <View style={styles.headerContainer}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>{item.title}</Text>
-          <Text style={[styles.language, { color: theme.colors.primary }]}>
+          <Text style={[styles.language, {color: theme.colors.primary}]}>
             {upperFirst(item.language)}
           </Text>
         </View>
-        <Text style={[styles.author, { color: theme.colors.onSurfaceVariant }]}>
+        <Text style={[styles.author, {color: theme.colors.onSurfaceVariant}]}>
           {`${t('pending-review.by')} ${item.first_name} ${item.last_name}`}
         </Text>
       </View>
 
       <Text
-        style={[styles.description, { color: theme.colors.onSurfaceVariant }]}
-        numberOfLines={3}
-      >
+        style={[styles.description, {color: theme.colors.onSurfaceVariant}]}
+        numberOfLines={3}>
         {item.description}
       </Text>
 
       <View style={styles.buttonContainer}>
         <Button
           mode="contained"
-          style={[styles.button, { backgroundColor: theme.colors.primary }]}
+          style={[styles.button, {backgroundColor: theme.colors.primary}]}
           labelStyle={styles.buttonLabel}
           onPress={() => {
             setSelectedItem(item);
@@ -150,7 +177,7 @@ const PendingReview: React.FC = () => {
         </Button>
         <Button
           mode="contained"
-          style={[styles.button, { backgroundColor: theme.colors.error }]}
+          style={[styles.button, {backgroundColor: theme.colors.error}]}
           labelStyle={styles.buttonLabel}
           onPress={() => {
             setSelectedItem(item);
@@ -164,53 +191,63 @@ const PendingReview: React.FC = () => {
   );
 
   return __DEV__ ? (
-    <BaseView
-      needsPaddingTop={false}
-      needsPaddingBottom={false}
-      avoidingView={false}>
-      <Appbar.Header style={{ backgroundColor: theme.colors.elevation.level2 }}>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content
-          title={'Pending Review'}
-          titleStyle={{ fontFamily: FONTS.p_regular }}
-        />
-      </Appbar.Header>
-      <View style={{ flex: 1 }}>
-        <FlatList
-          data={data}
-          keyExtractor={item => item.id}
-          renderItem={renderItem}
-          ListEmptyComponent={renderEmptyItem}
-          contentContainerStyle={styles.listContainer}
-        />
-        <Dialog
-          visible={isDialogVisible}
-          onDismiss={() => setIsDialogVisible(false)}>
-          <Dialog.Title>
-            {action === 'accept' ? t('pending-review.accept_dialog.title') : t('pending-review.deny_dialog.title')}
-          </Dialog.Title>
-          <Dialog.Content>
-            <Paragraph>
-              {action === 'accept' ? t('pending-review.accept_dialog.message') : t('pending-review.deny_dialog.message')}
-            </Paragraph>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setIsDialogVisible(false)}>
-              {action === 'accept' ? t('pending-review.accept_dialog.cancel') : t('pending-review.deny_dialog.cancel')}
-            </Button>
-            <Button onPress={handleAction}>
-              {action === 'accept' ? t('pending-review.accept_dialog.confirm') : t('pending-review.deny_dialog.confirm')}
+    <>
+      <BaseView
+        needsPaddingTop={false}
+        needsPaddingBottom={false}
+        avoidingView={false}>
+        <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
+          <Appbar.BackAction onPress={() => navigation.goBack()} />
+          <Appbar.Content
+            title={'Pending Review'}
+            titleStyle={{fontFamily: FONTS.p_regular}}
+          />
+        </Appbar.Header>
+        <View style={{flex: 1}}>
+          <FlatList
+            data={data}
+            keyExtractor={item => item.id}
+            renderItem={renderItem}
+            ListEmptyComponent={renderEmptyItem}
+            contentContainerStyle={styles.listContainer}
+          />
+          <Dialog
+            visible={isDialogVisible}
+            onDismiss={() => setIsDialogVisible(false)}>
+            <Dialog.Title>
+              {action === 'accept'
+                ? t('pending-review.accept_dialog.title')
+                : t('pending-review.deny_dialog.title')}
+            </Dialog.Title>
+            <Dialog.Content>
+              <Paragraph>
+                {action === 'accept'
+                  ? t('pending-review.accept_dialog.message')
+                  : t('pending-review.deny_dialog.message')}
+              </Paragraph>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button onPress={() => setIsDialogVisible(false)}>
+                {action === 'accept'
+                  ? t('pending-review.accept_dialog.cancel')
+                  : t('pending-review.deny_dialog.cancel')}
               </Button>
-          </Dialog.Actions>
-        </Dialog>
-      </View>
-    </BaseView>
+              <Button onPress={handleAction}>
+                {action === 'accept'
+                  ? t('pending-review.accept_dialog.confirm')
+                  : t('pending-review.deny_dialog.confirm')}
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </View>
+      </BaseView>
+    </>
   ) : (
     <BaseView
       needsPaddingTop={true}
       needsPaddingBottom={false}
       avoidingView={false}>
-      <Text style={{ textAlign: 'center' }}>
+      <Text style={{textAlign: 'center'}}>
         womp womp, you don't have access here
       </Text>
     </BaseView>
@@ -227,7 +264,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
