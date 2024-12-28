@@ -252,7 +252,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
           addRecentActivity(uid, {
             type: 'unliked',
             postId: codeId,
-            timestamp: firestore.Timestamp.fromDate(new Date()),
+            time: firestore.Timestamp.fromDate(new Date()),
           }),
         ]);
       } else {
@@ -260,7 +260,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
           addRecentActivity(uid, {
             type: 'liked',
             postId: codeId,
-            timestamp: firestore.Timestamp.fromDate(new Date()),
+            time: firestore.Timestamp.fromDate(new Date()),
           }),
           codeRef.update({
             likes: firestore.FieldValue.arrayUnion(uid),
@@ -325,7 +325,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
     }
     try {
       await firestore().collection('notifications').add({
-        userReceiveId: uid,
+        userReceiveID: uid,
         postId: post_id,
         notification_type: notification_type,
         userSentID: uid,
@@ -361,11 +361,14 @@ const Main = forwardRef<MainRef>((_, ref) => {
     try {
       if (!isCurrentlyBookmarked) {
         await Promise.all([
-          bookmarkDocRef.set({codeId}),
+          bookmarkDocRef.set({
+            codeId,
+            time: firestore.Timestamp.fromDate(new Date()),
+          }),
           addRecentActivity(uid, {
             type: 'bookmark',
             postId: codeId,
-            timestamp: firestore.Timestamp.fromDate(new Date()),
+            time: firestore.Timestamp.fromDate(new Date()),
           }),
         ]);
       } else {
@@ -374,7 +377,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
           addRecentActivity(uid, {
             type: 'unbookmark',
             postId: codeId,
-            timestamp: firestore.Timestamp.fromDate(new Date()),
+            time: firestore.Timestamp.fromDate(new Date()),
           }),
         ]);
       }
