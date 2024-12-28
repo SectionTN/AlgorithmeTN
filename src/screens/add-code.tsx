@@ -33,7 +33,7 @@ const AddCode: React.FC = () => {
 
   const theme = useTheme();
 
-  const { t } = useTranslation();
+  const {t} = useTranslation();
 
   const sections = [
     {title: t('add-code.inf'), value: 'Science Informatique'},
@@ -101,7 +101,6 @@ const AddCode: React.FC = () => {
     }
   }, [language, navigation]);
 
-
   function handleButtonPress() {
     const titleLength = title.trim().length;
     const descriptionLength = description.trim().length;
@@ -151,7 +150,7 @@ const AddCode: React.FC = () => {
     if (level !== '1ére' && !section) {
       return alert({
         title: 'Empty Section',
-        message: 'Level\'s section is required',
+        message: "Level's section is required",
         preset: 'error',
       });
     }
@@ -199,10 +198,11 @@ const AddCode: React.FC = () => {
         if (navigation.canGoBack()) {
           navigation.goBack();
         }
-      }).catch(error => {
-      crashlytics().recordError(error);
-      alert({title: 'Sending Failed', message: 'An error occurred'});
-    });
+      })
+      .catch(error => {
+        crashlytics().recordError(error);
+        alert({title: 'Sending Failed', message: 'An error occurred'});
+      });
   }
 
   return (
@@ -296,7 +296,9 @@ const AddCode: React.FC = () => {
               onDismiss={() => setSectionMenuVisible(false)}
               anchor={
                 <Button onPress={() => setSectionMenuVisible(true)}>
-                  {section ? `${section} selected` : t('add-code.select_section')}
+                  {section
+                    ? `${section} selected`
+                    : t('add-code.select_section')}
                 </Button>
               }>
               {sections.map(sec => (
@@ -391,7 +393,8 @@ const AddCode: React.FC = () => {
               }
               setInstructions(text);
             }}
-            multiline={instructions.length >= 25}
+            multiline={true}
+            returnKeyType="next"
           />
         )}
         <SpacerV height={heightPercentageToDP(0.25)} />
