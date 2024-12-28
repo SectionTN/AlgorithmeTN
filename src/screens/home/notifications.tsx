@@ -1,19 +1,28 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, {useEffect, useState, useCallback} from 'react';
 import BaseView from '../../components/baseview/baseview.tsx';
-import { Appbar, Avatar, Card, Text, useTheme, ActivityIndicator } from 'react-native-paper';
-import { FONTS } from '../../config/misc.ts';
+import {
+  Appbar,
+  Avatar,
+  Card,
+  Text,
+  useTheme,
+  ActivityIndicator,
+} from 'react-native-paper';
+import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
-import { widthPercentageToDP } from '../../config/dimensions.ts';
-import { Dimensions, StatusBar } from 'react-native';
-import { FlatGrid } from 'react-native-super-grid';
+import {widthPercentageToDP} from '../../config/dimensions.ts';
+import {Dimensions, StatusBar} from 'react-native';
+import {FlatGrid} from 'react-native-super-grid';
 import auth from '@react-native-firebase/auth';
-import { NativeViewGestureHandler } from 'react-native-gesture-handler';
-import { useTranslation } from 'react-i18next';
-import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import {NativeViewGestureHandler} from 'react-native-gesture-handler';
+import {useTranslation} from 'react-i18next';
+import firestore, {
+  FirebaseFirestoreTypes,
+} from '@react-native-firebase/firestore';
 import getUserData from '../../utils/firebase.ts';
 import moment from 'moment';
-import { NotificationData } from '../../types/interfaces.ts';
-import { sortBy } from 'lodash';
+import {NotificationData} from '../../types/interfaces.ts';
+import {sortBy} from 'lodash';
 import crashlytics from '@react-native-firebase/crashlytics';
 
 interface AvatarProps {
@@ -25,22 +34,22 @@ interface TimeProps {
   createdAt: FirebaseFirestoreTypes.Timestamp;
 }
 
-const LeftContent: React.FC<AvatarProps> = ({ avatarStatus, avatar }) => {
+const LeftContent: React.FC<AvatarProps> = ({avatarStatus, avatar}) => {
   if (avatarStatus === 'photo' && avatar) {
-    return <Avatar.Image source={{ uri: avatar }} size={48} />;
+    return <Avatar.Image source={{uri: avatar}} size={48} />;
   } else {
     return <Avatar.Text label={avatar} size={48} />;
   }
 };
 
-const RightContent: React.FC<TimeProps> = ({ createdAt }) => {
+const RightContent: React.FC<TimeProps> = ({createdAt}) => {
   const convertedTime = moment(createdAt.toDate()).fromNow(true);
   return <Text variant={'labelSmall'}>{convertedTime}</Text>;
 };
 
 const Notifications: React.FC = () => {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const [photoUrl, setPhotoUrl] = useState('XD');
   const windowDimension = Dimensions.get('window').width;
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
@@ -49,9 +58,34 @@ const Notifications: React.FC = () => {
   const NOTIFICATIONS_PER_PAGE = 10;
 
   useEffect(() => {
+    // Remove notifications that are not associated with a code
     const unsubscribe = firestore()
       .collection('notifications')
-      .where('userReceiveId', '==', auth().currentUser?.uid)
+      .onSnapshot(querySnapshot => {
+        querySnapshot.docs.forEach(async notification => {
+          const notificationData = notification.data();
+          if (notificationData.postId) {
+            const codeExists = await firestore()
+              .collection('codes')
+              .doc(notificationData.postId)
+              .get();
+            if (!codeExists.exists) {
+              await firestore()
+                .collection('notifications')
+                .doc(notification.id)
+                .delete();
+            }
+          }
+        });
+      });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('notifications')
+      .where('userReceiveID', '==', auth().currentUser?.uid)
       .orderBy('createdAt', 'desc')
       .limit(NOTIFICATIONS_PER_PAGE * page)
       .onSnapshot(
@@ -112,24 +146,25 @@ const Notifications: React.FC = () => {
     return message;
   };
 
-  const renderLeftContent = (avatarStatus: 'photo' | 'text', avatar: string) => (
-    <LeftContent avatarStatus={avatarStatus} avatar={avatar} />
-  );
+  const renderLeftContent = (
+    avatarStatus: 'photo' | 'text',
+    avatar: string,
+  ) => <LeftContent avatarStatus={avatarStatus} avatar={avatar} />;
 
   const renderRightContent = (createdAt: FirebaseFirestoreTypes.Timestamp) => (
     <RightContent createdAt={createdAt} />
   );
 
-  const renderNotificationItem = ({ item }: { item: NotificationData }) => {
+  const renderNotificationItem = ({item}: {item: NotificationData}) => {
     return (
-      <Card style={{ paddingTop: '1%', paddingBottom: '1%' }}>
+      <Card style={{paddingTop: '1%', paddingBottom: '1%'}}>
         <Card.Title
           title={`${item.first_name} ${item.last_name}`}
-          titleStyle={{ fontFamily: FONTS.p_regular, fontWeight: 'bold' }}
+          titleStyle={{fontFamily: FONTS.p_regular, fontWeight: 'bold'}}
           titleVariant={'titleMedium'}
           left={() => renderLeftContent(item.avatar_status, item.avatar)}
           right={() => renderRightContent(item.createdAt)}
-          rightStyle={{ padding: '2%' }}
+          rightStyle={{padding: '2%'}}
           subtitle={notificationMessage(item.notification_type)}
         />
       </Card>
@@ -156,17 +191,17 @@ const Notifications: React.FC = () => {
       needsPaddingTop={false}
       avoidingView={false}
       needsPaddingBottom={false}>
-      <Appbar.Header style={{ backgroundColor: theme.colors.elevation.level2 }}>
+      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
         <SpacerH width={widthPercentageToDP(0.5)} />
         {photoUrl && photoUrl.length === 2 ? (
           <Avatar.Text label={photoUrl} size={34} />
         ) : (
-          <Avatar.Image source={{ uri: photoUrl }} size={34} />
+          <Avatar.Image source={{uri: photoUrl}} size={34} />
         )}
         <SpacerH width={widthPercentageToDP(0.5)} />
         <Appbar.Content
           title={t('notifications.title')}
-          titleStyle={{ fontFamily: FONTS.p_regular }}
+          titleStyle={{fontFamily: FONTS.p_regular}}
         />
       </Appbar.Header>
       <NativeViewGestureHandler>
@@ -185,4 +220,3 @@ const Notifications: React.FC = () => {
 };
 
 export default Notifications;
-
