@@ -78,3 +78,5 @@ yarn-error.log
 # env files
 .env
 .env.*
+.github/copilot-instructions.md
+.vscode/settings.json
