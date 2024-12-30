@@ -19,7 +19,7 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/dimensions.ts';
-import { Dimensions, StatusBar, StyleSheet, View } from 'react-native';
+import {Dimensions, Platform, StatusBar, StyleSheet, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { useTranslation } from 'react-i18next';
 import { FlatGrid } from 'react-native-super-grid';
@@ -50,7 +50,9 @@ const Bookmarks: React.FC = () => {
   const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    if (Platform.OS === 'android'){
+      StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    }
   }, [theme.colors.elevation.level2]);
 
   useEffect(() => {

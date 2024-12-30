@@ -36,7 +36,7 @@ if (__DEV__) {
     );
     Appodeal.addEventListener(
         AppodealSdkEvent.AD_REVENUE,
-        (revenue: AppodealAdRevenue) => {
+        (revenue) => {
             console.log('Appodeal: SDK did receive ad revenue: ', revenue);
         },
     );
