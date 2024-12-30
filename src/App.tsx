@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect, useLayoutEffect, useMemo } from 'react';
-import { Appearance, StatusBar, StyleSheet, useColorScheme } from 'react-native';
+import {Appearance, Platform, StatusBar, StyleSheet, useColorScheme} from 'react-native';
 import { PaperProvider, MD3DarkTheme, MD3LightTheme } from 'react-native-paper';
 import StackNavigator from './config/navigation/stack.tsx';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -44,7 +44,9 @@ const useThemeSetup = () => {
   useLayoutEffect(() => {
     const backgroundColor = isDarkMode ? theme.dark.elevation.level2 : theme.light.elevation.level2;
     changeNavigationBarColor(backgroundColor, !isDarkMode, true);
-    StatusBar.setBackgroundColor(backgroundColor);
+    if (Platform.OS ===  'android') {
+      StatusBar.setBackgroundColor(backgroundColor);
+    }
   }, [isDarkMode, theme.dark.elevation.level2, theme.light.elevation.level2]);
 
   return { isDarkMode, colorScheme, theme };

@@ -11,7 +11,7 @@ import {
 import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {widthPercentageToDP} from '../../config/dimensions.ts';
-import {Dimensions, StatusBar} from 'react-native';
+import {Dimensions, Platform, StatusBar} from 'react-native';
 import {FlatGrid} from 'react-native-super-grid';
 import auth from '@react-native-firebase/auth';
 import {NativeViewGestureHandler} from 'react-native-gesture-handler';
@@ -172,8 +172,10 @@ const Notifications: React.FC = () => {
   };
 
   useEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-  }, [theme.colors.elevation.level2]);
+    if (Platform.OS === 'android'){
+      StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    }
+    }, [theme.colors.elevation.level2]);
 
   useEffect(() => {
     setPhotoUrl(auth().currentUser?.photoURL ?? 'XD');

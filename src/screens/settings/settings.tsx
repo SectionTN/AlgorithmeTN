@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useState} from 'react';
-import {BackHandler, StatusBar, StyleSheet} from 'react-native';
+import {BackHandler, Platform, StatusBar, StyleSheet} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -73,8 +73,9 @@ const Settings: React.FC = () => {
   }, []);
 
   useLayoutEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-  }, [theme.colors.elevation.level2]);
+    if (Platform.OS === 'android'){
+      StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    }  }, [theme.colors.elevation.level2]);
 
   useLayoutEffect(() => {
     setAvatar(auth()?.currentUser?.photoURL ?? 'XD');

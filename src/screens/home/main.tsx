@@ -7,7 +7,7 @@ import React, {
   useState,
   useMemo,
 } from 'react';
-import {Dimensions, StatusBar, StyleSheet, View} from 'react-native';
+import {Dimensions, Platform, StatusBar, StyleSheet, View} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -87,7 +87,9 @@ const Main = forwardRef<MainRef>((_, ref) => {
   const CODES_PER_PAGE = 10;
 
   useLayoutEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    if (Platform.OS === 'android'){
+      StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    }
   }, [theme.colors.elevation.level2]);
 
   useLayoutEffect(() => {

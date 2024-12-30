@@ -8,7 +8,7 @@ import {
   useTheme,
 } from 'react-native-paper';
 import BaseView from '../components/baseview/baseview';
-import {View, FlatList, StyleSheet, StatusBar, BackHandler} from 'react-native';
+import {View, FlatList, StyleSheet, StatusBar, BackHandler, Platform} from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import getUserData from '../utils/firebase.ts';
 import {CodeData} from '../types/interfaces.ts';
@@ -56,8 +56,9 @@ const PendingReview: React.FC = () => {
   }, []);
 
   useLayoutEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-  }, [theme.colors.elevation.level2]);
+    if (Platform.OS === 'android'){
+      StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    }  }, [theme.colors.elevation.level2]);
 
   const addBadgeIfNotExist = async (uid: string, language: string) => {
     if (!uid || language === 'none') {
