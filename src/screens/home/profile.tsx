@@ -32,7 +32,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import {ScrollView} from 'react-native-gesture-handler';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
-import {isUndefined, upperFirst} from 'lodash';
+import {isUndefined} from 'lodash';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
@@ -118,6 +118,9 @@ const fetchAchievements = async (uid: string): Promise<Achievement[]> => {
     })) as Achievement[];
   } catch (error) {
     console.error('Error fetching achievements:', error);
+    if (error instanceof Error) {
+      crashlytics().recordError(error);
+    }
     return [];
   }
 };
