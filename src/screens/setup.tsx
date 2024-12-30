@@ -276,6 +276,7 @@ const Setup: React.FC = () => {
               active_time: firestore?.Timestamp?.fromDate(new Date()),
               bio: '',
               password: hashedPassword,
+              role: 'member',
             };
             firestore()
               .collection('users')
