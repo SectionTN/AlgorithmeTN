@@ -42,6 +42,7 @@ import {OneSignal} from 'react-native-onesignal';
 import {encryptedStorage} from '../config/storage/mmkv.ts';
 import firestore from '@react-native-firebase/firestore';
 import {useTranslation} from 'react-i18next';
+import analytics from '@react-native-firebase/analytics';
 
 const Login: React.FC = () => {
   /**
@@ -184,24 +185,28 @@ const Login: React.FC = () => {
           .signInWithEmailAndPassword(email, password)
           .then(async () => {
             if (auth().currentUser) {
+              const user = auth().currentUser;
               try {
+                OneSignal.login(user!.uid);
+                OneSignal.User.addEmail(email);
+
                 const userData = await firestore()
                   .collection('users')
-                  .doc(auth().currentUser?.uid)
+                  .doc(user!.uid)
                   .get();
 
                 encryptedStorage.set('password', password);
 
-                if (userData.exists && auth().currentUser?.emailVerified) {
+                if (userData.exists && user!.emailVerified) {
                   navigation.navigate('home');
-                } else if (!auth().currentUser?.emailVerified) {
-                  const username = auth()
-                    .currentUser?.uid?.substring(0, 4)
+                } else if (!user!.emailVerified) {
+                  const username = user!.uid
+                    ?.substring(0, 4)
                     .concat(generateRandomString(6));
 
                   navigation.navigate('confirm-account', {
                     username: username,
-                    email: auth().currentUser?.email,
+                    email: user!.email,
                     password: password,
                     osID: userId,
                     osPT: pushToken,
@@ -276,32 +281,39 @@ const Login: React.FC = () => {
         auth()
           .createUserWithEmailAndPassword(email, password)
           .then(async () => {
-            try {
-              encryptedStorage.set('password', password);
+            if (auth().currentUser) {
+              try {
+                const user = auth().currentUser;
 
-              await auth().currentUser?.sendEmailVerification();
+                OneSignal.login(user!.uid);
+                OneSignal.User.addEmail(email);
 
-              const username = auth()
-                ?.currentUser?.uid?.substring(0, 4)
-                .concat(generateRandomString(6));
+                encryptedStorage.set('password', password);
 
-              navigation.navigate('confirm-account', {
-                username: username,
-                email: auth().currentUser?.email,
-                password: password,
-                osID: userId,
-                osPT: pushToken,
-                from_where: 'register',
-              });
-            } catch (error) {
-              if (error instanceof Error) {
-                crashlytics().recordError(error);
+                user!.sendEmailVerification().finally(() => {
+                  const username = auth()
+                    ?.currentUser?.uid?.substring(0, 4)
+                    .concat(generateRandomString(6));
+
+                  navigation.navigate('confirm-account', {
+                    username: username,
+                    email: auth().currentUser?.email,
+                    password: password,
+                    osID: userId,
+                    osPT: pushToken,
+                    from_where: 'register',
+                  });
+                });
+              } catch (error) {
+                if (error instanceof Error) {
+                  crashlytics().recordError(error);
+                }
+                alert({
+                  title: 'Error',
+                  message: t('error_occured'),
+                  preset: 'error',
+                });
               }
-              alert({
-                title: 'Error',
-                message: t('error_occured'),
-                preset: 'error',
-              });
             }
           })
           .catch(error => {
@@ -345,6 +357,9 @@ const Login: React.FC = () => {
               title: t('login.pass_reset'),
               message: t('login.reset_email'),
               preset: 'done',
+            });
+            analytics().logEvent('password_reset', {
+              email: email,
             });
             setCurrentMode('login');
           })
