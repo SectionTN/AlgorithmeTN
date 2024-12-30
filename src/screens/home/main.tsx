@@ -38,6 +38,7 @@ import {CodeData} from '../../types/interfaces.ts';
 import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {useTranslation} from 'react-i18next';
+import {OneSignal} from 'react-native-onesignal';
 
 const LeftContent = (props: JSX.IntrinsicAttributes & {size?: number}) => (
   <Avatar.Icon {...props} icon="code-tags" />
@@ -150,6 +151,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
           await user.getIdToken(true);
         } catch (error) {
           await auth().signOut();
+          OneSignal.logout();
           navigation.reset({
             index: 0,
             routes: [{name: 'login'}],

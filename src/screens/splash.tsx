@@ -25,6 +25,7 @@ import {useMMKVBoolean} from 'react-native-mmkv';
 import auth from '@react-native-firebase/auth';
 import {useFocusEffect} from '@react-navigation/native';
 import {BackHandler} from 'react-native';
+import {OneSignal} from 'react-native-onesignal';
 
 const Splash: React.FC = () => {
   const navigation =
@@ -57,7 +58,10 @@ const Splash: React.FC = () => {
       } else {
         auth()
           .signOut()
-          .then(() => navigation.navigate('login'));
+          .then(() => {
+            OneSignal.logout();
+            navigation.navigate('login');
+          });
       }
     } else {
       navigation.navigate(onboardingComplete ? 'login' : 'onboarding');

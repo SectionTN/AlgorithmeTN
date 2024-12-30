@@ -36,6 +36,7 @@ import firestore from '@react-native-firebase/firestore';
 import {MidnightPhoto} from '../../utils/const.ts';
 import {useTranslation} from 'react-i18next';
 import {getApplicationName, getVersion} from 'react-native-device-info';
+import {OneSignal} from 'react-native-onesignal';
 
 const Settings: React.FC = () => {
   const navigation =
@@ -191,6 +192,7 @@ const Settings: React.FC = () => {
               auth()
                 .signOut()
                 .then(() => {
+                  OneSignal.logout();
                   navigation.dispatch(
                     CommonActions.reset({
                       index: 0,
