@@ -4,7 +4,7 @@ import Main from '../../screens/home/main.tsx';
 import Profile from '../../screens/home/profile.tsx';
 import Notifications from '../../screens/home/notifications.tsx';
 import Bookmarks from '../../screens/home/bookmarks.tsx';
-import {BackHandler, StatusBar} from 'react-native';
+import {BackHandler, Platform, StatusBar} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -79,7 +79,9 @@ const HomeRender: React.FC = () => {
 
 
   useEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    if (Platform.OS ===  'android'){
+      StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    }
   }, [theme.colors.elevation.level2]);
 
   return (

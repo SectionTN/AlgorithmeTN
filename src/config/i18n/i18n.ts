@@ -1,8 +1,6 @@
-import i18n from 'i18next';
+import i18n, {LanguageDetectorModule} from 'i18next';
 import {initReactI18next} from 'react-i18next';
 import * as RNLocalize from 'react-native-localize';
-import {LanguageDetectorModule} from 'i18next';
-import {Title} from 'react-native-paper';
 
 const locales = RNLocalize.getLocales();
 
@@ -52,8 +50,8 @@ const resources = {
         login_slogan: "let's sign you in",
         signup: 'Create Account',
         signup_slogan: 'and start your journey here with us',
-        forgot_password: 'Forgot Password',
-        forgot_password_slogan: 'we gonna help you restore your account',
+        'forgot-password': 'Forgot Password',
+       'forgot-password_slogan': 'we gonna help you restore your account',
         forgot_password_interrogation: 'Forgot Password?',
         terms: 'Terms of Service',
         terms_text: 'By Signing up, you agree to our',

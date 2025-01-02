@@ -7,7 +7,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import Code from './code.tsx';
 import Instructions from './instructions.tsx';
-import {BackHandler, StatusBar} from 'react-native';
+import {BackHandler, Platform, StatusBar} from 'react-native';
 import {useTranslation} from 'react-i18next';
 
 const Algo: React.FC = () => {
@@ -64,7 +64,9 @@ const Algo: React.FC = () => {
   );
 
   useEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    if (Platform.OS ===  'android') {
+      StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    }
   }, [theme.colors.elevation.level2]);
 
   const getHeaderTitle = () => {

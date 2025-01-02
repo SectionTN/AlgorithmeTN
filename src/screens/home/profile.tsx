@@ -1,6 +1,6 @@
 import React, {useEffect, useLayoutEffect, useState} from 'react';
 import BaseView from '../../components/baseview/baseview.tsx';
-import {StatusBar, StyleSheet, View} from 'react-native';
+import {Platform, StatusBar, StyleSheet, View} from 'react-native';
 import {
   Appbar,
   Avatar,
@@ -271,8 +271,9 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
   }, [profileUID]);
 
   useLayoutEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-  }, [theme.colors.elevation.level2]);
+    if (Platform.OS === 'android'){
+      StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    }  }, [theme.colors.elevation.level2]);
 
   useLayoutEffect(() => {
     setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');

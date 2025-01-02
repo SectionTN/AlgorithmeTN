@@ -1,5 +1,5 @@
 import React, {useLayoutEffect} from 'react';
-import {Linking, Pressable, StatusBar, StyleSheet, View} from 'react-native';
+import {Linking, Platform, Pressable, StatusBar, StyleSheet, View} from 'react-native';
 import {Appbar, Avatar, IconButton, Text, useTheme} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import BaseView from '../../components/baseview/baseview';
@@ -29,8 +29,9 @@ const AboutDeveloper: React.FC = () => {
   };
 
   useLayoutEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-  }, [theme.colors.elevation.level2]);
+      if (Platform.OS === 'android'){
+          StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+      }  }, [theme.colors.elevation.level2]);
 
   const insets = useSafeAreaInsets();
 

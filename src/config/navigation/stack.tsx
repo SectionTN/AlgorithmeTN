@@ -17,7 +17,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {RootStackParamList} from './types';
 import Splash from '../../screens/splash';
 import Onboarding from '../../screens/onboarding';
-import Login from '../../screens/login';
+import Login from '../../screens/login/login.tsx';
 import Setup from '../../screens/setup';
 import HomeRender from './bottom-navigation';
 import Settings from '../../screens/settings/settings.tsx';

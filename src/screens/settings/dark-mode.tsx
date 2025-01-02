@@ -5,7 +5,7 @@ import {FONTS} from '../../config/misc.ts';
 import {useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '../../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {Appearance, StatusBar} from 'react-native';
+import {Appearance, Platform, StatusBar} from 'react-native';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {heightPercentageToDP} from '../../config/dimensions.ts';
 import {useMMKVString} from 'react-native-mmkv';
@@ -18,8 +18,9 @@ const DarkMode: React.FC = () => {
   const [themeStatus, setThemeStatus] = useMMKVString('theme');
 
   useEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-  }, [theme.colors.elevation.level2]);
+      if (Platform.OS === 'android'){
+          StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+      }  }, [theme.colors.elevation.level2]);
 
   return (
     <BaseView

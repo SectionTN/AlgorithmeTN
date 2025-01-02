@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   BackHandler,
-  Keyboard,
+  Keyboard, Platform,
   Pressable,
   StatusBar,
   StyleSheet,
@@ -144,8 +144,9 @@ const Setup: React.FC = () => {
   }, [from_where]);
 
   useEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.background);
-  }, [theme.colors.background]);
+    if (Platform.OS === 'android'){
+      StatusBar.setBackgroundColor(theme.colors.elevation.level2);
+    }  }, [theme.colors.background]);
 
   useFocusEffect(
     useCallback(() => {

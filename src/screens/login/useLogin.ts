@@ -1,50 +1,27 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   BackHandler,
   EmitterSubscription,
   Keyboard,
   Linking,
+  Platform,
   StatusBar,
-  StyleSheet,
-  View,
 } from 'react-native';
-import BaseView from '../components/baseview/baseview.tsx';
-import {
-  Appbar,
-  Button,
-  HelperText,
-  Text,
-  TextInput,
-  Tooltip,
-  useTheme,
-} from 'react-native-paper';
-import {
-  fontValue,
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from '../config/dimensions.ts';
-import {COLORS, FONTS} from '../config/misc.ts';
-import SpacerV from '../components/spacer/spacerv.tsx';
-import Animated, {
-  FadeInDown,
-  FadeInUp,
-  SlideInLeft,
-  SlideOutRight,
-} from 'react-native-reanimated';
-import auth from '@react-native-firebase/auth';
 import {alert} from '@baronha/ting';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import {encryptedStorage} from '../../config/storage/mmkv.ts';
+import {generateRandomString} from '../../utils/algo-utils.ts';
+import crashlytics from '@react-native-firebase/crashlytics';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../config/navigation/types.ts';
-import {generateRandomString} from '../utils/algo-utils.ts';
-import crashlytics from '@react-native-firebase/crashlytics';
-import {OneSignal} from 'react-native-onesignal';
-import {encryptedStorage} from '../config/storage/mmkv.ts';
-import firestore from '@react-native-firebase/firestore';
+import {RootStackParamList} from '../../config/navigation/types.ts';
+import {useTheme} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {OneSignal} from 'react-native-onesignal';
 import analytics from '@react-native-firebase/analytics';
 
-const Login: React.FC = () => {
+const useLogin = () => {
   /**
    * Theme
    */
@@ -130,7 +107,9 @@ const Login: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    StatusBar.setBackgroundColor(theme.colors.background);
+    if (Platform.OS === 'android') {
+      StatusBar.setBackgroundColor(theme.colors.background);
+    }
   }, [theme.colors.background]);
 
   const [pushToken, setPushToken] = React.useState<string | undefined>('');
@@ -184,29 +163,26 @@ const Login: React.FC = () => {
         auth()
           .signInWithEmailAndPassword(email, password)
           .then(async () => {
-            if (auth().currentUser) {
-              const user = auth().currentUser;
+            const currentUser = auth().currentUser;
+            if (currentUser) {
               try {
-                OneSignal.login(user!.uid);
-                OneSignal.User.addEmail(email);
-
                 const userData = await firestore()
                   .collection('users')
-                  .doc(user!.uid)
+                  .doc(currentUser?.uid)
                   .get();
 
                 encryptedStorage.set('password', password);
 
-                if (userData.exists && user!.emailVerified) {
+                if (userData.exists && currentUser?.emailVerified) {
                   navigation.navigate('home');
-                } else if (!user!.emailVerified) {
-                  const username = user!.uid
+                } else if (!currentUser?.emailVerified) {
+                  const username = currentUser?.uid
                     ?.substring(0, 4)
                     .concat(generateRandomString(6));
 
                   navigation.navigate('confirm-account', {
                     username: username,
-                    email: user!.email,
+                    email: currentUser?.email,
                     password: password,
                     osID: userId,
                     osPT: pushToken,
@@ -219,7 +195,7 @@ const Login: React.FC = () => {
 
                   navigation.navigate('setup', {
                     username: username,
-                    email: auth().currentUser?.email,
+                    email: currentUser?.email,
                     password: password,
                     osID: userId,
                     osPT: pushToken,
@@ -281,39 +257,34 @@ const Login: React.FC = () => {
         auth()
           .createUserWithEmailAndPassword(email, password)
           .then(async () => {
-            if (auth().currentUser) {
-              try {
-                const user = auth().currentUser;
+            const currentUser = auth().currentUser;
+            try {
+              OneSignal.login(<string>currentUser?.uid);
+              OneSignal.User.addEmail(email);
+              encryptedStorage.set('password', password);
 
-                OneSignal.login(user!.uid);
-                OneSignal.User.addEmail(email);
-
-                encryptedStorage.set('password', password);
-
-                user!.sendEmailVerification().finally(() => {
-                  const username = auth()
-                    ?.currentUser?.uid?.substring(0, 4)
-                    .concat(generateRandomString(6));
-
-                  navigation.navigate('confirm-account', {
-                    username: username,
-                    email: auth().currentUser?.email,
-                    password: password,
-                    osID: userId,
-                    osPT: pushToken,
-                    from_where: 'register',
-                  });
+              currentUser?.sendEmailVerification().finally(() => {
+                const username = auth()
+                  ?.currentUser?.uid?.substring(0, 4)
+                  .concat(generateRandomString(6));
+                navigation.navigate('confirm-account', {
+                  username: username,
+                  email: auth().currentUser?.email,
+                  password: password,
+                  osID: userId,
+                  osPT: pushToken,
+                  from_where: 'register',
                 });
-              } catch (error) {
-                if (error instanceof Error) {
-                  crashlytics().recordError(error);
-                }
-                alert({
-                  title: 'Error',
-                  message: t('error_occured'),
-                  preset: 'error',
-                });
+              });
+            } catch (error) {
+              if (error instanceof Error) {
+                crashlytics().recordError(error);
               }
+              alert({
+                title: 'Error',
+                message: t('error_occured'),
+                preset: 'error',
+              });
             }
           })
           .catch(error => {
@@ -352,13 +323,13 @@ const Login: React.FC = () => {
         }
         auth()
           .sendPasswordResetEmail(email)
-          .then(() => {
+          .then(async () => {
             alert({
               title: t('login.pass_reset'),
               message: t('login.reset_email'),
               preset: 'done',
             });
-            analytics().logEvent('password_reset', {
+            await analytics().logEvent('password_reset', {
               email: email,
             });
             setCurrentMode('login');
@@ -394,195 +365,23 @@ const Login: React.FC = () => {
     }
   }
 
-  return (
-    <>
-      <BaseView
-        needsPaddingTop={false}
-        avoidingView={
-          currentMode === 'signup' || currentMode === 'forgot-password'
-        }
-        needsPaddingBottom={true}>
-        <Appbar.Header>
-          {currentMode !== 'login' && (
-            <Tooltip title={t('go_back')}>
-              <Appbar.BackAction onPress={() => setCurrentMode('login')} />
-            </Tooltip>
-          )}
-          <Appbar.Content title="" />
-          <Tooltip title={t('help')}>
-            <Appbar.Action icon="dots-vertical" onPress={() => {}} />
-          </Tooltip>
-        </Appbar.Header>
-        <Animated.View
-          entering={SlideInLeft}
-          exiting={SlideOutRight}
-          style={styles.top_bar}>
-          <Text style={[styles.top_text, {color: theme.colors.primary}]}>
-            {currentMode === 'login'
-              ? t('login.login')
-              : currentMode === 'signup'
-              ? t('login.signup')
-              : t('login.forgot_password')}
-          </Text>
-          <Text
-            style={{
-              color: theme.colors.onBackground,
-              fontSize: fontValue(16),
-              marginHorizontal: widthPercentageToDP(3),
-              textAlign: 'left',
-              opacity: 0.75,
-              fontFamily: FONTS.p_regular,
-            }}>
-            {currentMode === 'login'
-              ? t('login.login_slogan')
-              : currentMode === 'signup'
-              ? t('login.signup_slogan')
-              : t('login.forgot_password_slogan')}
-          </Text>
-        </Animated.View>
-        <SpacerV height={heightPercentageToDP(0.1)} />
-        <View style={{flex: 1}}>{/* stub view */}</View>
-        <Animated.View
-          entering={FadeInUp}
-          exiting={FadeInDown}
-          style={{paddingLeft: '5%', paddingRight: '5%'}}>
-          <TextInput
-            mode={'outlined'}
-            value={email}
-            label={t('login.email')}
-            onChangeText={text => {
-              setEmail(text.trim());
-            }}
-            keyboardType={'email-address'}
-            style={{marginBottom: keyboardOffset}}
-          />
-          {currentMode !== 'forgot-password' && (
-            <>
-              <SpacerV height={heightPercentageToDP(0.5)} />
-              <TextInput
-                mode={'outlined'}
-                value={password}
-                label={t('login.password')}
-                onChangeText={text => {
-                  setPassword(text.trim());
-                }}
-                secureTextEntry={!passwordVisible}
-                style={{
-                  marginBottom: keyboardOffset,
-                }}
-                right={
-                  <TextInput.Icon
-                    onPress={() => setPasswordVisible(!passwordVisible)}
-                    icon={passwordVisible ? 'eye-off' : 'eye'}
-                  />
-                }
-              />
-            </>
-          )}
-          {currentMode === 'signup' && (
-            <>
-              <SpacerV height={heightPercentageToDP(0.5)} />
-              <TextInput
-                mode={'outlined'}
-                value={confirmPassword}
-                label={t('login.confirm_password')}
-                onChangeText={text => {
-                  setConfirmPassword(text.trim());
-                }}
-                secureTextEntry={!passwordVisible}
-                style={{
-                  bottom: keyboardOffset,
-                }}
-                right={
-                  <TextInput.Icon
-                    onPress={() => setPasswordVisible(!passwordVisible)}
-                    icon={passwordVisible ? 'eye-off' : 'eye'}
-                  />
-                }
-              />
-            </>
-          )}
-          <SpacerV height={heightPercentageToDP(0.5)} />
-          <Button mode="contained" onPress={onMainButtonPress}>
-            {currentMode === 'login'
-              ? t('login.connect')
-              : currentMode === 'signup'
-              ? t('login.create')
-              : t('login.forgot')}
-          </Button>
-          <SpacerV height={heightPercentageToDP(0.1)} />
-          {currentMode === 'login' ? (
-            <Button
-              mode="text"
-              onPress={() => setCurrentMode('forgot-password')}>
-              {t('login.forgot_password_interrogation')}
-            </Button>
-          ) : (
-            currentMode === 'signup' && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginHorizontal: -widthPercentageToDP(1.5),
-                }}>
-                <HelperText style={{fontSize: fontValue(11)}} type="info">
-                  {t('login.terms_text')}
-                </HelperText>
-                <HelperText
-                  onPress={handleTermsPress}
-                  type={'info'}
-                  style={{
-                    fontSize: fontValue(11),
-                    color: theme.colors.primary,
-                    textDecorationLine: 'underline',
-                    marginHorizontal: -widthPercentageToDP(5),
-                  }}>
-                  {t('login.terms')}
-                </HelperText>
-              </View>
-            )
-          )}
-        </Animated.View>
-        <View style={{flex: 1}}>{/* stub view */}</View>
-        {currentMode === 'login' && (
-          <>
-            <View style={{paddingLeft: '5%', paddingRight: '5%'}}>
-              <Button
-                mode={'contained-tonal'}
-                onPress={() => {
-                  setCurrentMode('signup');
-                }}>
-                {t('login.create_account')}
-              </Button>
-            </View>
-            <SpacerV height={heightPercentageToDP(0.5)} />
-          </>
-        )}
-      </BaseView>
-    </>
-  );
+  return {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    passwordVisible,
+    setPasswordVisible,
+    currentMode,
+    setCurrentMode,
+    onMainButtonPress,
+    handleTermsPress,
+    t,
+    theme,
+    keyboardOffset,
+  };
 };
 
-const styles = StyleSheet.create({
-  top_bar: {
-    flexDirection: 'column',
-    paddingLeft: '2%',
-    paddingRight: '2%',
-    justifyContent: 'flex-start',
-  },
-  top_text: {
-    position: 'relative',
-    fontSize: fontValue(28),
-    paddingLeft: '3%',
-    paddingRight: '3%',
-    textAlign: 'left',
-    fontFamily: FONTS.p_bold,
-  },
-  description: {
-    fontSize: fontValue(18),
-    textAlign: 'left',
-    color: COLORS.grey,
-    fontFamily: FONTS.p_regular,
-  },
-});
-
-export default Login;
+export default useLogin;
