@@ -51,7 +51,7 @@ const resources = {
         signup: 'Create Account',
         signup_slogan: 'and start your journey here with us',
         'forgot-password': 'Forgot Password',
-       'forgot-password_slogan': 'we gonna help you restore your account',
+        'forgot-password_slogan': 'we gonna help you restore your account',
         forgot_password_interrogation: 'Forgot Password?',
         terms: 'Terms of Service',
         terms_text: 'By Signing up, you agree to our',
@@ -121,6 +121,7 @@ const resources = {
         commented: 'commented on',
         did_something: 'did something',
         new_member: 'New Member',
+        bookmark: 'bookmark',
       },
       code: {
         title: 'Code',
@@ -321,6 +322,7 @@ const resources = {
         commented: 'a commenté',
         did_something: 'a fait quelque chose',
         new_member: 'Nouveau Membre',
+        bookmark: 'favori',
       },
       code: {
         title: 'Code',

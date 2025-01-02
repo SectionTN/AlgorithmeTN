@@ -205,7 +205,12 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           })) as RecentActivity[];
           const activitiesWithTitles = await Promise.all(
             activities.map(async activity => {
-              if (activity.type === 'liked' || activity.type === 'unliked') {
+              if (
+                activity.type === 'liked' ||
+                activity.type === 'unliked' ||
+                activity.type === 'commented' ||
+                activity.type === 'bookmark'
+              ) {
                 const codeDoc = await firestore()
                   .collection('codes')
                   .doc(activity.postId)
@@ -271,9 +276,10 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
   }, [profileUID]);
 
   useLayoutEffect(() => {
-    if (Platform.OS === 'android'){
+    if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-    }  }, [theme.colors.elevation.level2]);
+    }
+  }, [theme.colors.elevation.level2]);
 
   useLayoutEffect(() => {
     setPhotoUrl(auth()?.currentUser?.photoURL ?? 'XD');
@@ -384,6 +390,10 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
         return t('profile.created_account');
       case 'commented':
         return `${t('profile.commented')} "${
+          activity.title ?? `${t('profile.someone')}`
+        }" ${t('profile.post')}.`;
+      case 'bookmark':
+        return `${t('profile.bookmark')} "${
           activity.title ?? `${t('profile.someone')}`
         }" ${t('profile.post')}.`;
       default:
