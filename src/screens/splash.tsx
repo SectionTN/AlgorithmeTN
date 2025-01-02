@@ -159,7 +159,11 @@ const Splash: React.FC = () => {
       needsPaddingBottom={false}>
       <Animated.View style={[styles.container, viewAnimatedStyle]}>
         <Animated.Image
-          style={[styles.logo, imageAnimatedStyle]}
+          style={[
+            styles.logo,
+            imageAnimatedStyle,
+            {tintColor: theme.colors.primary},
+          ]}
           source={AlgoTNLogo}
         />
         <Text style={[styles.bottom_text, {color: theme.colors.primary}]}>

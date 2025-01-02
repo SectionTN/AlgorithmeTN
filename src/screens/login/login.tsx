@@ -152,27 +152,27 @@ const Login: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    topBar: {
-      flexDirection: 'column',
-      paddingHorizontal: '2%',
-      justifyContent: 'flex-start',
-    },
-    topText: {
-      fontSize: fontValue(28),
-      paddingHorizontal: '3%',
-      textAlign: 'left',
-      fontFamily: FONTS.p_bold,
-    },
-    description: {
-      fontSize: fontValue(16),
-      marginHorizontal: widthPercentageToDP(3),
-      textAlign: 'left',
-      opacity: 0.75,
-      fontFamily: FONTS.p_regular,
-    },
-    animatedView: {
-      paddingHorizontal: '5%',
-    },
-  });
+  topBar: {
+    flexDirection: 'column',
+    paddingHorizontal: '2%',
+    justifyContent: 'flex-start',
+  },
+  topText: {
+    fontSize: fontValue(28),
+    paddingHorizontal: '3%',
+    textAlign: 'left',
+    fontFamily: FONTS.p_bold,
+  },
+  description: {
+    fontSize: fontValue(16),
+    marginHorizontal: widthPercentageToDP(3),
+    textAlign: 'left',
+    opacity: 0.75,
+    fontFamily: FONTS.p_regular,
+  },
+  animatedView: {
+    paddingHorizontal: '5%',
+  },
+});
 
 export default Login;
