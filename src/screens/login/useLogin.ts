@@ -19,6 +19,7 @@ import {useTheme} from 'react-native-paper';
 import {useTranslation} from 'react-i18next';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {OneSignal} from 'react-native-onesignal';
+import analytics from '@react-native-firebase/analytics';
 
 const useLogin = () => {
   /**
@@ -258,21 +259,22 @@ const useLogin = () => {
           .then(async () => {
             const currentUser = auth().currentUser;
             try {
+              OneSignal.login(<string>currentUser?.uid);
+              OneSignal.User.addEmail(email);
               encryptedStorage.set('password', password);
 
-              await currentUser?.sendEmailVerification();
-
-              const username = currentUser?.uid
-                ?.substring(0, 4)
-                .concat(generateRandomString(6));
-
-              navigation.navigate('confirm-account', {
-                username: username,
-                email: currentUser?.email,
-                password: password,
-                osID: userId,
-                osPT: pushToken,
-                from_where: 'register',
+              currentUser?.sendEmailVerification().finally(() => {
+                const username = auth()
+                  ?.currentUser?.uid?.substring(0, 4)
+                  .concat(generateRandomString(6));
+                navigation.navigate('confirm-account', {
+                  username: username,
+                  email: auth().currentUser?.email,
+                  password: password,
+                  osID: userId,
+                  osPT: pushToken,
+                  from_where: 'register',
+                });
               });
             } catch (error) {
               if (error instanceof Error) {
@@ -321,11 +323,14 @@ const useLogin = () => {
         }
         auth()
           .sendPasswordResetEmail(email)
-          .then(() => {
+          .then(async () => {
             alert({
               title: t('login.pass_reset'),
               message: t('login.reset_email'),
               preset: 'done',
+            });
+            await analytics().logEvent('password_reset', {
+              email: email,
             });
             setCurrentMode('login');
           })
