@@ -53,7 +53,7 @@ jobs:
       - name: Build release BUNDLE.
         run: cd android && ./gradlew -PnewArchEnabled=true bundleRelease --stacktrace && cd ..
       - name: Upload build outputs.
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'workflow_dispatch' }}
         with:
           name: Build Outputs
