@@ -6,9 +6,17 @@ import {AppRegistry} from 'react-native';
 import App from './src/App';
 import {name as appName} from './app.json';
 import { LogLevel, OneSignal } from 'react-native-onesignal';
-import { Appodeal, AppodealAdType, AppodealSdkEvent, AppodealLogLevel, AppodealAdRevenue} from 'react-native-appodeal';
+import { Appodeal, AppodealAdType, AppodealSdkEvent, AppodealLogLevel} from 'react-native-appodeal';
 import {ONESIGNAL_APP_ID, APPODEAL_APP_ID} from '@env';
+import notifee, { AndroidImportance } from '@notifee/react-native';
 
+notifee.createChannel({
+  id: 'posts_interactions',
+  name: 'Post Interactions',
+  lights: false,
+  vibration: true,
+  importance: AndroidImportance.DEFAULT,
+});
 
 // OneSignal Init Code
 OneSignal.Debug.setLogLevel(__DEV__ ? LogLevel.Verbose : LogLevel.None);
