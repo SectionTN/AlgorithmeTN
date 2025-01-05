@@ -15,8 +15,8 @@ import Animated, {
   LinearTransition,
 } from 'react-native-reanimated';
 import useLogin from './useLogin.ts';
-import Signup from './components/Signup.tsx';
-import ForgotPassword from './components/ForgotPassword.tsx';
+import Signup from './components/sign-up.tsx';
+import ForgotPassword from './components/forgot-password.tsx';
 
 const Login: React.FC = () => {
   const {

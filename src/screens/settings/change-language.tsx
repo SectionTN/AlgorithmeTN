@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Appbar, RadioButton, Tooltip, useTheme} from 'react-native-paper';
 import BaseView from '../../components/baseview/baseview.tsx';
-import {StyleSheet} from 'react-native';
 import {FONTS} from '../../config/misc.ts';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {heightPercentageToDP} from '../../config/dimensions.ts';
@@ -11,7 +10,7 @@ import {useNavigation} from '@react-navigation/native';
 import {changeLanguage} from '../../config/i18n/changeLanguage.ts';
 import {useMMKVString} from 'react-native-mmkv';
 
-type SupportedLanguage = 'en' | 'fr';
+type SupportedLanguage = 'en-US' | 'fr-FR';
 
 const ChangeLanguage: React.FC = () => {
   const navigation =
@@ -41,14 +40,20 @@ const ChangeLanguage: React.FC = () => {
           setLanguage(languageChanged as SupportedLanguage);
           changeLanguage(languageChanged as SupportedLanguage);
         }}
-        value={language ?? 'en'}>
-        <RadioButton.Item label="English" value="en" />
-        <RadioButton.Item label="French" value="fr-FR" />
+        value={language ?? 'en-US'}>
+        <RadioButton.Item
+          label="English"
+          value="en-US"
+          labelStyle={{fontFamily: FONTS.p_regular}}
+        />
+        <RadioButton.Item
+          label="French"
+          value="fr-FR"
+          labelStyle={{fontFamily: FONTS.p_regular}}
+        />
       </RadioButton.Group>
     </BaseView>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default ChangeLanguage;

@@ -130,7 +130,9 @@ const useLogin = () => {
       setSubscribed(optedIn || false);
 
       if (__DEV__) {
-        console.log(pushToken, userId, isSubscribed);
+        console.log('Push Token: ', token);
+        console.log('User ID: ', id);
+        console.log('Is Subscribed: ', optedIn);
       }
     } catch (e) {
       if (__DEV__) {
@@ -141,7 +143,7 @@ const useLogin = () => {
         crashlytics().recordError(e);
       }
     }
-  }, [isSubscribed, pushToken, userId]);
+  }, []);
 
   useEffect(() => {
     initializeDevice();
@@ -174,6 +176,13 @@ const useLogin = () => {
                 encryptedStorage.set('password', password);
 
                 if (userData.exists && currentUser?.emailVerified) {
+                  await firestore()
+                    .collection('users')
+                    .doc(currentUser?.uid)
+                    .update({
+                      osID: userId,
+                      osPT: pushToken,
+                    });
                   navigation.navigate('home');
                 } else if (!currentUser?.emailVerified) {
                   const username = currentUser?.uid

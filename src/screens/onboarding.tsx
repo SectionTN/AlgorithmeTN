@@ -9,7 +9,8 @@ import {
   ImageRequireSource,
   StatusBar,
   SafeAreaView,
-  BackHandler, Platform,
+  BackHandler,
+  Platform,
 } from 'react-native';
 import type {PagerViewOnPageScrollEventData} from 'react-native-pager-view';
 import PagerView from 'react-native-pager-view';
@@ -334,9 +335,10 @@ const Onboarding: React.FC = () => {
   });
 
   useEffect(() => {
-    if (Platform.OS === 'android'){
+    if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-    }  }, [theme.colors.background]);
+    }
+  }, [theme.colors.elevation.level2]);
 
   return (
     <SafeAreaView style={style.safeInsets}>
