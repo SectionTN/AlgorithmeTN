@@ -15,15 +15,29 @@ import {
 import {ONESIGNAL_APP_ID, APPODEAL_APP_ID} from '@env';
 import notifee, {AndroidImportance} from '@notifee/react-native';
 
-if (!notifee.isChannelCreated('posts_interactions')) {
-  notifee.createChannel({
-    id: 'posts_interactions',
-    name: 'Post Interactions',
-    lights: false,
-    vibration: true,
-    importance: AndroidImportance.DEFAULT,
-  });
-}
+// Notifee init Code
+
+notifee.getChannel('posts_interaction').then(channel => {
+  if (channel === null) {
+    notifee.createChannel({
+      id: 'posts_interactions',
+      name: 'Post Interactions',
+      lights: true,
+      vibration: true,
+      importance: AndroidImportance.HIGH,
+    });
+  }
+});
+
+notifee.getChannel('default').then(channel => {
+  if (channel === null) {
+    notifee.createChannel({
+      id: 'default',
+      name: 'Default',
+      importance: AndroidImportance.DEFAULT,
+    });
+  }
+});
 
 // OneSignal Init Code
 OneSignal.Debug.setLogLevel(__DEV__ ? LogLevel.Verbose : LogLevel.None);
@@ -49,7 +63,7 @@ Appodeal.setBannerAnimation(true);
 
 if (__DEV__) {
   Appodeal.addEventListener(AppodealSdkEvent.INITIALIZED, () =>
-    console.log('Appodeal:  SDK did initialize'),
+    console.log('Appodeal: SDK did initialize'),
   );
   Appodeal.addEventListener(AppodealSdkEvent.AD_REVENUE, revenue => {
     console.log('Appodeal: SDK did receive ad revenue: ', revenue);
