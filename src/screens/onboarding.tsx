@@ -1,314 +1,226 @@
 import React, {useCallback, useEffect} from 'react';
 import {
   StyleSheet,
-  Text,
   View,
-  Image,
   Dimensions,
-  Animated,
-  ImageRequireSource,
+  Platform,
   StatusBar,
   SafeAreaView,
   BackHandler,
-  Platform,
 } from 'react-native';
-import type {PagerViewOnPageScrollEventData} from 'react-native-pager-view';
-import PagerView from 'react-native-pager-view';
-import {FONTS} from '../config/misc.ts';
-import {Button, MD3Theme, useTheme} from 'react-native-paper';
+import {Button, Card, Text, useTheme, Icon} from 'react-native-paper';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
-import {RootStackParamList} from '../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {storage} from '../config/storage/mmkv.ts';
+import {RootStackParamList} from '../config/navigation/types';
+import {storage} from '../config/storage/mmkv';
 import auth from '@react-native-firebase/auth';
 import {alert} from '@baronha/ting';
 import {OneSignal} from 'react-native-onesignal';
 import {useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {heightPercentageToDP} from '../config/dimensions';
+import {FONTS} from '../config/misc';
+import Animated, {
+  useAnimatedStyle,
+  withSpring,
+  useSharedValue,
+  interpolate,
+  useDerivedValue,
+  SharedValue,
+} from 'react-native-reanimated';
+import PagerView from 'react-native-pager-view';
+
+const {width} = Dimensions.get('window');
+const DOT_SIZE = 8;
 
 const ViewPagerData = [
   {
     id: 0,
-    title: 'Welcome',
-    imageUri: require('../assets/images/logo/AlgoTN.png'),
-    heading: 'Glad to see you',
-    description:
-      "Welcome to AlgorithmeTN! We've created this application for Tunisian secondary students.",
-    key: 'first',
-    color: '#9dcdfa',
+    icon: 'hand-wave',
+    key: 'welcome',
   },
   {
     id: 1,
-    title: 'FOCUS',
-    imageUri: require('../assets/images/logo/AlgoTN.png'),
-    heading: 'SHALL WE?',
-    description:
-      "If you're not that good with algorithms, we're here to help you focus and learn with us.",
-    key: 'second',
-    color: '#db9efa',
+    icon: 'code-braces',
+    key: 'learn',
   },
   {
     id: 2,
-    title: 'FACT',
-    imageUri: require('../assets/images/logo/AlgoTN.png'),
-    heading: 'RICH DATABASE',
-    description:
-      'We have the largest database of Tunisian pseudo-algorithms, dedicated just for you.',
-    key: 'third',
-    color: '#999',
+    icon: 'share-variant',
+    key: 'share',
   },
   {
     id: 3,
-    title: 'SEE YOU',
-    imageUri: require('../assets/images/logo/AlgoTN.png'),
-    heading: 'TIME TO GO',
-    description:
-      "See you inside, we're waiting. Let's first create an account, shall we?",
-    key: 'fourth',
-    color: '#a1e3a1',
+    icon: 'rocket-launch',
+    key: 'start',
   },
 ];
 
-const {width, height} = Dimensions.get('window');
-const LOGO_WIDTH = 220;
-const LOGO_HEIGHT = 40;
-const DOT_SIZE = 40;
-const TICKER_HEIGHT = 40;
-const CIRCLE_SIZE = width * 0.6;
+const DotItem: React.FC<{
+  index: number;
+  currentPage: SharedValue<number>;
+}> = ({index, currentPage}) => {
+  const theme = useTheme();
 
-const Circle = ({
-  scrollOffsetAnimatedValue,
-}: {
-  scrollOffsetAnimatedValue: Animated.Value;
-}) => {
+  const isActive = useDerivedValue(() => {
+    return currentPage.value === index;
+  });
+
+  const dotStyle = useAnimatedStyle(() => ({
+    width: withSpring(isActive.value ? DOT_SIZE * 4 : DOT_SIZE, {
+      mass: 0.5,
+      damping: 12,
+    }),
+    opacity: withSpring(isActive.value ? 1 : 0.5, {
+      mass: 0.5,
+      damping: 12,
+    }),
+  }));
+
   return (
-    <View style={[StyleSheet.absoluteFillObject, styles.circleContainer]}>
-      {ViewPagerData.map(({color}, index) => {
-        const inputRange = [0, 0.5, 0.99];
-        const inputRangeOpacity = [0, 0.5, 0.99];
-        const scale = scrollOffsetAnimatedValue.interpolate({
-          inputRange,
-          outputRange: [1, 0, 1],
-          extrapolate: 'clamp',
-        });
+    <Animated.View
+      style={[styles.dot, dotStyle, {backgroundColor: theme.colors.primary}]}
+    />
+  );
+};
 
-        const opacity = scrollOffsetAnimatedValue.interpolate({
-          inputRange: inputRangeOpacity,
-          outputRange: [0.2, 0, 0.2],
-        });
+const Pagination: React.FC<{
+  currentPage: SharedValue<number>;
+}> = ({currentPage}) => {
+  const animatedCurrentPage = useDerivedValue(() => {
+    return Math.round(currentPage.value);
+  });
 
-        return (
-          <Animated.View
-            key={index}
-            style={[
-              styles.circle,
-              {
-                backgroundColor: color,
-                opacity,
-                transform: [{scale}],
-              },
-            ]}
-          />
-        );
-      })}
+  return (
+    <View style={styles.paginationContainer}>
+      {ViewPagerData.map((_, index) => (
+        <DotItem key={index} index={index} currentPage={animatedCurrentPage} />
+      ))}
     </View>
   );
 };
 
-const Ticker = ({
-  scrollOffsetAnimatedValue,
-  positionAnimatedValue,
-}: {
-  scrollOffsetAnimatedValue: Animated.Value;
-  positionAnimatedValue: Animated.Value;
-}) => {
-  const inputRange = [0, ViewPagerData.length];
-  const translateY = Animated.add(
-    scrollOffsetAnimatedValue,
-    positionAnimatedValue,
-  ).interpolate({
-    inputRange,
-    outputRange: [0, ViewPagerData.length * -TICKER_HEIGHT],
-  });
-  const {t} = useTranslation();
+const Item: React.FC<{
+  icon: string;
+  id: number;
+  key: string;
+  currentPage: SharedValue<number>;
+  index: number;
+}> = ({icon, id, key, currentPage, index}) => {
   const theme = useTheme();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const {t} = useTranslation();
+
+  const animationProgress = useDerivedValue(() => {
+    return currentPage.value === index
+      ? withSpring(1, {
+          mass: 0.5,
+          damping: 12,
+          stiffness: 100,
+        })
+      : withSpring(0);
+  });
+
+  const cardStyle = useAnimatedStyle(() => {
+    const scale = interpolate(animationProgress.value, [0, 1], [0.8, 1]);
+    return {
+      transform: [{scale}],
+      opacity: animationProgress.value,
+    };
+  });
+
+  const iconStyle = useAnimatedStyle(() => {
+    const scale = interpolate(animationProgress.value, [0, 1], [0, 1]);
+    const translateY = interpolate(animationProgress.value, [0, 1], [-20, 0]);
+    return {
+      transform: [{scale}, {translateY}],
+      opacity: animationProgress.value,
+    };
+  });
+
+  const headingStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(animationProgress.value, [0, 1], [20, 0]);
+    return {
+      transform: [{translateY}],
+      opacity: animationProgress.value,
+    };
+  });
+
+  const descriptionStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(animationProgress.value, [0, 1], [15, 0]);
+    return {
+      transform: [{translateY}],
+      opacity: animationProgress.value,
+    };
+  });
+
   return (
-    <View style={styles.tickerContainer}>
-      <Animated.View style={{transform: [{translateY}]}}>
-        {ViewPagerData.map(({}, index) => {
-          return (
-            <Text
-              key={index}
-              style={[styles.tickerText, {color: theme.colors.primary}]}
-              adjustsFontSizeToFit={true}>
-              {t('onboarding.step' + (index + 1))}
-            </Text>
-          );
-        })}
+    <View key={key} style={styles.itemStyle}>
+      <Animated.View style={cardStyle}>
+        <Card
+          style={[
+            styles.card,
+            {
+              backgroundColor: theme.colors.elevation.level2,
+              shadowColor:
+                Platform.OS === 'ios' ? theme.colors.shadow : 'transparent',
+            },
+          ]}>
+          <Card.Content style={styles.cardContent}>
+            <Animated.View
+              style={[
+                styles.iconContainer,
+                iconStyle,
+                {backgroundColor: theme.colors.primary},
+              ]}>
+              <Icon source={icon} size={48} color={theme.colors.onPrimary} />
+            </Animated.View>
+
+            <Animated.View style={headingStyle}>
+              <Text
+                variant="headlineMedium"
+                style={[styles.heading, {color: theme.colors.onSurface}]}>
+                {t(`onboarding.step${id + 1}_heading`)}
+              </Text>
+            </Animated.View>
+
+            <Animated.View style={descriptionStyle}>
+              <Text
+                variant="bodyLarge"
+                style={[
+                  styles.description,
+                  {color: theme.colors.onSurfaceVariant},
+                ]}>
+                {t(`onboarding.step${id + 1}_description`)}
+              </Text>
+            </Animated.View>
+
+            {id === 3 && (
+              <Animated.View style={[styles.buttonContainer, headingStyle]}>
+                <Button
+                  mode="contained"
+                  onPress={async () => {
+                    await OneSignal.Notifications.requestPermission(true);
+                    storage.set('onboardingComplete', true);
+                    alert({title: t('please_wait'), preset: 'spinner'});
+                    navigation.navigate(auth()?.currentUser ? 'home' : 'login');
+                  }}>
+                  {t('onboarding.get_started')}
+                </Button>
+              </Animated.View>
+            )}
+          </Card.Content>
+        </Card>
       </Animated.View>
     </View>
   );
 };
 
-const Item = ({
-  imageUri,
-  scrollOffsetAnimatedValue,
-  id,
-}: {
-  imageUri: ImageRequireSource;
-  description: string;
-  heading: string;
-  scrollOffsetAnimatedValue: Animated.Value;
-  positionAnimatedValue: Animated.Value;
-  id: number;
-}) => {
-  const inputRange = [0, 0.5, 0.99];
-  const inputRangeOpacity = [0, 0.5, 0.99];
-  const scale = scrollOffsetAnimatedValue.interpolate({
-    inputRange,
-    outputRange: [1, 0, 1],
-  });
-
-  const opacity = scrollOffsetAnimatedValue.interpolate({
-    inputRange: inputRangeOpacity,
-    outputRange: [1, 0, 1],
-  });
-
-  const theme = useTheme();
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
-  const {t} = useTranslation();
-
-  return (
-    <View style={styles.itemStyle}>
-      <Animated.Image
-        source={imageUri}
-        style={[
-          styles.imageStyle,
-          {
-            transform: [{scale}],
-          },
-        ]}
-      />
-      <View style={styles.textContainer}>
-        <Animated.Text
-          adjustsFontSizeToFit={true}
-          style={[
-            styles.heading,
-            {
-              color: theme.colors.secondary,
-              opacity,
-            },
-          ]}>
-          {t(`onboarding.step${id + 1}_heading`)}
-        </Animated.Text>
-        <Animated.Text
-          adjustsFontSizeToFit={true}
-          style={[
-            styles.description,
-            {
-              color: theme.colors.onBackground,
-              opacity,
-            },
-          ]}>
-          {t(`onboarding.step${id + 1}_description`)}
-        </Animated.Text>
-        {id === 3 && (
-          <Button
-            mode="contained"
-            onPress={async () => {
-              await OneSignal.Notifications.requestPermission(true);
-              setViewPagerCompleted();
-              alert({title: 'Please Wait', preset: 'spinner'});
-              if (auth()?.currentUser !== null) {
-                navigation.navigate('home');
-              } else {
-                navigation.navigate('login');
-              }
-            }}>
-            {t('continue')}
-          </Button>
-        )}
-      </View>
-    </View>
-  );
-};
-
-function getRandomColor(id: number, theme: MD3Theme) {
-  switch (id) {
-    case 0:
-      return theme.colors.secondary;
-    case 1:
-      return theme.colors.tertiary;
-    case 2:
-      return theme.colors.error;
-    case 3:
-      return theme.colors.inversePrimary;
-  }
-}
-
-const Pagination = ({
-  scrollOffsetAnimatedValue,
-  positionAnimatedValue,
-}: {
-  scrollOffsetAnimatedValue: Animated.Value;
-  positionAnimatedValue: Animated.Value;
-}) => {
-  const inputRange = [0, ViewPagerData.length];
-  const translateX = Animated.add(
-    scrollOffsetAnimatedValue,
-    positionAnimatedValue,
-  ).interpolate({
-    inputRange,
-    outputRange: [0, ViewPagerData.length * DOT_SIZE],
-  });
-
-  const theme = useTheme();
-
-  return (
-    <View style={[styles.pagination]}>
-      <Animated.View
-        style={[
-          styles.paginationIndicator,
-          {
-            position: 'absolute',
-            transform: [{translateX: translateX}],
-            borderColor: theme.colors.primary,
-          },
-        ]}
-      />
-      {ViewPagerData.map(item => {
-        return (
-          <View key={item.id} style={styles.paginationDotContainer}>
-            <View
-              style={[
-                styles.paginationDot,
-                {
-                  backgroundColor: getRandomColor(item.id, theme),
-                },
-              ]}
-            />
-          </View>
-        );
-      })}
-    </View>
-  );
-};
-
-const AnimatedPagerView = Animated.createAnimatedComponent(PagerView);
-
-const setViewPagerCompleted = () => {
-  storage?.set('onboardingComplete', true);
-};
-
 const Onboarding: React.FC = () => {
-  const scrollOffsetAnimatedValue = React.useRef(new Animated.Value(0)).current;
-  const positionAnimatedValue = React.useRef(new Animated.Value(0)).current;
-
   const theme = useTheme();
-
   const insets = useSafeAreaInsets();
+  const currentPage = useSharedValue(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -317,22 +229,10 @@ const Onboarding: React.FC = () => {
         return true;
       };
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
-
       return () =>
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, []),
   );
-
-  const style = StyleSheet.create({
-    safeInsets: {
-      flex: 1,
-      backgroundColor: theme.colors.background,
-      paddingTop: 0,
-      paddingBottom: 0,
-      paddingLeft: insets.left,
-      paddingRight: insets.right,
-    },
-  });
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -341,154 +241,107 @@ const Onboarding: React.FC = () => {
   }, [theme.colors.elevation.level2]);
 
   return (
-    <SafeAreaView style={style.safeInsets}>
-      <Circle scrollOffsetAnimatedValue={scrollOffsetAnimatedValue} />
-      <AnimatedPagerView
+    <SafeAreaView
+      style={[
+        styles.container,
+        {
+          backgroundColor: theme.colors.background,
+          paddingTop: insets.top,
+        },
+      ]}>
+      <PagerView
         initialPage={0}
-        style={{width: '100%', height: '100%'}}
-        onPageScroll={Animated.event<PagerViewOnPageScrollEventData>(
-          [
-            {
-              nativeEvent: {
-                offset: scrollOffsetAnimatedValue,
-                position: positionAnimatedValue,
-              },
-            },
-          ],
-          {
-            listener: ({nativeEvent: {offset, position}}) => {
-              if (__DEV__) {
-                console.log(`Position: ${position} Offset: ${offset}`);
-              }
-            },
-            useNativeDriver: true,
-          },
-        )}>
+        style={styles.pagerView}
+        onPageSelected={e => {
+          currentPage.value = e.nativeEvent.position;
+        }}>
         {ViewPagerData.map((item, index) => (
-          <View collapsable={false} key={index}>
-            <Item
-              {...item}
-              scrollOffsetAnimatedValue={scrollOffsetAnimatedValue}
-              positionAnimatedValue={positionAnimatedValue}
-            />
+          <View key={item.key} style={styles.pageContainer}>
+            <Item {...item} index={index} currentPage={currentPage} />
           </View>
         ))}
-      </AnimatedPagerView>
-      <Image
-        style={styles.logo}
-        source={require('../assets/images/logo/AlgoTN.png')}
-      />
-      <Pagination
-        scrollOffsetAnimatedValue={scrollOffsetAnimatedValue}
-        positionAnimatedValue={positionAnimatedValue}
-      />
-      <Ticker
-        scrollOffsetAnimatedValue={scrollOffsetAnimatedValue}
-        positionAnimatedValue={positionAnimatedValue}
-      />
+      </PagerView>
+
+      <Pagination currentPage={currentPage} />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  itemStyle: {
-    width,
-    height,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  imageStyle: {
-    width: width * 0.75,
-    height: width * 0.75,
-    resizeMode: 'contain',
+  container: {
     flex: 1,
   },
+  pagerView: {
+    flex: 1,
+  },
+  pageContainer: {
+    flex: 1,
+  },
+  itemStyle: {
+    width,
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  card: {
+    width: '100%',
+    borderRadius: heightPercentageToDP(2),
+    elevation: 0,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  cardContent: {
+    alignItems: 'center',
+    padding: heightPercentageToDP(3),
+    backgroundColor: 'transparent',
+  },
   textContainer: {
-    alignItems: 'flex-start',
-    alignSelf: 'flex-end',
-    flex: 0.5,
+    alignItems: 'center',
   },
   heading: {
-    textTransform: 'uppercase',
-    fontSize: 24,
-    fontWeight: '800',
-    letterSpacing: 2,
-    marginBottom: 5,
-    fontFamily: FONTS.r_regular,
+    marginTop: heightPercentageToDP(2),
+    marginBottom: heightPercentageToDP(1),
+    textAlign: 'center',
+    fontFamily: FONTS.p_bold,
   },
   description: {
-    fontWeight: '600',
-    textAlign: 'left',
-    width: width * 0.75,
-    marginRight: 10,
-    fontSize: 16,
-    lineHeight: 16 * 1.5,
+    textAlign: 'center',
+    marginBottom: heightPercentageToDP(2),
     fontFamily: FONTS.p_regular,
   },
-  logo: {
-    opacity: 0.9,
-    height: LOGO_HEIGHT,
-    width: LOGO_WIDTH,
-    resizeMode: 'contain',
-    position: 'absolute',
-    left: 10,
-    bottom: 10,
-    transform: [
-      {translateX: -LOGO_WIDTH / 2},
-      {translateY: -LOGO_HEIGHT / 2},
-      {rotateZ: '-90deg'},
-      {translateX: LOGO_WIDTH / 2},
-      {translateY: LOGO_HEIGHT / 2},
-    ],
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: heightPercentageToDP(2),
   },
-  pagination: {
-    position: 'absolute',
-    right: 20,
-    bottom: 40,
+  iconContainer: {
+    width: heightPercentageToDP(10),
+    height: heightPercentageToDP(10),
+    borderRadius: heightPercentageToDP(5),
+    marginBottom: heightPercentageToDP(3),
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 0,
+    shadowColor: 'transparent',
+  },
+  dot: {
+    height: DOT_SIZE,
+    borderRadius: DOT_SIZE,
+    marginHorizontal: 4,
+  },
+  paginationContainer: {
     flexDirection: 'row',
-    height: DOT_SIZE,
-  },
-  paginationDot: {
-    width: DOT_SIZE * 0.3,
-    height: DOT_SIZE * 0.3,
-    borderRadius: DOT_SIZE * 0.15,
-  },
-  paginationDotContainer: {
-    width: DOT_SIZE,
-    alignItems: 'center',
     justifyContent: 'center',
-  },
-  paginationIndicator: {
-    width: DOT_SIZE,
-    height: DOT_SIZE,
-    borderRadius: DOT_SIZE / 2,
-    borderWidth: 2,
-  },
-  tickerContainer: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    overflow: 'hidden',
-    height: TICKER_HEIGHT,
-  },
-  tickerText: {
-    fontSize: TICKER_HEIGHT,
-    lineHeight: TICKER_HEIGHT,
-    textTransform: 'uppercase',
-    fontWeight: '800',
-    fontFamily: FONTS.p_regular,
-  },
-
-  circleContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  circle: {
-    width: CIRCLE_SIZE,
-    height: CIRCLE_SIZE,
-    borderRadius: CIRCLE_SIZE / 2,
     position: 'absolute',
-    top: '15%',
+    bottom: heightPercentageToDP(4),
+    left: 0,
+    right: 0,
   },
 });
 

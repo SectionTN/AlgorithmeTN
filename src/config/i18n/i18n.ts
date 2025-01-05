@@ -1,4 +1,5 @@
 import i18n, {LanguageDetectorModule} from 'i18next';
+import {get} from 'lodash';
 import {initReactI18next} from 'react-i18next';
 import * as RNLocalize from 'react-native-localize';
 
@@ -20,22 +21,19 @@ const resources = {
       slogan: 'Work hard for the BAC',
       algorithm: 'Algorithm',
       onboarding: {
-        step1: 'WELCOME',
-        step1_heading: 'Glad to see you',
+        step1_heading: 'Welcome to AlgoTN',
         step1_description:
-          "Welcome to AlgorithmeTN! We've created this application for Tunisian secondary students.",
-        step2: 'FOCUS',
-        step2_heading: 'SHALL WE?',
+          'Discover a world of algorithms, data structures, and coding solutions crafted by developers, for developers.',
+        step2_heading: 'Rich Learning Experience',
         step2_description:
-          "If you're not that good with algorithms, we're here to help you focus and learn with us.",
-        step3: 'FACT',
-        step3_heading: 'RICH DATABASE',
+          'Explore our vast collection of optimized algorithms, from sorting and searching to advanced graph theory and machine learning.',
+        step3_heading: 'Build Together',
         step3_description:
-          'We have the largest database of Tunisian pseudo-algorithms, dedicated just for you.',
-        step4: 'SEE YOU',
-        step4_heading: 'TIME TO GO',
+          'Share your implementations, get feedback from peers, and help others learn while building your professional portfolio.',
+        step4_heading: 'Join Our Community',
         step4_description:
-          "See you inside, we're waiting. Let's first create an account, shall we?",
+          'Start your journey with AlgoTN today. Connect with fellow developers, showcase your skills, and grow together.',
+        get_started: 'Get Started',
       },
       continue: 'Continue',
       go_back: 'Go Back',
@@ -218,22 +216,19 @@ const resources = {
       slogan: 'Travaillez dur pour le BAC',
       algorithm: 'Algorithme',
       onboarding: {
-        step1: 'BIENVENUE',
-        step1_heading: 'Ravi de vous voir',
+        step1_heading: 'Bienvenue sur AlgoTN',
         step1_description:
-          'Bienvenue sur AlgorithmeTN! Nous avons créé cette application pour les élèves tunisiens du secondaire.',
-        step2: 'FOCALISEZ',
-        step2_heading: 'ALLONS-Y?',
+          "Découvrez un monde d'algorithmes, de structures de données et de solutions de codage créés par des développeurs, pour des développeurs.",
+        step2_heading: "Riche expérience d'apprentissage",
         step2_description:
-          "Si vous n'êtes pas très bon en algorithmes, nous sommes là pour vous aider à vous concentrer et à apprendre avec nous.",
-        step3: 'FAIT',
-        step3_heading: 'B.D. RICHE',
+          "Explorez notre vaste collection d'algorithmes optimisés, du tri et de la recherche à la théorie avancée des graphes et à l'apprentissage automatique.",
+        step3_heading: 'Construire ensemble',
         step3_description:
-          'Nous avons la plus grande base de données de pseudo-algorithmes tunisiens, dédiée juste pour vous.',
-        step4: 'À BIENTÔT',
-        step4_heading: 'TEMPS DE PARTIR',
+          'Partagez vos implémentations, obtenez des retours de vos pairs et aidez les autres à apprendre tout en construisant votre portfolio professionnel.',
+        step4_heading: 'Rejoignez notre communauté',
         step4_description:
-          "À bientôt à l'intérieur, nous vous attendons. Créons d'abord un compte, d'accord?",
+          "Commencez votre voyage avec AlgoTN aujourd'hui. Connectez-vous avec d'autres développeurs, montrez vos compétences et grandissez ensemble.",
+        get_started: 'Commencer',
       },
       continue: 'Continuer',
       go_back: 'Retour',
