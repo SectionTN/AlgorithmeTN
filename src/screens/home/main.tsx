@@ -39,6 +39,8 @@ import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {useTranslation} from 'react-i18next';
 import {OneSignal} from 'react-native-onesignal';
+import {OneSignalPostNotification} from '../../utils/onesignal.ts';
+import getFullUserData from '../../utils/firebase.ts';
 
 const LeftContent = (props: JSX.IntrinsicAttributes & {size?: number}) => (
   <Avatar.Icon {...props} icon="code-tags" />
@@ -87,7 +89,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
   const CODES_PER_PAGE = 10;
 
   useLayoutEffect(() => {
-    if (Platform.OS === 'android'){
+    if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(theme.colors.elevation.level2);
     }
   }, [theme.colors.elevation.level2]);
@@ -248,6 +250,20 @@ const Main = forwardRef<MainRef>((_, ref) => {
       if (!userCodeUID) {
         return;
       }
+
+      const userData = await getFullUserData(userCodeUID);
+      if (!userData) {
+        return;
+      }
+
+      const UserCode = {
+        firstName: userData.first_name,
+        lastName: userData.last_name,
+        uid: userCodeUID,
+        photoURL: userData.photoURL?.length === 2 ? '' : userData.photoURL,
+        userPushID: userData.osID,
+      };
+
       if (likes.includes(uid)) {
         await Promise.all([
           codeRef.update({
@@ -270,6 +286,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
             likes: firestore.FieldValue.arrayUnion(uid),
           }),
           addNotification(userCodeUID, 'like', codeId),
+          OneSignalPostNotification(UserCode, 'like'),
         ]);
       }
     } catch (error) {
@@ -332,7 +349,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
         userReceiveID: uid,
         postId: post_id,
         notification_type: notification_type,
-        userSentID: uid,
+        userSentID: myUID,
         createdAt: firestore.Timestamp.now(),
       });
     } catch (e) {
@@ -362,6 +379,23 @@ const Main = forwardRef<MainRef>((_, ref) => {
     const userDocRef = firestore().collection('users').doc(uid);
     const bookmarkDocRef = userDocRef.collection('bookmarks').doc(codeId);
 
+    const codeUIDRef = await firestore().collection('codes').doc(codeId).get();
+
+    const userCodeUID = codeUIDRef.data()?.uid;
+
+    const userData = await getFullUserData(userCodeUID);
+    if (!userData) {
+      return;
+    }
+
+    const UserCode = {
+      firstName: userData.first_name,
+      lastName: userData.last_name,
+      uid: userCodeUID,
+      photoURL: userData.photoURL?.length === 2 ? '' : userData.photoURL,
+      userPushID: userData.osID,
+    };
+
     try {
       if (!isCurrentlyBookmarked) {
         await Promise.all([
@@ -374,6 +408,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
             postId: codeId,
             time: firestore.Timestamp.fromDate(new Date()),
           }),
+          OneSignalPostNotification(UserCode, 'bookmark'),
         ]);
       } else {
         await Promise.all([

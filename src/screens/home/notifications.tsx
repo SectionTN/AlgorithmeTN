@@ -172,10 +172,10 @@ const Notifications: React.FC = () => {
   };
 
   useEffect(() => {
-    if (Platform.OS === 'android'){
+    if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(theme.colors.elevation.level2);
     }
-    }, [theme.colors.elevation.level2]);
+  }, [theme.colors.elevation.level2]);
 
   useEffect(() => {
     setPhotoUrl(auth().currentUser?.photoURL ?? 'XD');

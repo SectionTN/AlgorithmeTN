@@ -1,7 +1,8 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   BackHandler,
-  Keyboard, Platform,
+  Keyboard,
+  Platform,
   Pressable,
   StatusBar,
   StyleSheet,
@@ -41,7 +42,6 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../config/navigation/types.ts';
 import NetInfo from '@react-native-community/netinfo';
 import {lowerToUppercase} from '../utils/algo-utils.ts';
 import auth from '@react-native-firebase/auth';
@@ -51,6 +51,9 @@ import crashlytics from '@react-native-firebase/crashlytics';
 import {createPasswordHash} from '../utils/hash.ts';
 import {encryptedStorage} from '../config/storage/mmkv.ts';
 import {useTranslation} from 'react-i18next';
+import {OneSignal} from 'react-native-onesignal';
+import {locales} from '../App.tsx';
+import {RootStackParamList} from '../config/navigation/types.ts';
 
 type SetupRouteProp = RouteProp<RootStackParamList, 'setup'>;
 
@@ -91,62 +94,36 @@ const Setup: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useTheme();
-
   const route = useRoute<SetupRouteProp>();
-
   const {t} = useTranslation();
-
   const {username, email, password, osID, osPT, from_where} =
     route.params || {};
 
   const [userPhoto, setUserPhoto] = useState<PhotoType | null>(null);
-
   const [onGoingData, setOnGoingData] = useState(false);
-
   const [storagePassword, setStoragePassword] = useState<string>('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [isConnected, setIsConnected] = useState(true);
 
   const pickerRef = useRef<BottomSheetModal>(null);
   const sheetSnapPoints = useMemo(() => ['27.5%'], []);
-
-  const handlePresentModal = useCallback(() => {
-    Keyboard.dismiss();
-    pickerRef?.current?.present();
-  }, []);
-
   const {dismissAll} = useBottomSheetModal();
 
-  /**
-   * User details
-   */
-
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-
-  /**
-   * Hooks
-   */
-  const memoizedFirstName = useMemo(() => firstName?.trim(), [firstName]);
-  const memoizedLastName = useMemo(() => lastName?.trim(), [lastName]);
+  const memoizedFirstName = useMemo(() => firstName.trim(), [firstName]);
+  const memoizedLastName = useMemo(() => lastName.trim(), [lastName]);
 
   useEffect(() => {
-    if (from_where === 'register') {
-      if (encryptedStorage.contains('password')) {
-        setStoragePassword(encryptedStorage.getString('password') ?? '');
-        if (__DEV__) {
-          console.log('done loading password from storage');
-        }
-      } else {
-        if (__DEV__) {
-          console.log("doesn't contain a password");
-        }
-      }
+    if (from_where === 'register' && encryptedStorage.contains('password')) {
+      setStoragePassword(encryptedStorage.getString('password') ?? '');
     }
   }, [from_where]);
 
   useEffect(() => {
-    if (Platform.OS === 'android'){
+    if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(theme.colors.elevation.level2);
-    }  }, [theme.colors.background]);
+    }
+  }, [theme.colors.elevation.level2]);
 
   useFocusEffect(
     useCallback(() => {
@@ -166,18 +143,6 @@ const Setup: React.FC = () => {
         BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, [navigation]),
   );
-  /**
-   * Functions
-   */
-
-  function returnNameLike() {
-    if (isEmpty(firstName) || isEmpty(lastName)) {
-      return 'XD';
-    }
-    return firstName[0].toUpperCase() + lastName[0].toUpperCase();
-  }
-
-  const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -189,175 +154,137 @@ const Setup: React.FC = () => {
     };
   }, []);
 
-  async function handleFABPress() {
+  const handlePresentModal = useCallback(() => {
+    Keyboard.dismiss();
+    pickerRef.current?.present();
+  }, []);
+
+  const returnNameLike = () => {
+    if (isEmpty(firstName) || isEmpty(lastName)) {
+      return 'XD';
+    }
+    return firstName[0].toUpperCase() + lastName[0].toUpperCase();
+  };
+
+  const handleFABPress = async () => {
     setOnGoingData(true);
     if (!isConnected) {
       setOnGoingData(false);
       return alert({title: t('no_internet'), preset: 'error'});
     }
+
     const modifiedFirstName = lowerToUppercase(memoizedFirstName);
     const modifiedLastName = lowerToUppercase(memoizedLastName);
-    if (firstName?.length > 1 && lastName?.length > 1) {
-      alert({title: t('please_wait'), preset: 'spinner', duration: 10});
-      if (!password) {
-        if (!storagePassword) {
-          crashlytics().log(
-            'both params & storage passwords seems to be undefined, crashing the app',
-          );
-          return crashlytics().crash();
-        }
-      }
-      const hashedPassword = await createPasswordHash(
-        password ?? storagePassword,
-      );
-      const firebaseParams = {username, email, osID, osPT};
-      await pushCollections();
-      if (userPhoto) {
-        /**
-         * Extract the filename from userPhoto Path and remove the extension
-         */
-        let fileName = userPhoto?.path?.substring(
-          userPhoto?.path?.lastIndexOf('/') + 1,
-        );
-        if (fileName) {
-          fileName = fileName.split('.').slice(0, -1).join('.');
-        } else {
-          fileName = 'photo';
-        }
-        /**
-         * Reference to users' image path
-         */
-        try {
-          const userAvatarRef = `avatars/${
-            auth()?.currentUser?.uid
-          }/${fileName}`;
-          const storageRef = storage().ref(userAvatarRef);
 
-          /**
-           * Uploading image to Firebase Storage
-           */
-
-          const uploadImageTask = storageRef?.putFile(userPhoto?.path);
-
-          /**
-           * Add observer to image uploading.
-           */
-
-          if (__DEV__) {
-            uploadImageTask.on('state_changed', taskSnapshot => {
-              let percentage =
-                (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100;
-              console.log(`Upload is ${percentage}% done`);
-            });
-          }
-
-          /**
-           * an async function to get {avatarUrl} and upload all user data.
-           */
-
-          uploadImageTask.then(async () => {
-            const avatarUrl = await storage()
-              .ref(userAvatarRef)
-              .getDownloadURL();
-            const userData = {
-              ...firebaseParams,
-              uid: auth()?.currentUser?.uid,
-              first_name: modifiedFirstName,
-              last_name: modifiedLastName,
-              avatar: avatarUrl,
-              avatar_status: 'photo',
-              info: {
-                created_At: firestore?.Timestamp?.fromDate(new Date()),
-                premium: false,
-                premiumUntil: 'none',
-                banned: false,
-                bannedUntil: '',
-              },
-              active_status: 'normal',
-              active_time: firestore?.Timestamp?.fromDate(new Date()),
-              bio: '',
-              password: hashedPassword,
-              role: 'member',
-            };
-            firestore()
-              .collection('users')
-              .doc(auth()?.currentUser?.uid)
-              .set(userData)
-              .finally(async () => {
-                await auth()?.currentUser?.updateProfile({
-                  displayName: `${memoizedFirstName} ${memoizedLastName}`,
-                  photoURL: avatarUrl,
-                });
-                navigation?.navigate('home');
-              })
-              .catch(e => {
-                setOnGoingData(false);
-                if (e instanceof Error) {
-                  crashlytics().recordError(e);
-                }
-                if (__DEV__) {
-                  console.error(e);
-                }
-              });
-          });
-        } catch (e) {
-          setOnGoingData(false);
-          if (e instanceof Error) {
-            crashlytics().recordError(e);
-          }
-          if (__DEV__) {
-            console.error(e);
-          }
-        }
-      } else {
-        const avatarText = `${modifiedFirstName[0]}${modifiedLastName[0]}`;
-        const userData = {
-          ...firebaseParams,
-          first_name: modifiedFirstName,
-          last_name: modifiedLastName,
-          avatar: avatarText,
-          avatar_status: 'text',
-          info: {
-            created_At: firestore?.Timestamp?.fromDate(new Date()),
-            premium: false,
-            premiumUntil: 'none',
-            banned: false,
-            bannedUntil: '',
-          },
-          active_status: 'normal',
-          active_time: firestore?.Timestamp?.fromDate(new Date()),
-          bio: '',
-          password: hashedPassword,
-        };
-        firestore()
-          .collection('users')
-          .doc(auth()?.currentUser?.uid)
-          .set(userData)
-          .finally(async () => {
-            await auth()?.currentUser?.updateProfile({
-              displayName: `${memoizedFirstName} ${memoizedLastName}`,
-              photoURL: avatarText,
-            });
-            navigation?.navigate('home');
-          })
-          .catch(e => {
-            setOnGoingData(false);
-            if (e instanceof Error) {
-              crashlytics().recordError(e);
-            }
-            if (__DEV__) {
-              console.error(e);
-            }
-          });
-      }
-    } else {
+    if (firstName.length <= 1 || lastName.length <= 1) {
       setOnGoingData(false);
       return alert({
         title: t('setup.wrong_info'),
         message: t('setup.wrong_info_message'),
       });
     }
-  }
+
+    alert({title: t('please_wait'), preset: 'spinner', duration: 10});
+
+    const hashedPassword = await createPasswordHash(
+      password ?? storagePassword,
+    );
+    const firebaseParams = {username, email, osID, osPT};
+
+    await pushCollections();
+
+    const userData = {
+      ...firebaseParams,
+      uid: auth().currentUser?.uid,
+      first_name: modifiedFirstName,
+      last_name: modifiedLastName,
+      avatar: '',
+      avatar_status: userPhoto ? 'photo' : 'text',
+      info: {
+        created_At: firestore.Timestamp.fromDate(new Date()),
+        premium: false,
+        premiumUntil: 'none',
+        banned: false,
+        bannedUntil: '',
+      },
+      active_status: 'normal',
+      active_time: firestore.Timestamp.fromDate(new Date()),
+      bio: '',
+      password: hashedPassword,
+      role: 'member',
+    };
+
+    if (userPhoto) {
+      const fileName =
+        userPhoto.path
+          .substring(userPhoto.path.lastIndexOf('/') + 1)
+          .split('.')
+          .slice(0, -1)
+          .join('.') || 'photo';
+
+      const userAvatarRef = `avatars/${auth().currentUser?.uid}/${fileName}`;
+      const storageRef = storage().ref(userAvatarRef);
+
+      try {
+        const uploadImageTask = storageRef.putFile(userPhoto.path);
+
+        if (__DEV__) {
+          uploadImageTask.on('state_changed', taskSnapshot => {
+            const percentage =
+              (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100;
+            console.log(`Upload is ${percentage}% done`);
+          });
+        }
+
+        uploadImageTask
+          .then(async () => {
+            const avatarUrl = await storageRef.getDownloadURL();
+            userData.avatar = avatarUrl;
+
+            await firestore()
+              .collection('users')
+              .doc(auth().currentUser?.uid)
+              .set(userData);
+            await auth().currentUser?.updateProfile({
+              displayName: `${memoizedFirstName} ${memoizedLastName}`,
+              photoURL: avatarUrl,
+            });
+            OneSignal.User.setLanguage(locales[0].languageTag);
+            navigation.navigate('home');
+          })
+          .catch(handleError);
+      } catch (e) {
+        handleError(e);
+      }
+    } else {
+      const avatarText = `${modifiedFirstName[0]}${modifiedLastName[0]}`;
+      userData.avatar = avatarText;
+
+      firestore()
+        .collection('users')
+        .doc(auth().currentUser?.uid)
+        .set(userData)
+        .finally(async () => {
+          await auth().currentUser?.updateProfile({
+            displayName: `${memoizedFirstName} ${memoizedLastName}`,
+            photoURL: avatarText,
+          });
+          OneSignal.User.setLanguage(locales[0].languageTag);
+          navigation.navigate('home');
+        })
+        .catch(handleError);
+    }
+  };
+
+  const handleError = (e: any) => {
+    setOnGoingData(false);
+    if (e instanceof Error) {
+      crashlytics().recordError(e);
+    }
+    if (__DEV__) {
+      console.error(e);
+    }
+  };
 
   return (
     <BaseView
@@ -407,7 +334,7 @@ const Setup: React.FC = () => {
             paddingLeft: '2.5%',
           }}>
           {userPhoto ? (
-            <Avatar.Image size={67.5} source={{uri: userPhoto?.path}} />
+            <Avatar.Image size={67.5} source={{uri: userPhoto.path}} />
           ) : (
             <View
               style={{
