@@ -1,7 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
 
-const getUserData = async (uid: string) => {
+const getFullUserData = async (uid: string) => {
   try {
     const userDoc = await firestore().collection('users').doc(uid).get();
     if (userDoc.exists) {
@@ -17,4 +17,4 @@ const getUserData = async (uid: string) => {
   }
 };
 
-export default getUserData;
+export default getFullUserData;
