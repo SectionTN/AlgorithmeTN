@@ -1,7 +1,6 @@
 import auth from '@react-native-firebase/auth';
 import crashlytics from '@react-native-firebase/crashlytics';
 import {ONESIGNAL_APP_ID, REST_API_KEY} from '@env';
-import {alert} from '@baronha/ting';
 import axios from 'axios';
 
 interface User {
@@ -54,7 +53,7 @@ const OneSignalPostNotification = async (
     app_id: ONESIGNAL_APP_ID,
     include_player_ids: [userToReceive.userPushID],
     contents: notificationContents,
-    channel_id: 'default',
+    channel_id: 'posts_interactions',
     existing_android_channel_id: 'posts_interactions',
     data: {
       type,
@@ -93,11 +92,6 @@ const OneSignalPostNotification = async (
       if (__DEV__) {
         console.error('OneSignal Error:', message);
       }
-      alert({
-        title: 'Notification Error',
-        message,
-        preset: 'error',
-      });
     }
     throw error;
   }
