@@ -318,17 +318,6 @@ const Setup: React.FC = () => {
             Keyboard.dismiss();
             handlePresentModal();
           }}
-          onLongPress={() => {
-            if (userPhoto) {
-              setUserPhoto(null);
-              alert({
-                title: t('setup.photo_removed'),
-                message: t('setup.select_new_photo'),
-                preset: 'done',
-                backdropOpacity: 0.1,
-              });
-            }
-          }}
           style={{
             justifyContent: 'center',
             paddingLeft: '2.5%',
@@ -395,6 +384,16 @@ const Setup: React.FC = () => {
         sheetRef={pickerRef}
         index={0}
         snapPoints={sheetSnapPoints}
+        showDelete={userPhoto !== null}
+        onDeletePress={() => {
+          setUserPhoto(null);
+          dismissAll();
+          alert({
+            title: 'Photo Removed',
+            message: 'Your profile picture has been removed',
+            preset: 'done',
+          });
+        }}
         onCameraPress={async () => {
           await openCamera(AvatarPicker)
             .then(image => {

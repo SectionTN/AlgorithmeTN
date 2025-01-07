@@ -35,6 +35,13 @@ import {lowerToUppercase} from '../../utils/algo-utils.ts';
 import NetInfo from '@react-native-community/netinfo';
 import {nameRegex} from '../../utils/regex.ts';
 
+interface ProfileUpdates {
+  first_name?: string;
+  last_name?: string;
+  avatar?: string;
+  avatar_status?: 'text' | 'photo';
+}
+
 const EditProfile: React.FC = () => {
   const pickerRef = useRef<BottomSheetModal>(null);
   const sheetSnapPoints = useMemo(() => ['27.5%'], []);
@@ -108,143 +115,113 @@ const EditProfile: React.FC = () => {
     return () => userData();
   }, []);
 
-  async function pushUserPhoto() {
-    alert({title: 'Please Wait', preset: 'spinner', duration: 5});
-    /**
-     * Extract the filename from userPhoto Path and remove an extension
-     */
-    let fileName = userPhoto?.path?.substring(
-      userPhoto?.path?.lastIndexOf('/') + 1,
-    );
-    if (fileName) {
-      fileName = fileName.split('.').slice(0, -1).join('.');
-    } else {
-      fileName = 'photo';
+  const handleProfileUpdate = async () => {
+    if (!isConnected) {
+      alert({
+        title: 'Network Unavailable',
+        message: 'Network connection is needed to update your profile',
+        preset: 'error',
+      });
+      return;
     }
 
-    /**
-     * Reference to users image path
-     */
-
-    const avatarRef = `avatars/${auth()?.currentUser?.uid}/${fileName}`;
-
-    const storageRef = storage().ref(avatarRef);
-
-    if (userPhoto?.path) {
-      /**
-       * Uploading image to Firebase Storage
-       */
-
-      const uploadImageTask = storageRef.putFile(userPhoto.path);
-      uploadImageTask.on('state_changed', taskSnapshot => {
-        if (__DEV__) {
-          console.log(
-            `${taskSnapshot?.bytesTransferred} transferred out of ${taskSnapshot?.totalBytes}`,
-          );
-        }
-      });
-
-      /**
-       * an async function to get {avatarUrl} and upload all user data.
-       */
-      uploadImageTask.then(async () => {
-        const avatar = await storage().ref(avatarRef).getDownloadURL();
-        pushImage(avatar);
-      });
-    } else {
+    if (firstnameHasLessLength() || lastnameHasLessLength()) {
       alert({
-        title: 'An error occurred',
-        message: 'Please select your image again',
+        title: 'Your name is too short',
+        message: `${
+          firstnameHasLessLength() ? 'First name' : 'Last Name'
+        } must be longer than 3 characters`,
+        preset: 'error',
+      });
+      return;
+    }
+
+    alert({title: 'Please Wait', preset: 'spinner'});
+
+    try {
+      const updates: ProfileUpdates = {};
+      let needsNameUpdate = false;
+      let needsPhotoUpdate = false;
+
+      if (
+        firstName?.trim() !== oldFirstname?.trim() ||
+        lastName?.trim() !== oldLastname?.trim()
+      ) {
+        updates.first_name = lowerToUppercase(firstName?.trim());
+        updates.last_name = lowerToUppercase(lastName?.trim());
+        needsNameUpdate = true;
+
+        if (avatarStatus === 'text') {
+          const newInitials = `${updates.first_name[0]}${updates.last_name[0]}`;
+          updates.avatar = newInitials;
+          updates.avatar_status = 'text';
+          needsPhotoUpdate = true;
+        }
+      }
+
+      if (userPhoto) {
+        const photoUrl = await uploadUserPhoto(userPhoto);
+        updates.avatar = photoUrl;
+        updates.avatar_status = 'photo';
+        needsPhotoUpdate = true;
+      } else if (userPhoto === null && avatarStatus === 'photo') {
+        const initials = `${(updates.first_name || firstName)[0]}${
+          (updates.last_name || lastName)[0]
+        }`;
+        updates.avatar = initials;
+        updates.avatar_status = 'text';
+        needsPhotoUpdate = true;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await firestore()
+          .collection('users')
+          .doc(auth()?.currentUser?.uid)
+          .update(updates);
+
+        const authUpdates: {displayName?: string; photoURL?: string} = {};
+
+        if (needsNameUpdate) {
+          authUpdates.displayName = `${updates.first_name || firstName} ${
+            updates.last_name || lastName
+          }`;
+        }
+
+        if (needsPhotoUpdate || (needsNameUpdate && avatarStatus === 'text')) {
+          authUpdates.photoURL = updates.avatar;
+        }
+
+        await auth()?.currentUser?.updateProfile(authUpdates);
+
+        alert({
+          title: 'Profile Updated',
+          message: 'Your profile has been updated successfully',
+          preset: 'done',
+        });
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        crashlytics().recordError(error);
+      }
+      alert({
+        title: 'Update Failed',
+        message: 'An error occurred while updating your profile',
         preset: 'error',
       });
     }
-  }
+  };
 
-  /**
-   * Push image url to the currentUser.
-   * @param pureImageUrl
-   */
-  function pushImage(pureImageUrl: string) {
-    firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .update({
-        avatar: pureImageUrl,
-      })
-      .finally(async () => {
-        await auth()?.currentUser?.updateProfile({photoURL: pureImageUrl});
-        alert({
-          title: 'Profile Updated',
-          message: 'Your profile is updated successfully',
-          preset: 'done',
-        });
-      })
-      .catch(error => {
-        crashlytics().recordError(error);
-        alert({
-          title: 'An error occurred',
-          message: 'Profile photo update failed',
-          preset: 'error',
-        });
-      });
-  }
+  const uploadUserPhoto = async (photo: PhotoType): Promise<string> => {
+    const fileName =
+      photo?.path
+        ?.substring(photo?.path?.lastIndexOf('/') + 1)
+        ?.split('.')[0] || 'photo';
+    const avatarRef = `avatars/${auth()?.currentUser?.uid}/${fileName}`;
+    const storageRef = storage().ref(avatarRef);
 
-  async function pushNames() {
-    alert({title: 'Please Wait', preset: 'spinner'});
-    await firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .update({
-        first_name: lowerToUppercase(firstName?.trim()),
-        last_name: lowerToUppercase(lastName?.trim()),
-      })
-      .finally(async () => {
-        await auth()?.currentUser?.updateProfile({
-          displayName: `${lowerToUppercase(
-            firstName?.trim(),
-          )} ${lowerToUppercase(lastName?.trim())}`,
-        });
-        if (avatarStatus === 'text') {
-          await pushAvatarAsName();
-        }
-        setOldFirstname(firstName);
-        setOldLastName(lastName);
-        alert({
-          title: 'Profile Updated',
-          message: 'Your profile is updated successfully',
-          preset: 'done',
-        });
-      })
-      .catch(error => {
-        crashlytics().recordError(error);
-        alert({
-          title: 'Profile Update Failed',
-          message: 'An error occurred when updating your profile',
-          preset: 'error',
-        });
-      });
-  }
-
-  async function pushAvatarAsName() {
-    await firestore()
-      .collection('users')
-      .doc(auth()?.currentUser?.uid)
-      .update({
-        avatar: `${firstName?.trim()[0].toUpperCase()}${lastName
-          ?.trim()[0]
-          .toUpperCase()}`,
-      })
-      .finally(async () => {
-        await auth()?.currentUser?.updateProfile({
-          photoURL: `${firstName?.trim()[0].toUpperCase()}${lastName
-            ?.trim()[0]
-            .toUpperCase()}`,
-        });
-      })
-      .catch(error => {
-        crashlytics().recordError(error);
-      });
-  }
+    await storageRef.putFile(photo.path);
+    return await storageRef.getDownloadURL();
+  };
 
   const firstnameHasLessLength = () => {
     return firstName?.trim()?.length < 3;
@@ -255,41 +232,7 @@ const EditProfile: React.FC = () => {
   };
 
   function handleFabPress() {
-    if (isConnected) {
-      if (!firstnameHasLessLength() && !lastnameHasLessLength()) {
-        if (
-          firstName?.trim() === oldFirstname?.trim() &&
-          lastName?.trim() === oldLastname?.trim() &&
-          !userPhoto
-        ) {
-          navigation?.goBack();
-        } else {
-          if (userPhoto) {
-            pushUserPhoto();
-          }
-          if (
-            firstName?.trim() !== oldFirstname?.trim() ||
-            lastName?.trim() !== oldLastname?.trim()
-          ) {
-            pushNames();
-          }
-        }
-      } else {
-        alert({
-          title: 'Your name is too short',
-          message: `${
-            firstnameHasLessLength() ? 'First name' : 'Last Name'
-          } must be longer or equal to 3 characters`,
-          preset: 'error',
-        });
-      }
-    } else {
-      alert({
-        title: 'Network Unavailable',
-        message: 'Network connection is needed to update your profile',
-        preset: 'error',
-      });
-    }
+    handleProfileUpdate();
   }
 
   return (
@@ -415,27 +358,43 @@ const EditProfile: React.FC = () => {
         sheetRef={pickerRef}
         index={0}
         snapPoints={sheetSnapPoints}
-        onCameraPress={async () => {
-          await openCamera(AvatarPicker)
-            .then(image => {
-              setUserPhoto(image as PhotoType);
-            })
-            .catch(e => {
-              console.error(e);
-            });
+        showDelete={userPhoto !== null}
+        onDeletePress={() => {
+          setUserPhoto(null);
           dismissAll();
+          alert({
+            title: 'Photo Removed',
+            message: 'Your profile picture has been removed',
+            preset: 'done',
+          });
+        }}
+        onCameraPress={async () => {
+          try {
+            const image = await openCamera(AvatarPicker);
+            setUserPhoto(image as PhotoType);
+            dismissAll();
+          } catch (e) {
+            if (e instanceof Error) {
+              crashlytics().recordError(e);
+            }
+            if (__DEV__) {
+              console.error(e);
+            }
+          }
         }}
         onFilePicker={async () => {
-          await openImagePicker()
-            .then(image => {
-              setUserPhoto(image as PhotoType);
-            })
-            .catch(e => {
-              if (__DEV__) {
-                console.error(e);
-              }
-            });
-          dismissAll();
+          try {
+            const image = await openImagePicker();
+            setUserPhoto(image as PhotoType);
+            dismissAll();
+          } catch (e) {
+            if (__DEV__) {
+              console.error(e);
+            }
+            if (e instanceof Error) {
+              crashlytics().recordError(e);
+            }
+          }
         }}
       />
     </BaseView>

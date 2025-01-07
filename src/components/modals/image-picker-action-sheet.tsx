@@ -16,7 +16,6 @@ import {
   useBottomSheetSpringConfigs,
 } from '@gorhom/bottom-sheet';
 
-import {SharedValue} from 'react-native-reanimated';
 import {
   Divider,
   IconButton,
@@ -33,14 +32,12 @@ import SpacerV from '../spacer/spacerv.tsx';
 
 interface ActionSheetProps {
   sheetRef: RefObject<BottomSheetModal>;
-  snapPoints:
-    | (string | number)[]
-    | SharedValue<(string | number)[]>
-    | Readonly<(string | number)[] | SharedValue<(string | number)[]>>
-    | undefined;
+  snapPoints: (string | number)[];
   index: number;
   onCameraPress: () => void;
   onFilePicker: () => void;
+  onDeletePress?: () => void;
+  showDelete?: boolean;
 }
 
 const ImagePickerActionSheet = (props: ActionSheetProps) => {
@@ -109,7 +106,12 @@ const ImagePickerActionSheet = (props: ActionSheetProps) => {
           style={styles.optionContainer}>
           <>
             <View style={styles.arrowStyle}>
-              <IconButton mode={'contained'} size={24} icon={'camera'} onPress={undefined} />
+              <IconButton
+                mode={'contained'}
+                size={24}
+                icon={'camera'}
+                onPress={undefined}
+              />
             </View>
             <Text
               style={[styles.optionText, {color: theme.colors.onBackground}]}>
@@ -125,7 +127,12 @@ const ImagePickerActionSheet = (props: ActionSheetProps) => {
           style={styles.optionContainer}>
           <>
             <View style={styles.arrowStyle}>
-              <IconButton mode={'contained'} icon="image" size={24} onPress={undefined} />
+              <IconButton
+                mode={'contained'}
+                icon="image"
+                size={24}
+                onPress={undefined}
+              />
             </View>
             <Text
               style={[styles.optionText, {color: theme.colors.onBackground}]}>
@@ -133,6 +140,30 @@ const ImagePickerActionSheet = (props: ActionSheetProps) => {
             </Text>
           </>
         </TouchableRipple>
+        {props.showDelete && (
+          <>
+            <Divider />
+            <TouchableRipple
+              onPress={props.onDeletePress}
+              style={styles.optionContainer}>
+              <>
+                <View style={styles.arrowStyle}>
+                  <IconButton
+                    mode={'contained'}
+                    icon="delete"
+                    size={24}
+                    onPress={undefined}
+                    iconColor={theme.colors.error}
+                  />
+                </View>
+                <Text style={[styles.optionText, {color: theme.colors.error}]}>
+                  Remove Photo
+                </Text>
+              </>
+            </TouchableRipple>
+          </>
+        )}
+        <SpacerV height={heightPercentageToDP(0.5)} />
       </BottomSheetView>
     </BottomSheetModal>
   );
