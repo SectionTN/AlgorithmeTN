@@ -21,7 +21,7 @@ import {
   useTheme,
   ActivityIndicator,
 } from 'react-native-paper';
-import {FlatGrid, FlatGridProps} from 'react-native-super-grid';
+import {FlatGrid} from 'react-native-super-grid';
 import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {
@@ -47,9 +47,6 @@ const LeftContent = (props: JSX.IntrinsicAttributes & {size?: number}) => (
 );
 
 type CodeDataWithName = CodeData & {first_name: string; last_name: string};
-
-const AnimatedFlatGrid =
-  Animated.createAnimatedComponent<FlatGridProps<CodeDataWithName>>(FlatGrid);
 
 interface MainRef {
   fetchUserBookmarks: () => Promise<void>;
@@ -700,7 +697,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
         />
       </View>
       <SpacerV height={heightPercentageToDP(0.1)} />
-      <AnimatedFlatGrid
+      <FlatGrid
         itemDimension={windowWidth}
         data={filteredCodesData}
         style={styles.gridView}

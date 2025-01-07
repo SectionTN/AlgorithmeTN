@@ -1,20 +1,14 @@
-import React, {useCallback, useEffect, useLayoutEffect, useMemo} from 'react';
-import {StyleSheet} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {FONTS} from '../config/misc.ts';
-import {Text, useTheme} from 'react-native-paper';
+import {useTheme} from 'react-native-paper';
 import Animated, {
-  SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withDelay,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
-import {
-  fontValue,
-  heightPercentageToDP,
-  widthPercentageToDP,
-} from '../config/dimensions.ts';
+import {fontValue, heightPercentageToDP} from '../config/dimensions.ts';
 import {AlgoTNLogo} from '../index.d';
 import {RootStackParamList} from '../config/navigation/types.ts';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -28,27 +22,19 @@ import {BackHandler} from 'react-native';
 import {OneSignal} from 'react-native-onesignal';
 
 const Splash: React.FC = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const theme = useTheme();
   const {t} = useTranslation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const logoScale = useSharedValue(0.3);
+  const logoOpacity = useSharedValue(0);
+  const textTranslateY = useSharedValue(50);
+  const textOpacity = useSharedValue(0);
+  const sloganTranslateY = useSharedValue(30);
+  const sloganOpacity = useSharedValue(0);
 
   const [onboardingComplete] = useMMKVBoolean('onboardingComplete');
-
-  const scaleX = useSharedValue(0.1);
-  const scaleY = useSharedValue(0.1);
-  const translateY = useSharedValue(0);
-  const opacity = useSharedValue(1);
-
-  const animationValues = useMemo(
-    () => ({
-      scaleX,
-      scaleY,
-      translateY,
-      opacity,
-    }),
-    [scaleX, scaleY, translateY, opacity],
-  );
 
   const handleNavigation = useCallback(() => {
     const currentUser = auth().currentUser;
@@ -68,70 +54,50 @@ const Splash: React.FC = () => {
     }
   }, [navigation, onboardingComplete]);
 
-  const runAnimations = useCallback(
-    (
-      scaleX: SharedValue<number>,
-      scaleY: SharedValue<number>,
-      opacity: SharedValue<number>,
-      translateY: SharedValue<number>,
-    ) => {
-      'worklet';
-      scaleX.value = withDelay(30, withTiming(0.08, {duration: 275}));
-      scaleY.value = withDelay(30, withTiming(0.08, {duration: 275}));
-      opacity.value = withTiming(0, {duration: 275});
-      translateY.value = withDelay(
-        0,
-        withTiming(heightPercentageToDP(-5.5), {duration: 250}),
-      );
-      translateY.value = withDelay(
-        300,
-        withTiming(heightPercentageToDP(5.5), {duration: 375}),
-      );
-      scaleX.value = withSpring(0.08);
-      scaleY.value = withSpring(0.08);
-      scaleX.value = withSpring(0);
-      scaleY.value = withSpring(0);
-      opacity.value = withSpring(1);
-      scaleX.value = withDelay(750, withTiming(0.08, {duration: 250}));
-      scaleY.value = withDelay(750, withTiming(0.08, {duration: 250}));
-    },
-    [],
-  );
-
   useEffect(() => {
+    logoScale.value = withSpring(1, {
+      mass: 1,
+      damping: 15,
+    });
+    logoOpacity.value = withSpring(1);
+
+    textTranslateY.value = withDelay(
+      400,
+      withSpring(0, {
+        mass: 1,
+        damping: 15,
+      }),
+    );
+    textOpacity.value = withDelay(400, withSpring(1));
+
+    sloganTranslateY.value = withDelay(
+      600,
+      withSpring(0, {
+        mass: 1,
+        damping: 15,
+      }),
+    );
+    sloganOpacity.value = withDelay(600, withSpring(1));
+
     const timer = setTimeout(handleNavigation, 2000);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleNavigation]);
 
-  useLayoutEffect(() => {
-    const timer = setTimeout(() => {
-      runAnimations(
-        animationValues.scaleX,
-        animationValues.scaleY,
-        animationValues.opacity,
-        animationValues.translateY,
-      );
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [runAnimations, animationValues]);
+  const logoStyle = useAnimatedStyle(() => ({
+    transform: [{scale: logoScale.value}],
+    opacity: logoOpacity.value,
+  }));
 
-  const viewAnimatedStyle = useAnimatedStyle(
-    () => ({
-      transform: [{translateY: animationValues.translateY.value}],
-    }),
-    [],
-  );
+  const textStyle = useAnimatedStyle(() => ({
+    transform: [{translateY: textTranslateY.value}],
+    opacity: textOpacity.value,
+  }));
 
-  const imageAnimatedStyle = useAnimatedStyle(
-    () => ({
-      transform: [
-        {scaleX: animationValues.scaleX.value},
-        {scaleY: animationValues.scaleY.value},
-      ],
-      opacity: animationValues.opacity.value,
-    }),
-    [],
-  );
+  const sloganStyle = useAnimatedStyle(() => ({
+    transform: [{translateY: sloganTranslateY.value}],
+    opacity: sloganOpacity.value,
+  }));
 
   useFocusEffect(
     useCallback(() => {
@@ -157,53 +123,60 @@ const Splash: React.FC = () => {
       avoidingView={false}
       needsPaddingTop={false}
       needsPaddingBottom={false}>
-      <Animated.View style={[styles.container, viewAnimatedStyle]}>
+      <Animated.View style={styles.container}>
         <Animated.Image
-          style={[
-            styles.logo,
-            imageAnimatedStyle,
-            {tintColor: theme.colors.primary},
-          ]}
+          style={[styles.logo, logoStyle, {tintColor: theme.colors.primary}]}
           source={AlgoTNLogo}
         />
-        <Text style={[styles.bottom_text, {color: theme.colors.primary}]}>
-          {t('welcome')}
-        </Text>
-        <Text style={[styles.slogan_text, {color: theme.colors.onBackground}]}>
-          {t('slogan')}
-        </Text>
+        <View style={styles.textContainer}>
+          <Animated.Text
+            style={[
+              styles.bottom_text,
+              textStyle,
+              {color: theme.colors.primary},
+            ]}>
+            {t('welcome')}
+          </Animated.Text>
+          <Animated.Text
+            style={[
+              styles.slogan_text,
+              sloganStyle,
+              {color: theme.colors.onBackground},
+            ]}>
+            {t('slogan')}
+          </Animated.Text>
+        </View>
       </Animated.View>
     </BaseView>
   );
 };
 
 const styles = StyleSheet.create({
-  fill_screen: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignContent: 'center',
+    alignItems: 'center',
+  },
+  textContainer: {
+    position: 'absolute',
+    bottom: heightPercentageToDP(8),
+    width: '100%',
     alignItems: 'center',
   },
   logo: {
-    height: heightPercentageToDP(300),
-    width: widthPercentageToDP(800),
-    bottom: heightPercentageToDP(13.5),
+    height: heightPercentageToDP(12),
+    width: heightPercentageToDP(12),
+    resizeMode: 'contain',
   },
   bottom_text: {
-    position: 'absolute',
     textAlign: 'center',
     fontSize: fontValue(20),
-    bottom: heightPercentageToDP(7.25),
     fontFamily: FONTS.p_bold,
   },
   slogan_text: {
-    position: 'absolute',
+    marginTop: heightPercentageToDP(1),
     textAlign: 'center',
     fontSize: fontValue(16),
-    bottom: heightPercentageToDP(3.75),
     fontFamily: FONTS.p_regular,
     opacity: 0.75,
   },
