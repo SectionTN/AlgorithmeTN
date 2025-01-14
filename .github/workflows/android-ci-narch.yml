@@ -33,7 +33,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Install node_modules.
-        run: yarn install
+        run: yarn install --immutable --immutable-cache
       - name: Decode Google Service JSON File.
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
@@ -42,12 +42,6 @@ jobs:
         env:
           ENV_FILE: ${{ secrets.ENV }}
         run: echo $ENV_FILE > .env
-      - name: Increase Gradle JVM max memory.
-        run: sed -i 's/Xmx868/Xmx8096/g' android/gradle.properties && sed -i 's/300/4048/g' android/gradle.properties
-      - name: Enable New Arch
-        run: cd android && sed 's/newArchEnabled=false/newArchEnabled=true/g' gradle.properties && cd ..
-      - name: Clean the build.
-        run: cd android && ./gradlew -PnewArchEnabled=true clean --stacktrace && cd ..
       - name: Build release APK.
         run: cd android && ./gradlew -PnewArchEnabled=true assembleRelease --stacktrace && cd ..
       - name: Build release BUNDLE.
