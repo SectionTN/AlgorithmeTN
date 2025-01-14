@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: set up JDK 11
+      - name: set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
@@ -43,9 +43,9 @@ jobs:
           ENV_FILE: ${{ secrets.ENV }}
         run: echo $ENV_FILE > .env
       - name: Build release APK.
-        run: cd android && ./gradlew -PnewArchEnabled=true assembleRelease --stacktrace && cd ..
+        run: cd android && ./gradlew assembleRelease --stacktrace && cd ..
       - name: Build release BUNDLE.
-        run: cd android && ./gradlew -PnewArchEnabled=true bundleRelease --stacktrace && cd ..
+        run: cd android && ./gradlew bundleRelease --stacktrace && cd ..
       - name: Upload build outputs.
         uses: actions/upload-artifact@v4
         if: ${{ github.event_name == 'workflow_dispatch' }}
