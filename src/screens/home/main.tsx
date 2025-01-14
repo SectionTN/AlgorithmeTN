@@ -20,11 +20,13 @@ import {
   Tooltip,
   useTheme,
   ActivityIndicator,
+  Menu,
 } from 'react-native-paper';
 import {FlatGrid} from 'react-native-super-grid';
 import {FONTS} from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {
+  getStatusBarHeight,
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/dimensions.ts';
@@ -41,6 +43,7 @@ import {useTranslation} from 'react-i18next';
 import {OneSignal} from 'react-native-onesignal';
 import {OneSignalPostNotification} from '../../utils/onesignal.ts';
 import getFullUserData from '../../utils/firebase.ts';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const LeftContent = (props: JSX.IntrinsicAttributes & {size?: number}) => (
   <Avatar.Icon {...props} icon="code-tags" />
@@ -52,6 +55,8 @@ interface MainRef {
   fetchUserBookmarks: () => Promise<void>;
   fetchBookmarks: () => Promise<void>;
 }
+
+type SortType = 'newest' | 'oldest' | 'most_liked';
 
 const Main = forwardRef<MainRef>((_, ref) => {
   const navigation =
@@ -67,7 +72,10 @@ const Main = forwardRef<MainRef>((_, ref) => {
 
   const [photoUrl, setPhotoUrl] = useState('XD');
 
+  const [role, setRole] = useState('member');
+
   const [codes, setCodes] = useState<CodeDataWithName[]>([]);
+  const insets = useSafeAreaInsets();
 
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
     {},
@@ -84,6 +92,9 @@ const Main = forwardRef<MainRef>((_, ref) => {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const CODES_PER_PAGE = 10;
+
+  const [sortType, setSortType] = useState<SortType>('newest');
+  const [showSortMenu, setShowSortMenu] = useState(false);
 
   useLayoutEffect(() => {
     if (Platform.OS === 'android') {
@@ -211,8 +222,23 @@ const Main = forwardRef<MainRef>((_, ref) => {
     return () => unsubscribe();
   }, []);
 
+
+  useEffect(() => {
+    const user = auth().currentUser;
+    if (!user) {
+      return;
+    }
+    const unsubscribe = firestore().collection('users').doc(user.uid).onSnapshot(async (doc) => {
+      if (doc.exists) {
+        setRole(doc.data()?.role);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const filteredCodesData = useMemo(() => {
-    return codes.filter(code => {
+    let filtered = codes.filter(code => {
       const searchLower = searchQuery.toLowerCase();
       return (
         code.title.toLowerCase().includes(searchLower) ||
@@ -223,7 +249,19 @@ const Main = forwardRef<MainRef>((_, ref) => {
           .includes(searchLower)
       );
     });
-  }, [codes, searchQuery]);
+    return [...filtered].sort((a: CodeData, b: CodeData) => {
+      switch (sortType) {
+        case 'newest':
+          return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
+        case 'oldest':
+          return a.createdAt.toDate().getTime() - b.createdAt.toDate().getTime();
+        case 'most_liked':
+          return b.likes.length - a.likes.length;
+        default:
+          return 0;
+      }
+    });
+  }, [codes, searchQuery, sortType]);
 
   const handleLoadMore = () => {
     if (!loading && codes.length === CODES_PER_PAGE * page) {
@@ -674,7 +712,42 @@ const Main = forwardRef<MainRef>((_, ref) => {
           title={t('home.title')}
           titleStyle={{fontFamily: FONTS.p_regular}}
         />
-        {__DEV__ && (
+        <Menu
+          visible={showSortMenu}
+          statusBarHeight={getStatusBarHeight()}
+          onDismiss={() => setShowSortMenu(false)}
+          anchor={
+            <Appbar.Action
+              icon="sort"
+              onPress={() => setShowSortMenu(true)}
+            />
+          }>
+          <Menu.Item
+            onPress={() => {
+              setSortType('newest');
+              setShowSortMenu(false);
+            }}
+            title={t('sort.newest')}
+            leadingIcon="clock-outline"
+          />
+          <Menu.Item
+            onPress={() => {
+              setSortType('oldest');
+              setShowSortMenu(false);
+            }}
+            title={t('sort.oldest')}
+            leadingIcon="clock"
+          />
+          <Menu.Item
+            onPress={() => {
+              setSortType('most_liked');
+              setShowSortMenu(false);
+            }}
+            title={t('sort.most_liked')}
+            leadingIcon="heart"
+          />
+        </Menu>
+        {role === 'admin' && (
           <Appbar.Action
             icon="clock-time-eight-outline"
             onPress={() => navigation.navigate('pending-review')}

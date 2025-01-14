@@ -37,6 +37,11 @@ const resources = {
       },
       continue: 'Continue',
       go_back: 'Go Back',
+      sort: {
+        newest: 'Newest First',
+        oldest: 'Oldest First',
+        most_liked: 'Most Liked',
+      },
       login: {
         email: 'Email',
         password: 'Password',
@@ -232,6 +237,11 @@ const resources = {
       },
       continue: 'Continuer',
       go_back: 'Retour',
+      sort: {
+        newest: 'Le plus récent',
+        oldest: 'Le plus ancien',
+        most_liked: 'Le plus aimé',
+      },
       login: {
         email: 'E-mail',
         password: 'Mot de passe',

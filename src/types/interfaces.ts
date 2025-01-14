@@ -16,6 +16,7 @@ interface CodeData {
   comments: string[];
   bookmarksCount: number;
   isBookmarked: boolean;
+  createdAt: FirebaseFirestoreTypes.Timestamp;
 }
 
 interface InstructionsProps {
