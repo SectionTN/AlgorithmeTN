@@ -52,7 +52,7 @@ const useLogin = () => {
    */
 
   const handleTermsPress = async () => {
-    await Linking.openURL('https://google.com');
+    await Linking.openURL('https://sectiontn.github.io/algotn/tos');
   };
 
   /**

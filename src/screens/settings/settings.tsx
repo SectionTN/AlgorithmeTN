@@ -1,5 +1,5 @@
 import React, {useEffect, useLayoutEffect, useState} from 'react';
-import {BackHandler, Platform, StatusBar, StyleSheet} from 'react-native';
+import {BackHandler, Linking, Platform, StatusBar, StyleSheet} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -246,7 +246,9 @@ const Settings: React.FC = () => {
           <SpacerV height={heightPercentageToDP(0.15)} />
           <Text variant={'titleMedium'}>{t('settings.help_title')}</Text>
           <SpacerV height={heightPercentageToDP(0.15)} />
-          <Card mode={'contained'}>
+          <Card onPress={() => {
+            Linking.openURL('https://sectiontn.github.io/algotn/privacy-policy');
+          }} mode={'contained'}>
             <Card.Title
               title={t('settings.privacy_policy')}
               titleStyle={{paddingTop: '1%'}}
