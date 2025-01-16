@@ -20,6 +20,7 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {upperFirst, omit} from 'lodash';
 import {alert} from '@baronha/ting';
 import crashlytics from '@react-native-firebase/crashlytics';
+import auth from '@react-native-firebase/auth';
 
 const PendingReview: React.FC = () => {
   const navigation =
@@ -31,9 +32,28 @@ const PendingReview: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<CodeData | null>(null);
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [action, setAction] = useState<'accept' | 'deny' | null>(null);
+  const [role, setRole] = useState<string>('member');
+  const [waiting, setWaiting] = useState(true);
+
 
   useEffect(() => {
-    if (__DEV__) {
+    const fetchRole = async () => {
+      const currentUser = auth().currentUser;
+      if (!currentUser?.uid) {
+        return;
+      }
+      const user = await firestore().collection('users').doc(currentUser?.uid).get();
+      const userData = user.data();
+      if (userData) {
+        setRole(userData.role);
+      }
+      setWaiting(false);
+    };
+    fetchRole();
+  }, []);
+
+  useEffect(() => {
+    if (role === 'admin' && !waiting) {
       const fetchData = async () => {
         const snapshot = await firestore().collection('pending_codes').get();
         const fetchedData = await Promise.all(
@@ -53,7 +73,7 @@ const PendingReview: React.FC = () => {
 
       fetchData();
     }
-  }, []);
+  }, [role, waiting]);
 
   useLayoutEffect(() => {
     if (Platform.OS === 'android'){
@@ -191,7 +211,7 @@ const PendingReview: React.FC = () => {
     </View>
   );
 
-  return __DEV__ ? (
+  return role === 'admin' && !waiting ? (
     <>
       <BaseView
         needsPaddingTop={false}
