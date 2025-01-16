@@ -23,7 +23,7 @@ export const isDynamicThemeSupported =
  * @returns
  */
 export function useMaterial3Theme(params?: { fallbackSourceColor?: string; sourceColor?: string }) {
-  const { fallbackSourceColor = '#6750A4', sourceColor } = params || {};
+  const { fallbackSourceColor = '#1649ff', sourceColor } = params || {};
 
   const [theme, setTheme] = useState<Material3Theme>(
     sourceColor ? createMaterial3Theme(sourceColor) : getMaterial3Theme(fallbackSourceColor)
@@ -45,10 +45,10 @@ export function useMaterial3Theme(params?: { fallbackSourceColor?: string; sourc
  *
  * If the system does not support Material3, it will return a theme based on the fallback source color.
  *
- * @param fallbackSourceColor source color for the fallback theme (default to #6750A4)
+ * @param fallbackSourceColor source color for the fallback theme (default to #1649ff)
  * @returns
  */
-export function getMaterial3Theme(fallbackSourceColor: string = '#6750A4'): Material3Theme {
+export function getMaterial3Theme(fallbackSourceColor: string = '#1649ff'): Material3Theme {
   if (!isDynamicThemeSupported) {
     return createThemeFromSourceColor(fallbackSourceColor);
   }
@@ -63,7 +63,7 @@ export function getMaterial3Theme(fallbackSourceColor: string = '#6750A4'): Mate
   return createThemeFromSourceColor(fallbackSourceColor);
 }
 
-export async function getMaterial3ThemeAsync(fallbackSourceColor: string = '#6750A4'): Promise<Material3Theme> {
+export async function getMaterial3ThemeAsync(fallbackSourceColor: string = '#1649ff'): Promise<Material3Theme> {
   if (!isDynamicThemeSupported) {
     return createThemeFromSourceColor(fallbackSourceColor);
   }
