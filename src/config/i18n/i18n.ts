@@ -199,7 +199,7 @@ const resources = {
       },
       'about-developer': {
         title: 'About developer',
-        shortDescription: 'a hobbyist android developer',
+        shortDescription: 'hobbyist android developer',
         longDescription:
           'Hi, I am M. Rayen Sbai, a hobbyist Android developer from Tunisia. I started programming at the age of 14, and since then, I have been passionate about creating engaging apps and exploring new technologies. Currently, I am learning Unity to expand my skills in game development. With experience in React Native, Java, JavaScript, TypeScript and more, I enjoy building intuitive and functional applications.',
       },

@@ -23,8 +23,11 @@ import 'moment/locale/en-gb';
 import i18n from './config/i18n/i18n.ts';
 import {changeNavigationBarColor} from './modules/navigation';
 import getColorScheme = Appearance.getColorScheme;
+import { enableScreens } from 'react-native-screens';
 
 export const locales = RNLocalize.getLocales();
+
+enableScreens();
 
 const useThemeSetup = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -72,7 +75,7 @@ function App(): React.JSX.Element {
         setLanguageStatus(lang);
         changeLanguage(lang);
       }
-      moment.locale(locales[0].languageTag);
+      moment.locale(locales[0].languageTag === 'en-US' ? 'en' : 'fr');
     };
     initLanguage();
   }, [languageStatus, setLanguageStatus]);
