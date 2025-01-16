@@ -79,6 +79,7 @@ const EditProfile: React.FC = () => {
   };
 
   const [isConnected, setIsConnected] = useState(true);
+  const [removeProfilePicture, setRemoveProfilePicture] = useState(false);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -164,7 +165,7 @@ const EditProfile: React.FC = () => {
         updates.avatar = photoUrl;
         updates.avatar_status = 'photo';
         needsPhotoUpdate = true;
-      } else if (userPhoto === null && avatarStatus === 'photo') {
+      } else if (removeProfilePicture || (userPhoto === null && avatarStatus === 'photo')) {
         const initials = `${(updates.first_name || firstName)[0]}${
           (updates.last_name || lastName)[0]
         }`;
@@ -256,13 +257,9 @@ const EditProfile: React.FC = () => {
           handlePresentModal();
         }}
         onLongPress={() => {
-          if (userPhoto) {
-            setUserPhoto(null);
-            alert({
-              title: 'Photo Removed',
-              message: 'now select a new photo if you want',
-              preset: 'done',
-            });
+          if (avatarStatus === 'photo') {
+            setRemoveProfilePicture(true);
+                    setUserPhoto(null);
           }
         }}
         style={{

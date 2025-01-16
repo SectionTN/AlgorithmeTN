@@ -246,7 +246,7 @@ const Setup: React.FC = () => {
               .doc(auth().currentUser?.uid)
               .set(userData);
             await auth().currentUser?.updateProfile({
-              displayName: `${memoizedFirstName} ${memoizedLastName}`,
+              displayName: `${modifiedFirstName} ${modifiedLastName}`,
               photoURL: avatarUrl,
             });
             OneSignal.User.setLanguage(locales[0].languageTag);
@@ -266,7 +266,7 @@ const Setup: React.FC = () => {
         .set(userData)
         .finally(async () => {
           await auth().currentUser?.updateProfile({
-            displayName: `${memoizedFirstName} ${memoizedLastName}`,
+            displayName: `${modifiedFirstName} ${modifiedLastName}`,
             photoURL: avatarText,
           });
           OneSignal.User.setLanguage(locales[0].languageTag);

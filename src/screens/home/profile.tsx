@@ -396,6 +396,10 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
         return `${t('profile.bookmark')} "${
           activity.title ?? `${t('profile.someone')}`
         }" ${t('profile.post')}.`;
+      case 'unbookmark':
+        return `${t('profile.unbookmark')} "${
+          activity.title ?? `${t('profile.someone')}`
+        }" ${t('profile.post')}.`;
       default:
         return t('profile.did_something');
     }
@@ -463,7 +467,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
         <Animated.View
           entering={FlipInEasyX}
           exiting={FlipOutEasyX}
-          style={[styles.badgeView]}>
+          style={styles.badgeView}>
           {badges.map(badge => (
             <Chip
               key={badge.id}
@@ -631,7 +635,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 6,
   },
   achievementsView: {
     margin: '1%',
@@ -645,7 +649,6 @@ const styles = StyleSheet.create({
   },
   chipBadge: {
     marginBottom: '0.5%',
-    width: widthPercentageToDP(28),
   },
   chipAch: {
     marginBottom: '0.5%',
