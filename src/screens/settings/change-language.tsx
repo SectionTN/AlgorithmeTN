@@ -9,6 +9,8 @@ import {RootStackParamList} from '../../config/navigation/types.ts';
 import {useNavigation} from '@react-navigation/native';
 import {changeLanguage} from '../../config/i18n/changeLanguage.ts';
 import {useMMKVString} from 'react-native-mmkv';
+import { AppodealBanner } from 'react-native-appodeal';
+import { View } from 'react-native';
 
 type SupportedLanguage = 'en-US' | 'fr-FR';
 
@@ -52,6 +54,9 @@ const ChangeLanguage: React.FC = () => {
           labelStyle={{fontFamily: FONTS.p_regular}}
         />
       </RadioButton.Group>
+      <View style={{flex: 1}} />
+      <AppodealBanner adSize={'phone'} placement={'default'} onAdFailedToLoad={(r: any) => console.error(r)} />
+      <SpacerV height={heightPercentageToDP(0.25)} />
     </BaseView>
   );
 };

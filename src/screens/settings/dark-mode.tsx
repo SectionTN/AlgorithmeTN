@@ -9,6 +9,8 @@ import {Appearance, Platform, StatusBar} from 'react-native';
 import SpacerV from '../../components/spacer/spacerv.tsx';
 import {heightPercentageToDP} from '../../config/dimensions.ts';
 import {useMMKVString} from 'react-native-mmkv';
+import { AppodealBanner } from 'react-native-appodeal';
+import { View } from 'react-native';
 
 const DarkMode: React.FC = () => {
   const navigation =
@@ -57,6 +59,9 @@ const DarkMode: React.FC = () => {
         <RadioButton.Item label="Dark" value="dark" />
         <RadioButton.Item label="System" value="system" />
       </RadioButton.Group>
+      <View style={{flex: 1}} />
+      <AppodealBanner adSize={'phone'} placement="default" />
+      <SpacerV height={heightPercentageToDP(0.25)} />
     </BaseView>
   );
 };
