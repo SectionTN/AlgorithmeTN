@@ -39,6 +39,8 @@ import firestore, {
 import crashlytics from '@react-native-firebase/crashlytics';
 import getUserData from '../../utils/firebase.ts';
 import {useTranslation} from 'react-i18next';
+import { getRandomInt } from '../../utils/algo-utils.ts';
+import { Appodeal, AppodealAdType } from 'react-native-appodeal';
 
 interface ProfileProps {
   uid: string | undefined;
@@ -426,6 +428,13 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
             <Menu.Item
               onPress={() => {
                 closeMenu();
+                const randomNumber = getRandomInt(1, 10);
+                if (__DEV__) {
+                  console.log('random number for ad is:', randomNumber);
+                }
+                if (randomNumber === 5) {
+                  Appodeal.show(AppodealAdType.INTERSTITIAL, 'Interstitial');
+                }
                 navigation.navigate('settings');
               }}
               title="Settings"

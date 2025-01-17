@@ -6,6 +6,7 @@ import {
   Paragraph,
   Appbar,
   useTheme,
+  Portal,
 } from 'react-native-paper';
 import BaseView from '../components/baseview/baseview';
 import {View, FlatList, StyleSheet, StatusBar, BackHandler, Platform} from 'react-native';
@@ -232,6 +233,7 @@ const PendingReview: React.FC = () => {
             ListEmptyComponent={renderEmptyItem}
             contentContainerStyle={styles.listContainer}
           />
+          <Portal>
           <Dialog
             visible={isDialogVisible}
             onDismiss={() => setIsDialogVisible(false)}>
@@ -260,6 +262,7 @@ const PendingReview: React.FC = () => {
               </Button>
             </Dialog.Actions>
           </Dialog>
+          </Portal>
         </View>
       </BaseView>
     </>

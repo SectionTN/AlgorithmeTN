@@ -2,8 +2,12 @@ import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   Appbar,
   Avatar,
+  Button,
+  Dialog,
   FAB,
   HelperText,
+  Portal,
+  Text,
   TextInput,
   Tooltip,
   useTheme,
@@ -80,6 +84,13 @@ const EditProfile: React.FC = () => {
 
   const [isConnected, setIsConnected] = useState(true);
   const [removeProfilePicture, setRemoveProfilePicture] = useState(false);
+
+  const [profilePictureDialogVisible, setProfilePictureDialogVisible] =
+    React.useState(false);
+
+  const showDialog = () => setProfilePictureDialogVisible(true);
+
+  const hideDialog = () => setProfilePictureDialogVisible(false);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -165,7 +176,10 @@ const EditProfile: React.FC = () => {
         updates.avatar = photoUrl;
         updates.avatar_status = 'photo';
         needsPhotoUpdate = true;
-      } else if (removeProfilePicture || (userPhoto === null && avatarStatus === 'photo')) {
+      } else if (
+        removeProfilePicture ||
+        (userPhoto === null && avatarStatus === 'photo')
+      ) {
         const initials = `${(updates.first_name || firstName)[0]}${
           (updates.last_name || lastName)[0]
         }`;
@@ -258,8 +272,7 @@ const EditProfile: React.FC = () => {
         }}
         onLongPress={() => {
           if (avatarStatus === 'photo') {
-            setRemoveProfilePicture(true);
-                    setUserPhoto(null);
+            showDialog();
           }
         }}
         style={{
@@ -357,18 +370,15 @@ const EditProfile: React.FC = () => {
         snapPoints={sheetSnapPoints}
         showDelete={userPhoto !== null}
         onDeletePress={() => {
-          setUserPhoto(null);
+          Keyboard.dismiss();
           dismissAll();
-          alert({
-            title: 'Photo Removed',
-            message: 'Your profile picture has been removed',
-            preset: 'done',
-          });
+          showDialog();
         }}
         onCameraPress={async () => {
           try {
             const image = await openCamera(AvatarPicker);
             setUserPhoto(image as PhotoType);
+            setRemoveProfilePicture(false);
             dismissAll();
           } catch (e) {
             if (e instanceof Error) {
@@ -394,6 +404,32 @@ const EditProfile: React.FC = () => {
           }
         }}
       />
+      <Portal>
+        <Dialog visible={profilePictureDialogVisible} onDismiss={hideDialog}>
+          <Dialog.Title>{'Remove profile picture?'}</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyMedium">
+              {'This will replace your profile picture with your initials'}
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={hideDialog}>Cancel</Button>
+            <Button
+              onPress={() => {
+                setRemoveProfilePicture(true);
+                setUserPhoto(null);
+                hideDialog();
+                alert({
+                  title: 'Profile Picture Removed',
+                  message: 'Save changes to confirm',
+                  preset: 'done',
+                });
+              }}>
+              Remove
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </BaseView>
   );
 };

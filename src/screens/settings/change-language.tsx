@@ -55,7 +55,7 @@ const ChangeLanguage: React.FC = () => {
         />
       </RadioButton.Group>
       <View style={{flex: 1}} />
-      <AppodealBanner adSize={'phone'} placement={'default'} onAdFailedToLoad={(r: any) => console.error(r)} />
+      <AppodealBanner adSize={'phone'} placement={'Banner'} />
       <SpacerV height={heightPercentageToDP(0.25)} />
     </BaseView>
   );

@@ -60,7 +60,7 @@ const DarkMode: React.FC = () => {
         <RadioButton.Item label="System" value="system" />
       </RadioButton.Group>
       <View style={{flex: 1}} />
-      <AppodealBanner adSize={'phone'} placement="default" />
+      <AppodealBanner adSize={'phone'} placement="Banner" />
       <SpacerV height={heightPercentageToDP(0.25)} />
     </BaseView>
   );
