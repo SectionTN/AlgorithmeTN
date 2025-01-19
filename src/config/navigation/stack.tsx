@@ -74,118 +74,86 @@ const StackNavigator: React.FC = () => {
         }
         routeNameRef.current = currentRouteName;
       }}>
-      <Stack.Navigator initialRouteName={'splash'}>
+      <Stack.Navigator initialRouteName={'splash'} screenOptions={{gestureEnabled: false, headerShown: false}}>
         <Stack.Screen
           name={'splash'}
           component={Splash}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'onboarding'}
           component={Onboarding}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'login'}
           component={Login}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'setup'}
           component={Setup}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'home'}
           component={HomeRender}
-          options={{
-            gestureEnabled: false,
-            headerShown: false,
-          }}
         />
         <Stack.Screen
           name={'settings'}
           component={Settings}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'algo'}
           component={Algo}
-          options={{
-            gestureEnabled: false,
-            headerShown: false,
-          }}
         />
         <Stack.Screen
           name={'add-code'}
           component={AddCode}
-          options={{
-            gestureEnabled: false,
-            headerShown: false,
-          }}
         />
         <Stack.Screen
           name={'write-code'}
           component={WriteCode}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'dark-mode'}
           component={DarkMode}
-          options={{
-            gestureEnabled: false,
-            headerShown: false,
-          }}
         />
         <Stack.Screen
           name={'edit-profile'}
           component={EditProfile}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'edit-bio'}
           component={EditBio}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'edit-username'}
           component={EditUsername}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'bug-report'}
           component={BugReport}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'change-language'}
           component={ChangeLanguage}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'pending-review'}
           component={PendingReview}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'comments'}
           component={Comments}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'profile'}
           component={Profile}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'about-developer'}
           component={AboutDeveloper}
-          options={{gestureEnabled: false, headerShown: false}}
         />
         <Stack.Screen
           name={'confirm-account'}
           component={ConfirmAccount}
-          options={{gestureEnabled: false, headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
