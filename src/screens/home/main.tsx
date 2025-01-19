@@ -785,6 +785,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
         updateCellsBatchingPeriod={50}
         ListFooterComponent={ListFooterComponent}
         keyExtractor={item => item.id}
+        showsVerticalScrollIndicator={false}
       />
     </BaseView>
   );
