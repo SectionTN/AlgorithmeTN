@@ -74,7 +74,7 @@ const StackNavigator: React.FC = () => {
         }
         routeNameRef.current = currentRouteName;
       }}>
-      <Stack.Navigator initialRouteName={'splash'} screenOptions={{gestureEnabled: false, headerShown: false}}>
+      <Stack.Navigator initialRouteName={'splash'} screenOptions={{gestureEnabled: false, headerShown: false, animation: 'ios_from_left'}}>
         <Stack.Screen
           name={'splash'}
           component={Splash}
