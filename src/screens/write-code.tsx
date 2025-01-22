@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Keyboard, StyleSheet, ToastAndroid} from 'react-native';
-import {Appbar, FAB, useTheme} from 'react-native-paper';
+import {Keyboard, ToastAndroid} from 'react-native';
+import {Appbar, useTheme} from 'react-native-paper';
 import {FONTS} from '../config/misc.ts';
 import BaseView from '../components/baseview/baseview.tsx';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
@@ -123,7 +123,7 @@ const WriteCode: React.FC = () => {
         language={language}
         theme={theme.dark ? 'monokai' : 'material theme'}
         fontSize={fontValue(14)}
-       initialCode={isEmpty(codeValue) ? '' : codeValue}
+        initialCode={isEmpty(codeValue) ? '' : codeValue}
         webViewProps={{
           ref: webViewRef,
           onMessage,
@@ -132,9 +132,5 @@ const WriteCode: React.FC = () => {
     </BaseView>
   );
 };
-
-const styles = StyleSheet.create({
-
-});
 
 export default WriteCode;

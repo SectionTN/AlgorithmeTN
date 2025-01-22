@@ -3,20 +3,12 @@ import {StyleSheet, View, Text, Keyboard} from 'react-native';
 import {WebView} from 'react-native-webview';
 import NetInfo from '@react-native-community/netinfo';
 import {fontValue} from '../../config/dimensions.ts';
+import { Language } from '../../types/languages.ts';
 
 interface CodeEditorWebViewProps {
   editorStyles?: string;
   initialCode?: string;
-  language?:
-    | 'javascript'
-    | 'java'
-    | 'python'
-    | 'html5'
-    | 'css3'
-    | 'php'
-    | 'sql'
-    | 'none'
-    | 'algorithm';
+  language?: Language;
   theme?: 'monokai' | 'atom' | 'material theme' | 'github';
   fontSize?: number;
   showGutter?: boolean;

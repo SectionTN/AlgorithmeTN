@@ -1,31 +1,30 @@
-import React, {useEffect, useState} from 'react';
-import {Keyboard, StyleSheet, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, StyleSheet, View } from 'react-native';
 import BaseView from '../components/baseview/baseview.tsx';
 import {
   Appbar,
   Button,
-  Menu,
+  SegmentedButtons,
   Switch,
   Text,
   TextInput,
   useTheme,
 } from 'react-native-paper';
-import {FONTS} from '../config/misc.ts';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../config/navigation/types.ts';
-import {ScrollView} from 'react-native-gesture-handler';
+import { FONTS } from '../config/misc.ts';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../config/navigation/types.ts';
+import { ScrollView } from 'react-native-gesture-handler';
 import SpacerV from '../components/spacer/spacerv.tsx';
-import {fontValue, heightPercentageToDP} from '../config/dimensions.ts';
-import {alert} from '@baronha/ting';
-import {isEmpty, isEqual} from 'lodash';
-import {customCapitalize} from '../utils/algo-utils.ts';
-import {Language} from '../types/languages.ts';
+import { fontValue, heightPercentageToDP } from '../config/dimensions.ts';
+import { alert } from '@baronha/ting';
+import { isEmpty, isEqual } from 'lodash';
+import { Language } from '../types/languages.ts';
 import NetInfo from '@react-native-community/netinfo';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 const AddCode: React.FC = () => {
   const navigation =
@@ -33,44 +32,31 @@ const AddCode: React.FC = () => {
 
   const theme = useTheme();
 
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const sections = [
-    {title: t('add-code.inf'), value: 'Science Informatique'},
-    {title: t('add-code.sc'), value: 'Science Naturel'},
-    {title: t('add-code.eco'), value: 'Économie & Gestion'},
+    { title: t('add-code.inf'), value: 'Science Informatique' },
+    { title: t('add-code.sc'), value: 'Science Naturel' },
+    { title: t('add-code.eco'), value: 'Économie & Gestion' },
   ];
 
-  const languages: {title: string; value: Language; icon: string}[] = [
-    {title: 'Algorithm', value: 'algorithm', icon: 'brain'},
-    {title: 'Python', value: 'python', icon: 'language-python'},
-    {title: 'JavaScript', value: 'javascript', icon: 'language-javascript'},
-    {title: 'HTML5', value: 'html5', icon: 'language-html5'},
-    {title: 'CSS3', value: 'css3', icon: 'language-css3'},
-    {title: 'PHP', value: 'php', icon: 'language-php'},
-    {title: 'SQL', value: 'sql', icon: 'code-tags'},
+  const languages: { title: string; value: Language; icon: string }[] = [
+    { title: 'Algorithm', value: 'algorithm', icon: 'brain' },
+    { title: 'Python', value: 'python', icon: 'language-python' },
+    { title: 'JavaScript', value: 'javascript', icon: 'language-javascript' },
+    { title: 'HTML5', value: 'html5', icon: 'language-html5' },
+    { title: 'CSS3', value: 'css3', icon: 'language-css3' },
+    { title: 'PHP', value: 'php', icon: 'language-php' },
+    { title: 'SQL', value: 'sql', icon: 'code-tags' },
   ];
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [level, setLevel] = useState('');
+  const [level, setLevel] = useState('BAC');
   const [section, setSection] = useState('');
-  const [language, setLanguage] = useState<
-    | 'algorithm'
-    | 'javascript'
-    | 'python'
-    | 'html5'
-    | 'css3'
-    | 'php'
-    | 'sql'
-    | 'none'
-  >('none');
+  const [language, setLanguage] = useState<Language | 'none'>('none');
   const [instructions, setInstructions] = useState('');
   const [codeValue, setCodeValue] = useState('');
-
-  const [levelMenuVisible, setLevelMenuVisible] = useState(false);
-  const [sectionMenuVisible, setSectionMenuVisible] = useState(false);
-  const [languageMenuVisible, setLanguageMenuVisible] = useState(false);
 
   const [isConnected, setIsConnected] = useState(true);
 
@@ -175,7 +161,7 @@ const AddCode: React.FC = () => {
         preset: 'error',
       });
     }
-    alert({title: 'Please Wait', preset: 'spinner'});
+    alert({ title: 'Please Wait', preset: 'spinner' });
 
     const newCode = {
       title,
@@ -194,14 +180,14 @@ const AddCode: React.FC = () => {
       .collection('pending_codes')
       .add(newCode)
       .then(() => {
-        alert({title: 'Sent for review', preset: 'done'});
+        alert({ title: 'Sent for review', preset: 'done' });
         if (navigation.canGoBack()) {
           navigation.goBack();
         }
       })
       .catch(error => {
         crashlytics().recordError(error);
-        alert({title: 'Sending Failed', message: 'An error occurred'});
+        alert({ title: 'Sending Failed', message: 'An error occurred' });
       });
   }
 
@@ -210,18 +196,20 @@ const AddCode: React.FC = () => {
       needsPaddingTop={false}
       needsPaddingBottom={false}
       avoidingView={true}>
-      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.elevation.level2 }}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content
           title={t('add-code.add_code')}
-          titleStyle={{fontFamily: FONTS.p_regular}}
+          titleStyle={{ fontFamily: FONTS.p_regular }}
         />
       </Appbar.Header>
       <SpacerV height={heightPercentageToDP(0.15)} />
       <ScrollView
         nestedScrollEnabled={true}
         alwaysBounceVertical={true}
-        style={styles.scrollContainer}>
+        showsVerticalScrollIndicator={false}
+        style={styles.scrollContainer}
+      >
         <SpacerV height={heightPercentageToDP(0.25)} />
         <TextInput
           label={t('add-code.code_title')}
@@ -243,6 +231,7 @@ const AddCode: React.FC = () => {
           mode={'outlined'}
           multiline={true}
           right={<TextInput.Affix text={`${description.length}/100`} />}
+          style={styles.textArea}
           onChangeText={text => {
             if (text.length > 100) {
               return;
@@ -251,92 +240,56 @@ const AddCode: React.FC = () => {
           }}
         />
         <SpacerV height={heightPercentageToDP(0.25)} />
-        <Menu
-          visible={levelMenuVisible}
-          onDismiss={() => setLevelMenuVisible(false)}
-          anchor={
-            <Button onPress={() => setLevelMenuVisible(true)}>
-              {level ? `${level} selected` : t('add-code.select_level')}
-            </Button>
-          }>
-          <Menu.Item
-            onPress={() => {
-              setLevel('1ére');
-              setLevelMenuVisible(false);
-            }}
-            title="1ére"
-          />
-          <Menu.Item
-            onPress={() => {
-              setLevel('2éme');
-              setLevelMenuVisible(false);
-            }}
-            title="2éme"
-          />
-          <Menu.Item
-            onPress={() => {
-              setLevel('3éme');
-              setLevelMenuVisible(false);
-            }}
-            title="3éme"
-          />
-          <Menu.Item
-            onPress={() => {
-              setLevel('BAC');
-              setLevelMenuVisible(false);
-            }}
-            title="BAC"
-          />
-        </Menu>
+
+        <Text style={styles.label}>Niveau</Text>
+        <SegmentedButtons
+          value={level}
+          onValueChange={setLevel}
+          buttons={['1ére', '2éme', '3éme', 'BAC'].map(lvl => ({
+            label: lvl,
+            value: lvl,
+          }
+          ))}
+        />
+
         {level !== '1ére' && level !== '' && (
           <>
             <SpacerV height={heightPercentageToDP(0.25)} />
-            <Menu
-              visible={sectionMenuVisible}
-              onDismiss={() => setSectionMenuVisible(false)}
-              anchor={
-                <Button onPress={() => setSectionMenuVisible(true)}>
-                  {section
-                    ? `${section} selected`
-                    : t('add-code.select_section')}
-                </Button>
-              }>
-              {sections.map(sec => (
-                <Menu.Item
-                  key={sec.value}
-                  onPress={() => {
-                    setSection(sec.value);
-                    setSectionMenuVisible(false);
-                  }}
-                  title={sec.title}
-                />
-              ))}
-            </Menu>
+            <Text style={styles.label}>Section</Text>
+            <SegmentedButtons
+              value={section}
+              onValueChange={setSection}
+              buttons={sections.map(sec => ({
+                label: sec.title,
+                value: sec.value,
+              }))
+              }
+            />
           </>
         )}
         <SpacerV height={heightPercentageToDP(0.25)} />
-        <Menu
-          visible={languageMenuVisible}
-          onDismiss={() => setLanguageMenuVisible(false)}
-          anchor={
-            <Button onPress={() => setLanguageMenuVisible(true)}>
-              {language !== 'none'
-                ? `${customCapitalize(language)} selected`
-                : t('add-code.select_language')}
-            </Button>
-          }>
-          {languages.map(lang => (
-            <Menu.Item
-              key={lang.value}
-              leadingIcon={lang.icon}
-              onPress={() => {
-                setLanguage(lang.value);
-                setLanguageMenuVisible(false);
-              }}
-              title={lang.title}
-            />
-          ))}
-        </Menu>
+        <Text style={styles.label}>Language</Text>
+        <SegmentedButtons
+          value={language}
+          onValueChange={v => setLanguage(v as Language)}
+          density="small"
+          buttons={languages.slice(0, 3).map(lang => ({
+            label: lang.title,
+            value: lang.value,
+            icon: lang.icon,
+          }))}
+        />
+
+        <SegmentedButtons
+          value={language}
+          onValueChange={v => setLanguage(v as Language)}
+          density="small"
+          buttons={languages.slice(3, languages.length - 1).map(lang => ({
+            label: lang.title,
+            value: lang.value,
+            icon: lang.icon,
+          }))}
+        />
         <SpacerV height={heightPercentageToDP(0.25)} />
         <TextInput
           label={t('add-code.write_code')}
@@ -398,7 +351,7 @@ const AddCode: React.FC = () => {
           />
         )}
         <SpacerV height={heightPercentageToDP(0.25)} />
-        <View style={{flex: 1}}>{/*STUB VIEW*/}</View>
+        <View style={{ flex: 1 }}>{/*STUB VIEW*/}</View>
         <Button mode="contained-tonal" onPress={handleButtonPress}>
           Send for review
         </Button>
@@ -431,6 +384,14 @@ const styles = StyleSheet.create({
   },
   levelButton: {
     marginLeft: 10,
+  },
+  textArea: {
+    height: heightPercentageToDP(15),
+    textAlignVertical: 'top',
+  },
+  label: {
+    fontFamily: FONTS.m_regular,
+    marginBottom: 5,
   },
 });
 
