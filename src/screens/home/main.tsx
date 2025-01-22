@@ -45,7 +45,8 @@ import { OneSignalPostNotification } from '../../utils/onesignal.ts';
 import getFullUserData from '../../utils/firebase.ts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { toast } from '@baronha/ting';
-
+import Fuse from 'fuse.js';
+import lodash from 'lodash';
 const LeftContent = (props: JSX.IntrinsicAttributes & { size?: number }) => (
   <Avatar.Icon {...props} icon="code-tags" />
 );
@@ -239,29 +240,42 @@ const Main = forwardRef<MainRef>((_, ref) => {
   }, []);
 
   const filteredCodesData = useMemo(() => {
-    let filtered = codes.filter(code => {
-      const searchLower = searchQuery.toLowerCase();
-      return (
-        code.title.toLowerCase().includes(searchLower) ||
-        code.description.toLowerCase().includes(searchLower) ||
-        code.language.toLowerCase().includes(searchLower) ||
-        `${code.first_name} ${code.last_name}`
-          .toLowerCase()
-          .includes(searchLower)
-      );
-    });
-    return [...filtered].sort((a: CodeData, b: CodeData) => {
-      switch (sortType) {
-        case 'newest':
-          return b.createdAt.toDate().getTime() - a.createdAt.toDate().getTime();
-        case 'oldest':
-          return a.createdAt.toDate().getTime() - b.createdAt.toDate().getTime();
-        case 'most_liked':
-          return b.likes.length - a.likes.length;
-        default:
-          return 0;
-      }
-    });
+
+    const fuseOptions = {
+      keys: [
+        'title',
+        'description',
+        'language',
+      ],
+      threshold: 0.4, // adjust this as u want (1 means everything, 0 means u need exact match)
+    };
+
+    const fuse = new Fuse(codes, fuseOptions);
+
+    // Perform the search using the search query
+    const filtered =
+      searchQuery.trim() !== ''
+        ? fuse.search(searchQuery).map(result => result.item)
+        : codes;
+
+    // Sort the filtered results
+    const sorted = lodash.orderBy(
+      filtered,
+      [
+        sortType === 'newest' || sortType === 'oldest' ? 'createdAt' : sortType === 'most_liked' ? 'likes.length' : null,
+      ],
+      [
+        sortType === 'newest'
+          ? 'desc'
+          : sortType === 'oldest'
+            ? 'asc'
+            : sortType === 'most_liked'
+              ? 'desc'
+              : 'asc',
+      ]
+    );
+
+    return sorted;
   }, [codes, searchQuery, sortType]);
 
   const handleLoadMore = () => {
