@@ -13,7 +13,6 @@ import {
   Appbar,
   Avatar,
   Card,
-  Icon,
   IconButton,
   Searchbar,
   Text,
@@ -47,8 +46,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { toast } from '@baronha/ting';
 import Fuse from 'fuse.js';
 import lodash from 'lodash';
-const LeftContent = (props: JSX.IntrinsicAttributes & { size?: number }) => (
-  <Avatar.Icon {...props} icon="code-tags" />
+
+const LanguageAvatarIcon = (language: string) => (
+  <Avatar.Icon
+    icon={language === 'algorithm' ? 'brain' : `language-${language}`}
+    size={40}
+  />
 );
 
 type CodeDataWithName = CodeData & { first_name: string; last_name: string };
@@ -577,7 +580,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
     const commentCount = commentCounts[item.id] || 0;
 
     const rightContent = () => (
-      <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+      <View style={{ flexDirection: 'column', alignItems: 'center', paddingRight: 10 }}>
         <IconButton
           icon="eye"
           iconColor={theme.colors.onPrimary}
@@ -606,13 +609,13 @@ const Main = forwardRef<MainRef>((_, ref) => {
             subtitle={`${item.first_name} ${item.last_name}`}
             titleStyle={{ fontFamily: FONTS.p_regular }}
             subtitleStyle={{ fontFamily: FONTS.p_regular }}
-            left={LeftContent}
+            left={() => LanguageAvatarIcon(item.language)}
             right={rightContent}
           />
           <Card.Content>
             <Text variant="bodyMedium">{item.description}</Text>
             <SpacerV height={heightPercentageToDP(0.15)} />
-            <Icon
+            {/* <Icon
               size={24}
               color={theme.colors.primary}
               source={
@@ -620,7 +623,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
                   ? 'brain'
                   : `language-${item.language}`
               }
-            />
+            /> */}
             <SpacerV height={heightPercentageToDP(0.15)} />
             <Text
               variant={'bodySmall'}
@@ -633,61 +636,63 @@ const Main = forwardRef<MainRef>((_, ref) => {
                 ? `Année: ${item.level} | Section: ${item.section}`
                 : `Année: ${item.level}`}
             </Text>
-          </Card.Content>
-          <Card.Actions>
-            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-              <IconButton
-                icon={liked ? 'heart' : 'heart-outline'}
-                iconColor={theme.colors.onPrimary}
-                containerColor={theme.colors.primary}
-                size={20}
-                onPress={() => {
-                  toggleLike(item.id, item.likes);
-                }}
-              />
-              <Text
-                style={{ fontFamily: FONTS.p_regular }}
-                variant={'labelSmall'}>
-                {item.likes.length}
-              </Text>
-            </View>
-            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-              <IconButton
-                icon={
-                  commentCount === 0
-                    ? 'thought-bubble-outline'
-                    : 'thought-bubble'
-                }
-                iconColor={theme.colors.onPrimary}
-                containerColor={theme.colors.primary}
-                size={20}
-                onPress={() => {
-                  navigation.navigate('comments', { pid: item.id });
-                }}
-              />
-              <Text
-                style={{ fontFamily: FONTS.p_regular }}
-                variant={'labelSmall'}>
-                {commentCount}
-              </Text>
-            </View>
-            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-              <IconButton
-                icon={userBookmarks[item.id] ? 'bookmark' : 'bookmark-outline'}
-                iconColor={theme.colors.onPrimary}
-                containerColor={theme.colors.primary}
-                size={20}
-                onPress={() => {
-                  toggleBookmark(item.id);
-                }}
-              />
-              <Text
-                style={{ fontFamily: FONTS.p_regular }}
-                variant={'labelSmall'}>
-                {bookmarkCounts[item.id] || 0}
-              </Text>
-            </View>
-            {/**<View style={{flexDirection: 'column', alignItems: 'center'}}>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
+                  <IconButton
+                    icon={liked ? 'heart' : 'heart-outline'}
+                    iconColor={theme.colors.onPrimary}
+                    containerColor={theme.colors.primary}
+                    size={20}
+                    onPress={() => {
+                      toggleLike(item.id, item.likes);
+                    }}
+                  />
+                  <Text
+                    style={{ fontFamily: FONTS.p_regular }}
+                    variant={'labelSmall'}>
+                    {item.likes.length}
+                  </Text>
+                </View>
+                <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                  <IconButton
+                    icon={
+                      commentCount === 0
+                        ? 'thought-bubble-outline'
+                        : 'thought-bubble'
+                    }
+                    iconColor={theme.colors.onPrimary}
+                    containerColor={theme.colors.primary}
+                    size={20}
+                    onPress={() => {
+                      navigation.navigate('comments', { pid: item.id });
+                    }}
+                  />
+                  <Text
+                    style={{ fontFamily: FONTS.p_regular }}
+                    variant={'labelSmall'}>
+                    {commentCount}
+                  </Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'column', alignItems: 'center' }}>
+                <IconButton
+                  icon={userBookmarks[item.id] ? 'bookmark' : 'bookmark-outline'}
+                  iconColor={theme.colors.onPrimary}
+                  containerColor={theme.colors.primary}
+                  size={20}
+                  onPress={() => {
+                    toggleBookmark(item.id);
+                  }}
+                />
+                <Text
+                  style={{ fontFamily: FONTS.p_regular }}
+                  variant={'labelSmall'}>
+                  {bookmarkCounts[item.id] || 0}
+                </Text>
+              </View>
+              {/**<View style={{flexDirection: 'column', alignItems: 'center'}}>
              <IconButton
              icon="share"
              iconColor={theme.colors.onPrimary}
@@ -703,7 +708,8 @@ const Main = forwardRef<MainRef>((_, ref) => {
              5, 294K
              </Text>
              </View>*/}
-          </Card.Actions>
+            </View>
+          </Card.Content>
         </Card>
       </Animated.View>
     );
