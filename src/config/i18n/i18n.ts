@@ -214,6 +214,10 @@ const resources = {
         resend_mail_after: 'Resend mail after',
         resend_verification_mail: 'Resend verification mail',
       },
+      'bookmark_saved': 'Bookmark saved',
+      'bookmark_saved_message': 'The code has been saved to your bookmarks.',
+      'bookmark_removed': 'Bookmark removed',
+      'bookmark_removed_message': 'The code has been removed from your bookmarks.',
     },
   },
   fr: {
@@ -421,6 +425,11 @@ const resources = {
         resend_mail_after: 'Renvoyer le mail après',
         resend_verification_mail: 'Renvoyer le mail de vérification',
       },
+
+      'bookmark_saved': 'Favori enregistré',
+      'bookmark_saved_message': 'Le code a été enregistré dans vos favoris.',
+      'bookmark_removed': 'Favori supprimé',
+      'bookmark_removed_message': 'Le code a été supprimé de vos favoris.',
     },
   },
 };

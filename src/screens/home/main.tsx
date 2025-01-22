@@ -7,7 +7,7 @@ import React, {
   useState,
   useMemo,
 } from 'react';
-import { Dimensions, Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Dimensions, Platform, StatusBar, StyleSheet, Vibration, View } from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -44,6 +44,7 @@ import { OneSignal } from 'react-native-onesignal';
 import { OneSignalPostNotification } from '../../utils/onesignal.ts';
 import getFullUserData from '../../utils/firebase.ts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { toast } from '@baronha/ting';
 
 const LeftContent = (props: JSX.IntrinsicAttributes & { size?: number }) => (
   <Avatar.Icon {...props} icon="code-tags" />
@@ -432,6 +433,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
     };
 
     try {
+      Vibration.vibrate(100);
       if (!isCurrentlyBookmarked) {
         await Promise.all([
           bookmarkDocRef.set({
@@ -445,6 +447,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
           }),
           OneSignalPostNotification(UserCode, 'bookmark'),
         ]);
+        toast({ title: t('bookmark_saved'), message: t('bookmark_saved_message') });
       } else {
         await Promise.all([
           bookmarkDocRef.delete(),
@@ -454,6 +457,8 @@ const Main = forwardRef<MainRef>((_, ref) => {
             time: firestore.Timestamp.fromDate(new Date()),
           }),
         ]);
+
+        toast({ title: t('bookmark_removed'), message: t('bookmark_removed_message'), preset: 'error' });
       }
     } catch (error) {
       console.error('Error toggling bookmark:', error);
