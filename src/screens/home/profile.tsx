@@ -1,6 +1,6 @@
-import React, {useEffect, useLayoutEffect, useState} from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import BaseView from '../../components/baseview/baseview.tsx';
-import {Platform, StatusBar, StyleSheet, View} from 'react-native';
+import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import {
   Appbar,
   Avatar,
@@ -11,7 +11,7 @@ import {
   Tooltip,
   useTheme,
 } from 'react-native-paper';
-import {FONTS} from '../../config/misc.ts';
+import { FONTS } from '../../config/misc.ts';
 import Animated, {
   BounceInUp,
   BounceOutUp,
@@ -26,19 +26,19 @@ import {
   widthPercentageToDP,
 } from '../../config/dimensions.ts';
 import SpacerV from '../../components/spacer/spacerv.tsx';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {CommonActions, useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../config/navigation/types.ts';
-import {ScrollView} from 'react-native-gesture-handler';
-import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
-import {isUndefined} from 'lodash';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CommonActions, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../config/navigation/types.ts';
+import { ScrollView } from 'react-native-gesture-handler';
+import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+import { isUndefined } from 'lodash';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
 import getUserData from '../../utils/firebase.ts';
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { getRandomInt } from '../../utils/algo-utils.ts';
 import { Appodeal, AppodealAdType } from 'react-native-appodeal';
 
@@ -103,7 +103,7 @@ const fetchStatistics = async (uid: string): Promise<Statistics> => {
       crashlytics().recordError(error);
     }
     console.error('Error fetching user statistics:', error);
-    return {posts: 0, comments: 0, views: 0};
+    return { posts: 0, comments: 0, views: 0 };
   }
 };
 
@@ -143,10 +143,10 @@ const fetchUserViewsCount = async (uid: string): Promise<number> => {
   }
 };
 
-const Profile: React.FC<ProfileProps> = ({uid}) => {
+const Profile: React.FC<ProfileProps> = ({ uid }) => {
   const theme = useTheme();
 
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -293,7 +293,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{name: 'login'}],
+            routes: [{ name: 'login' }],
           }),
         );
       }
@@ -381,27 +381,22 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
   const activtyTranslator = (activity: RecentActivity) => {
     switch (activity.type) {
       case 'liked':
-        return `${t('profile.liked')} "${
-          activity.title ?? `${t('profile.someone')}`
-        }" ${t('profile.post')}.`;
+        return `${t('profile.liked')} "${activity.title ?? `${t('profile.someone')}`
+          }" ${t('profile.post')}.`;
       case 'unliked':
-        return `${t('profile.unliked')} "${
-          activity.title ?? `${t('profile.someone')}`
-        }" ${t('profile.post')}.`;
+        return `${t('profile.unliked')} "${activity.title ?? `${t('profile.someone')}`
+          }" ${t('profile.post')}.`;
       case 'account_created':
         return t('profile.created_account');
       case 'commented':
-        return `${t('profile.commented')} "${
-          activity.title ?? `${t('profile.someone')}`
-        }" ${t('profile.post')}.`;
+        return `${t('profile.commented')} "${activity.title ?? `${t('profile.someone')}`
+          }" ${t('profile.post')}.`;
       case 'bookmark':
-        return `${t('profile.bookmark')} "${
-          activity.title ?? `${t('profile.someone')}`
-        }" ${t('profile.post')}.`;
+        return `${t('profile.bookmark')} "${activity.title ?? `${t('profile.someone')}`
+          }" ${t('profile.post')}.`;
       case 'unbookmark':
-        return `${t('profile.unbookmark')} "${
-          activity.title ?? `${t('profile.someone')}`
-        }" ${t('profile.post')}.`;
+        return `${t('profile.unbookmark')} "${activity.title ?? `${t('profile.someone')}`
+          }" ${t('profile.post')}.`;
       default:
         return t('profile.did_something');
     }
@@ -412,14 +407,14 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
       needsPaddingTop={false}
       avoidingView={false}
       needsPaddingBottom={false}>
-      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.elevation.level2 }}>
         <Appbar.Content
           title={t('profile.title')}
-          titleStyle={{fontFamily: FONTS.p_regular}}
+          titleStyle={{ fontFamily: FONTS.p_regular }}
         />
         <Tooltip title={t('help')}>
           <Menu
-            style={{paddingTop: insets.top, paddingRight: insets.right}}
+            style={{ paddingTop: insets.top, paddingRight: insets.right }}
             visible={menuVisible}
             onDismiss={closeMenu}
             anchor={
@@ -450,14 +445,14 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           {photoUrl && photoUrl.length === 2 ? (
             <Avatar.Text label={photoUrl} size={85} />
           ) : (
-            <Avatar.Image source={{uri: photoUrl}} size={85} />
+            <Avatar.Image source={{ uri: photoUrl }} size={85} />
           )}
           <Text
             adjustsFontSizeToFit
             numberOfLines={2}
             style={[
               styles.under_header_text,
-              {color: theme.colors.onBackground},
+              { color: theme.colors.onBackground },
             ]}>
             {mode === 'itself'
               ? auth().currentUser?.displayName
@@ -466,7 +461,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
           <Text
             adjustsFontSizeToFit={true}
             numberOfLines={1}
-            style={[styles.bioText, {color: theme.colors.onBackground}]}
+            style={[styles.bioText, { color: theme.colors.onBackground }]}
             onPress={() => navigation.navigate('edit-bio')}>
             {bio ? bio : t('settings.add_bio')}
           </Text>
@@ -507,7 +502,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                   numberOfLines={1}
                   style={[
                     styles.statNumber,
-                    {color: theme.colors.onPrimaryContainer},
+                    { color: theme.colors.onPrimaryContainer },
                   ]}>
                   {statistics.posts}
                 </Text>
@@ -516,7 +511,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                   numberOfLines={1}
                   style={[
                     styles.statLabel,
-                    {color: theme.colors.onPrimaryContainer},
+                    { color: theme.colors.onPrimaryContainer },
                   ]}>
                   {t('algorithm') + '(s)'}
                 </Text>
@@ -527,7 +522,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                   numberOfLines={1}
                   style={[
                     styles.statNumber,
-                    {color: theme.colors.onPrimaryContainer},
+                    { color: theme.colors.onPrimaryContainer },
                   ]}>
                   {statistics.comments}
                 </Text>
@@ -536,7 +531,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                   numberOfLines={1}
                   style={[
                     styles.statLabel,
-                    {color: theme.colors.onPrimaryContainer},
+                    { color: theme.colors.onPrimaryContainer },
                   ]}>
                   {t('comments.title').slice(0, -1) + '(s)'}
                 </Text>
@@ -547,7 +542,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                   numberOfLines={1}
                   style={[
                     styles.statNumber,
-                    {color: theme.colors.onPrimaryContainer},
+                    { color: theme.colors.onPrimaryContainer },
                   ]}>
                   {viewCount}
                 </Text>
@@ -556,9 +551,9 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                   numberOfLines={1}
                   style={[
                     styles.statLabel,
-                    {color: theme.colors.onPrimaryContainer},
+                    { color: theme.colors.onPrimaryContainer },
                   ]}>
-                  {t('views').slice(0, -1) + '(s)'}
+                    {viewCount !== 1 ? t('views') : t('view')}
                 </Text>
               </View>
             </Card.Content>
@@ -576,12 +571,11 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                   key={achievement.id}
                   style={[
                     styles.chipAch,
-                    {backgroundColor: theme.colors.elevation.level3},
+                    { backgroundColor: theme.colors.elevation.level3 },
                   ]}
-                  icon="medal">
-                  {achievement.title === 'New Member'
-                    ? t('profile.new_member')
-                    : achievement.title}
+                  icon="medal"
+                >
+                  {achievement.title === 'New Member' ? t('profile.new_member') : achievement.title}
                 </Chip>
               ))}
             </Card.Content>
@@ -598,7 +592,7 @@ const Profile: React.FC<ProfileProps> = ({uid}) => {
                 <Text
                   key={activity.id}
                   variant={'labelMedium'}
-                  style={{fontFamily: FONTS.p_regular}}>
+                  style={{ fontFamily: FONTS.p_regular }}>
                   {`- ${activtyTranslator(activity)}`}
                 </Text>
               ))}

@@ -178,6 +178,7 @@ const resources = {
         about_developer: 'About Developer',
       },
       views: 'Views',
+      view: 'View',
       'pending-review': {
         title: 'Pending Review',
         accept: 'Accept',
@@ -382,6 +383,7 @@ const resources = {
         about_developer: 'À propos du développeur',
       },
       views: 'Vues',
+      view: 'Vue',
       'pending-review': {
         title: 'En attente de validation',
         accept: 'Accepter',

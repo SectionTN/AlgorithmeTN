@@ -7,7 +7,7 @@ import React, {
   useState,
   useMemo,
 } from 'react';
-import {Dimensions, Platform, StatusBar, StyleSheet, View} from 'react-native';
+import { Dimensions, Platform, StatusBar, StyleSheet, View } from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
 import {
   Appbar,
@@ -22,34 +22,34 @@ import {
   ActivityIndicator,
   Menu,
 } from 'react-native-paper';
-import {FlatGrid} from 'react-native-super-grid';
-import {FONTS} from '../../config/misc.ts';
+import { FlatGrid } from 'react-native-super-grid';
+import { FONTS } from '../../config/misc.ts';
 import SpacerH from '../../components/spacer/spacerh.tsx';
 import {
   getStatusBarHeight,
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/dimensions.ts';
-import Animated, {SlideInLeft, SlideOutRight} from 'react-native-reanimated';
+import Animated, { SlideInLeft, SlideOutRight } from 'react-native-reanimated';
 import SpacerV from '../../components/spacer/spacerv.tsx';
-import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../../config/navigation/types.ts';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../config/navigation/types.ts';
 import auth from '@react-native-firebase/auth';
-import {CodeData} from '../../types/interfaces.ts';
+import { CodeData } from '../../types/interfaces.ts';
 import firestore from '@react-native-firebase/firestore';
 import crashlytics from '@react-native-firebase/crashlytics';
-import {useTranslation} from 'react-i18next';
-import {OneSignal} from 'react-native-onesignal';
-import {OneSignalPostNotification} from '../../utils/onesignal.ts';
+import { useTranslation } from 'react-i18next';
+import { OneSignal } from 'react-native-onesignal';
+import { OneSignalPostNotification } from '../../utils/onesignal.ts';
 import getFullUserData from '../../utils/firebase.ts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const LeftContent = (props: JSX.IntrinsicAttributes & {size?: number}) => (
+const LeftContent = (props: JSX.IntrinsicAttributes & { size?: number }) => (
   <Avatar.Icon {...props} icon="code-tags" />
 );
 
-type CodeDataWithName = CodeData & {first_name: string; last_name: string};
+type CodeDataWithName = CodeData & { first_name: string; last_name: string };
 
 interface MainRef {
   fetchUserBookmarks: () => Promise<void>;
@@ -68,7 +68,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
 
   const windowWidth = Dimensions.get('window').width;
 
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const [photoUrl, setPhotoUrl] = useState('XD');
 
@@ -108,7 +108,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
 
   const getUserData = async (
     uid: string,
-  ): Promise<{first_name: string; last_name: string}> => {
+  ): Promise<{ first_name: string; last_name: string }> => {
     try {
       const userDoc = await firestore().collection('users').doc(uid).get();
       const userData = userDoc.data();
@@ -118,7 +118,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
       };
     } catch (error) {
       console.error('Error fetching user data:', error);
-      return {first_name: '', last_name: ''};
+      return { first_name: '', last_name: '' };
     }
   };
 
@@ -135,8 +135,8 @@ const Main = forwardRef<MainRef>((_, ref) => {
         if (!codeDoc.exists) {
           crashlytics().log(
             'Adding view for codeId `' +
-              codeId +
-              "` isn't available; document doesn't exist",
+            codeId +
+            "` isn't available; document doesn't exist",
           );
           return;
         }
@@ -166,7 +166,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
           OneSignal.logout();
           navigation.reset({
             index: 0,
-            routes: [{name: 'login'}],
+            routes: [{ name: 'login' }],
           });
         }
       }
@@ -211,7 +211,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
       .onSnapshot(async snapshot => {
         const counts: Record<string, number> = {};
         snapshot.docs.forEach(doc => {
-          const {postId} = doc.data();
+          const { postId } = doc.data();
           if (postId) {
             counts[postId] = (counts[postId] || 0) + 1;
           }
@@ -337,7 +337,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
 
     const snapshot = await firestore().collection('comments').get();
     snapshot.docs.forEach(doc => {
-      const {postId} = doc.data();
+      const { postId } = doc.data();
       if (postId) {
         commentCounts[postId] = (commentCounts[postId] || 0) + 1;
       }
@@ -481,7 +481,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
       .onSnapshot(snapshot => {
         const bookmarks: Record<string, boolean> = {};
         snapshot.docs.forEach(doc => {
-          const {codeId} = doc.data();
+          const { codeId } = doc.data();
           if (codeId) {
             bookmarks[codeId] = true;
           }
@@ -494,7 +494,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
       .onSnapshot(snapshot => {
         const counts: Record<string, number> = {};
         snapshot.docs.forEach(doc => {
-          const {codeId} = doc.data();
+          const { codeId } = doc.data();
           if (codeId) {
             counts[codeId] = (counts[codeId] || 0) + 1;
           }
@@ -524,7 +524,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
 
         const bookmarks: Record<string, boolean> = {};
         snapshot.docs.forEach(doc => {
-          const {codeId} = doc.data();
+          const { codeId } = doc.data();
           if (codeId) {
             bookmarks[codeId] = true;
           }
@@ -540,7 +540,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
 
         const counts: Record<string, number> = {};
         snapshot.docs.forEach(doc => {
-          const {codeId} = doc.data();
+          const { codeId } = doc.data();
           if (codeId) {
             counts[codeId] = (counts[codeId] || 0) + 1;
           }
@@ -552,20 +552,20 @@ const Main = forwardRef<MainRef>((_, ref) => {
     },
   }));
 
-  const renderGridItem = ({item}: {item: CodeDataWithName}) => {
+  const renderGridItem = ({ item }: { item: CodeDataWithName }) => {
     const uid = auth().currentUser?.uid;
     const liked = uid ? item.likes.includes(uid) : false;
     const commentCount = commentCounts[item.id] || 0;
 
     const rightContent = () => (
-      <View style={{flexDirection: 'column', alignItems: 'center'}}>
+      <View style={{ flexDirection: 'column', alignItems: 'center' }}>
         <IconButton
           icon="eye"
           iconColor={theme.colors.onPrimary}
           containerColor={theme.colors.primary}
           size={20}
         />
-        <Text style={{fontFamily: FONTS.p_regular}} variant={'labelSmall'}>
+        <Text style={{ fontFamily: FONTS.p_regular }} variant={'labelSmall'}>
           {item.views.length}
         </Text>
       </View>
@@ -575,16 +575,18 @@ const Main = forwardRef<MainRef>((_, ref) => {
       <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
         <Card
           onPress={() => {
-            navigation.preload('algo', {codeId: item.id});
+            navigation.preload('algo', { codeId: item.id });
             addView(item.id).then(() => {
-              navigation.navigate('algo', {codeId: item.id});
+              navigation.navigate('algo', { codeId: item.id });
             });
-          }}>
+          }}
+          onLongPress={() => toggleBookmark(item.id)}
+        >
           <Card.Title
             title={item.title}
             subtitle={`${item.first_name} ${item.last_name}`}
-            titleStyle={{fontFamily: FONTS.p_regular}}
-            subtitleStyle={{fontFamily: FONTS.p_regular}}
+            titleStyle={{ fontFamily: FONTS.p_regular }}
+            subtitleStyle={{ fontFamily: FONTS.p_regular }}
             left={LeftContent}
             right={rightContent}
           />
@@ -614,7 +616,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
             </Text>
           </Card.Content>
           <Card.Actions>
-            <View style={{flexDirection: 'column', alignItems: 'center'}}>
+            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
               <IconButton
                 icon={liked ? 'heart' : 'heart-outline'}
                 iconColor={theme.colors.onPrimary}
@@ -625,12 +627,12 @@ const Main = forwardRef<MainRef>((_, ref) => {
                 }}
               />
               <Text
-                style={{fontFamily: FONTS.p_regular}}
+                style={{ fontFamily: FONTS.p_regular }}
                 variant={'labelSmall'}>
                 {item.likes.length}
               </Text>
             </View>
-            <View style={{flexDirection: 'column', alignItems: 'center'}}>
+            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
               <IconButton
                 icon={
                   commentCount === 0
@@ -641,16 +643,16 @@ const Main = forwardRef<MainRef>((_, ref) => {
                 containerColor={theme.colors.primary}
                 size={20}
                 onPress={() => {
-                  navigation.navigate('comments', {pid: item.id});
+                  navigation.navigate('comments', { pid: item.id });
                 }}
               />
               <Text
-                style={{fontFamily: FONTS.p_regular}}
+                style={{ fontFamily: FONTS.p_regular }}
                 variant={'labelSmall'}>
                 {commentCount}
               </Text>
             </View>
-            <View style={{flexDirection: 'column', alignItems: 'center'}}>
+            <View style={{ flexDirection: 'column', alignItems: 'center' }}>
               <IconButton
                 icon={userBookmarks[item.id] ? 'bookmark' : 'bookmark-outline'}
                 iconColor={theme.colors.onPrimary}
@@ -661,7 +663,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
                 }}
               />
               <Text
-                style={{fontFamily: FONTS.p_regular}}
+                style={{ fontFamily: FONTS.p_regular }}
                 variant={'labelSmall'}>
                 {bookmarkCounts[item.id] || 0}
               </Text>
@@ -700,17 +702,17 @@ const Main = forwardRef<MainRef>((_, ref) => {
       needsPaddingTop={false}
       avoidingView={false}
       needsPaddingBottom={false}>
-      <Appbar.Header style={{backgroundColor: theme.colors.elevation.level2}}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.elevation.level2 }}>
         <SpacerH width={widthPercentageToDP(0.5)} />
         {photoUrl && photoUrl.length === 2 ? (
           <Avatar.Text label={photoUrl} size={34} />
         ) : (
-          <Avatar.Image source={{uri: photoUrl}} size={34} />
+          <Avatar.Image source={{ uri: photoUrl }} size={34} />
         )}
         <SpacerH width={widthPercentageToDP(0.5)} />
         <Appbar.Content
           title={t('home.title')}
-          titleStyle={{fontFamily: FONTS.p_regular}}
+          titleStyle={{ fontFamily: FONTS.p_regular }}
         />
         <Menu
           visible={showSortMenu}
