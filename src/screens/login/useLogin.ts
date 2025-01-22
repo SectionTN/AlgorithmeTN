@@ -185,9 +185,7 @@ const useLogin = () => {
                     });
                   navigation.navigate('home');
                 } else if (!currentUser?.emailVerified) {
-                  const username = currentUser?.uid
-                    ?.substring(0, 4)
-                    .concat(generateRandomString(6));
+                  const username = auth().currentUser?.email?.split('@')[0];
 
                   navigation.navigate('confirm-account', {
                     username: username,
@@ -198,9 +196,7 @@ const useLogin = () => {
                     from_where: 'register',
                   });
                 } else {
-                  const username = auth()
-                    .currentUser?.uid?.substring(0, 4)
-                    .concat(generateRandomString(6));
+                  const username = auth().currentUser?.email?.split('@')[0];
 
                   navigation.navigate('setup', {
                     username: username,
