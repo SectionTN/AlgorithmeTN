@@ -402,10 +402,6 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
     }
   };
 
-  if (firstName === '' || lastName === '') {
-    return <LoadingScreen />;
-  }
-
   return (
     <BaseView
       needsPaddingTop={false}
@@ -441,173 +437,177 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
           </Menu>
         </Tooltip>
       </Appbar.Header>
-      <ScrollView nestedScrollEnabled={true} alwaysBounceVertical={true}>
-        <Animated.View
-          entering={BounceInUp}
-          exiting={BounceOutUp}
-          style={styles.under_header}>
-          {photoUrl && photoUrl.length === 2 ? (
-            <Avatar.Text label={photoUrl} size={85} />
-          ) : (
-            <Avatar.Image source={{ uri: photoUrl }} size={85} />
-          )}
-          <Text
-            adjustsFontSizeToFit
-            numberOfLines={2}
-            style={[
-              styles.under_header_text,
-              { color: theme.colors.onBackground },
-            ]}>
-            {mode === 'itself'
-              ? auth().currentUser?.displayName
-              : `${firstName} ${lastName}`}
-          </Text>
-          <Text
-            adjustsFontSizeToFit={true}
-            numberOfLines={1}
-            style={[styles.bioText, { color: theme.colors.onBackground }]}
-            onPress={() => navigation.navigate('edit-bio')}>
-            {bio ? bio : t('settings.add_bio')}
-          </Text>
-        </Animated.View>
-        <SpacerV height={heightPercentageToDP(0.1)} />
-        {/*Language Chips*/}
-        <Animated.View
-          entering={FlipInEasyX}
-          exiting={FlipOutEasyX}
-          style={styles.badgeView}>
-          {badges.map(badge => (
-            <Chip
-              key={badge.id}
-              style={styles.chipBadge}
-              icon={
-                badge.language === 'algorithm'
-                  ? 'brain'
-                  : `language-${badge.language}`
-              }>
-              {badgeTranslator(badge.language)}
-            </Chip>
-          ))}
-        </Animated.View>
-        <SpacerV height={heightPercentageToDP(0.25)} />
-        <Animated.View
-          style={styles.statisticsHolder}
-          entering={ZoomInLeft}
-          exiting={ZoomOutRight}>
-          <Card mode={'contained'}>
-            <Card.Title
-              title={t('profile.stats')}
-              titleVariant={'titleLarge'}
-            />
-            <Card.Content style={styles.cardContent}>
-              <View style={styles.statItem}>
-                <Text
-                  adjustsFontSizeToFit={true}
-                  numberOfLines={1}
-                  style={[
-                    styles.statNumber,
-                    { color: theme.colors.onPrimaryContainer },
-                  ]}>
-                  {statistics.posts}
-                </Text>
-                <Text
-                  adjustsFontSizeToFit={true}
-                  numberOfLines={1}
-                  style={[
-                    styles.statLabel,
-                    { color: theme.colors.onPrimaryContainer },
-                  ]}>
-                  {t('algorithm') + '(s)'}
-                </Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text
-                  adjustsFontSizeToFit={true}
-                  numberOfLines={1}
-                  style={[
-                    styles.statNumber,
-                    { color: theme.colors.onPrimaryContainer },
-                  ]}>
-                  {statistics.comments}
-                </Text>
-                <Text
-                  adjustsFontSizeToFit={true}
-                  numberOfLines={1}
-                  style={[
-                    styles.statLabel,
-                    { color: theme.colors.onPrimaryContainer },
-                  ]}>
-                  {t('comments.title').slice(0, -1) + '(s)'}
-                </Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text
-                  adjustsFontSizeToFit={true}
-                  numberOfLines={1}
-                  style={[
-                    styles.statNumber,
-                    { color: theme.colors.onPrimaryContainer },
-                  ]}>
-                  {viewCount}
-                </Text>
-                <Text
-                  adjustsFontSizeToFit={true}
-                  numberOfLines={1}
-                  style={[
-                    styles.statLabel,
-                    { color: theme.colors.onPrimaryContainer },
-                  ]}>
-                  {viewCount !== 1 ? t('views') : t('view')}
-                </Text>
-              </View>
-            </Card.Content>
-          </Card>
-          <SpacerV height={heightPercentageToDP(0.25)} />
-          {/*Achievements Chips*/}
-          <Card mode={'contained'}>
-            <Card.Title
-              title={t('profile.achievements')}
-              titleVariant={'titleLarge'}
-            />
-            <Card.Content style={styles.achievementsView}>
-              {achievements.map(achievement => (
+      {
+        (firstName !== '' || lastName !== '') ? <LoadingScreen /> : (
+          <ScrollView nestedScrollEnabled={true} alwaysBounceVertical={true}>
+            <Animated.View
+              entering={BounceInUp}
+              exiting={BounceOutUp}
+              style={styles.under_header}>
+              {photoUrl && photoUrl.length === 2 ? (
+                <Avatar.Text label={photoUrl} size={85} />
+              ) : (
+                <Avatar.Image source={{ uri: photoUrl }} size={85} />
+              )}
+              <Text
+                adjustsFontSizeToFit
+                numberOfLines={2}
+                style={[
+                  styles.under_header_text,
+                  { color: theme.colors.onBackground },
+                ]}>
+                {mode === 'itself'
+                  ? auth().currentUser?.displayName
+                  : `${firstName} ${lastName}`}
+              </Text>
+              <Text
+                adjustsFontSizeToFit={true}
+                numberOfLines={1}
+                style={[styles.bioText, { color: theme.colors.onBackground }]}
+                onPress={() => navigation.navigate('edit-bio')}>
+                {bio ? bio : t('settings.add_bio')}
+              </Text>
+            </Animated.View>
+            <SpacerV height={heightPercentageToDP(0.1)} />
+            {/*Language Chips*/}
+            <Animated.View
+              entering={FlipInEasyX}
+              exiting={FlipOutEasyX}
+              style={styles.badgeView}>
+              {badges.map(badge => (
                 <Chip
-                  key={achievement.id}
-                  style={[
-                    styles.chipAch,
-                    { backgroundColor: theme.colors.elevation.level3 },
-                  ]}
-                  icon="medal"
-                >
-                  {achievement.title === 'New Member' ? t('profile.new_member') : achievement.title}
+                  key={badge.id}
+                  style={styles.chipBadge}
+                  icon={
+                    badge.language === 'algorithm'
+                      ? 'brain'
+                      : `language-${badge.language}`
+                  }>
+                  {badgeTranslator(badge.language)}
                 </Chip>
               ))}
-            </Card.Content>
-          </Card>
-          <SpacerV height={heightPercentageToDP(0.25)} />
-          {/*Recent Activities*/}
-          <Card mode={'contained'}>
-            <Card.Title
-              title={t('profile.recent_activities')}
-              titleVariant={'titleLarge'}
-            />
-            <Card.Content style={styles.recentActivities}>
-              {recentActivities.map((activity, key) => (
-                <View key={key} style={styles.activityItem}>
-                  <Icon source={'circle'} size={8} />
-                  <Text
-                    key={activity.id}
-                    variant={'labelMedium'}
-                    style={{ fontFamily: FONTS.p_regular }}>
-                    {capitalize(activtyTranslator(activity))}
-                  </Text>
-                </View>
-              ))}
-            </Card.Content>
-          </Card>
-          <SpacerV height={heightPercentageToDP(0.25)} />
-        </Animated.View>
-      </ScrollView>
+            </Animated.View>
+            <SpacerV height={heightPercentageToDP(0.25)} />
+            <Animated.View
+              style={styles.statisticsHolder}
+              entering={ZoomInLeft}
+              exiting={ZoomOutRight}>
+              <Card mode={'contained'}>
+                <Card.Title
+                  title={t('profile.stats')}
+                  titleVariant={'titleLarge'}
+                />
+                <Card.Content style={styles.cardContent}>
+                  <View style={styles.statItem}>
+                    <Text
+                      adjustsFontSizeToFit={true}
+                      numberOfLines={1}
+                      style={[
+                        styles.statNumber,
+                        { color: theme.colors.onPrimaryContainer },
+                      ]}>
+                      {statistics.posts}
+                    </Text>
+                    <Text
+                      adjustsFontSizeToFit={true}
+                      numberOfLines={1}
+                      style={[
+                        styles.statLabel,
+                        { color: theme.colors.onPrimaryContainer },
+                      ]}>
+                      {t('algorithm') + '(s)'}
+                    </Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text
+                      adjustsFontSizeToFit={true}
+                      numberOfLines={1}
+                      style={[
+                        styles.statNumber,
+                        { color: theme.colors.onPrimaryContainer },
+                      ]}>
+                      {statistics.comments}
+                    </Text>
+                    <Text
+                      adjustsFontSizeToFit={true}
+                      numberOfLines={1}
+                      style={[
+                        styles.statLabel,
+                        { color: theme.colors.onPrimaryContainer },
+                      ]}>
+                      {t('comments.title').slice(0, -1) + '(s)'}
+                    </Text>
+                  </View>
+                  <View style={styles.statItem}>
+                    <Text
+                      adjustsFontSizeToFit={true}
+                      numberOfLines={1}
+                      style={[
+                        styles.statNumber,
+                        { color: theme.colors.onPrimaryContainer },
+                      ]}>
+                      {viewCount}
+                    </Text>
+                    <Text
+                      adjustsFontSizeToFit={true}
+                      numberOfLines={1}
+                      style={[
+                        styles.statLabel,
+                        { color: theme.colors.onPrimaryContainer },
+                      ]}>
+                      {viewCount !== 1 ? t('views') : t('view')}
+                    </Text>
+                  </View>
+                </Card.Content>
+              </Card>
+              <SpacerV height={heightPercentageToDP(0.25)} />
+              {/*Achievements Chips*/}
+              <Card mode={'contained'}>
+                <Card.Title
+                  title={t('profile.achievements')}
+                  titleVariant={'titleLarge'}
+                />
+                <Card.Content style={styles.achievementsView}>
+                  {achievements.map(achievement => (
+                    <Chip
+                      key={achievement.id}
+                      style={[
+                        styles.chipAch,
+                        { backgroundColor: theme.colors.elevation.level3 },
+                      ]}
+                      icon="medal"
+                    >
+                      {achievement.title === 'New Member' ? t('profile.new_member') : achievement.title}
+                    </Chip>
+                  ))}
+                </Card.Content>
+              </Card>
+              <SpacerV height={heightPercentageToDP(0.25)} />
+              {/*Recent Activities*/}
+              <Card mode={'contained'}>
+                <Card.Title
+                  title={t('profile.recent_activities')}
+                  titleVariant={'titleLarge'}
+                />
+                <Card.Content style={styles.recentActivities}>
+                  {recentActivities.map((activity, key) => (
+                    <View key={key} style={styles.activityItem}>
+                      <Icon source={'circle'} size={8} />
+                      <Text
+                        key={activity.id}
+                        variant={'labelMedium'}
+                        style={{ fontFamily: FONTS.p_regular }}>
+                        {capitalize(activtyTranslator(activity))}
+                      </Text>
+                    </View>
+                  ))}
+                </Card.Content>
+              </Card>
+              <SpacerV height={heightPercentageToDP(0.25)} />
+            </Animated.View>
+          </ScrollView>
+        )
+      }
     </BaseView>
   );
 };
