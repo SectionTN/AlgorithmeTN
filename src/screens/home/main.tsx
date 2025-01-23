@@ -615,12 +615,13 @@ const Main = forwardRef<MainRef>((_, ref) => {
             </Text>
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
                 <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start' }}>
                   <IconButton
                     icon={liked ? 'heart' : 'heart-outline'}
                     iconColor={theme.colors.onPrimary}
                     containerColor={theme.colors.primary}
+                    style={styles.iconButton}
                     size={20}
                     onPress={() => {
                       toggleLike(item.id, item.likes);
@@ -658,6 +659,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
                   icon={userBookmarks[item.id] ? 'bookmark' : 'bookmark-outline'}
                   iconColor={theme.colors.onPrimary}
                   containerColor={theme.colors.primary}
+                  style={styles.iconButton}
                   size={20}
                   onPress={() => {
                     toggleBookmark(item.id);
@@ -691,11 +693,11 @@ const Main = forwardRef<MainRef>((_, ref) => {
             <SpacerV height={heightPercentageToDP(0.15)} />
             <View style={styles.cardFooter}>
               <View style={styles.footerItem}>
-                <Icon source="clock" size={14} />
-                <Text style={styles.footerValue}>{moment(item.createdAt.toDate()).fromNow()}</Text>
+                <Icon source="clock" size={14} color={theme.colors.onBackground} />
+                <Text style={[styles.footerValue, { color: theme.colors.onBackground }]}>{moment(item.createdAt.toDate()).fromNow()}</Text>
               </View>
               <View style={styles.footerItem}>
-                <Icon source="eye" size={14} />
+                <Icon source="eye" size={14} color={theme.colors.onBackground} />
                 <Text style={styles.footerValue}>{item.views.length}</Text>
               </View>
             </View>
@@ -848,6 +850,9 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     opacity: 0.75,
     fontSize: 12,
+  },
+  iconButton: {
+    marginHorizontal: 0,
   },
 });
 
