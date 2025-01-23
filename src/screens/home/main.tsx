@@ -692,11 +692,11 @@ const Main = forwardRef<MainRef>((_, ref) => {
             <View style={styles.cardFooter}>
               <View style={styles.footerItem}>
                 <Icon source="clock" size={14} />
-                <Text style={styles.timeAgo}>{moment(item.createdAt.toDate()).locale('fr').fromNow()}</Text>
+                <Text style={styles.footerValue}>{moment(item.createdAt.toDate()).fromNow()}</Text>
               </View>
               <View style={styles.footerItem}>
                 <Icon source="eye" size={14} />
-                <Text style={styles.timeAgo}>{item.views.length}</Text>
+                <Text style={styles.footerValue}>{item.views.length}</Text>
               </View>
             </View>
           </Card.Content>
@@ -843,10 +843,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
   },
-  timeAgo: {
+  footerValue: {
     fontFamily: FONTS.p_regular,
     marginLeft: 5,
     opacity: 0.75,
+    fontSize: 12,
   },
 });
 

@@ -11,6 +11,7 @@ import {
   Text,
   useTheme,
   ActivityIndicator,
+  Divider,
 } from 'react-native-paper';
 import BaseView from '../../components/baseview/baseview.tsx';
 import { FONTS } from '../../config/misc.ts';
@@ -19,7 +20,7 @@ import {
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/dimensions.ts';
-import {Dimensions, Platform, StatusBar, StyleSheet, View} from 'react-native';
+import { Dimensions, Platform, StatusBar, StyleSheet, View } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import { useTranslation } from 'react-i18next';
 import { FlatGrid } from 'react-native-super-grid';
@@ -30,6 +31,9 @@ import SpacerV from '../../components/spacer/spacerv.tsx';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../config/navigation/types.ts';
+import moment from 'moment';
+import { customCapitalize } from '../../utils/algo-utils.ts';
+import { LoadingScreen } from '../../components/LoadingScreen.tsx';
 
 const Bookmarks: React.FC = () => {
   const navigation =
@@ -50,7 +54,7 @@ const Bookmarks: React.FC = () => {
   const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
-    if (Platform.OS === 'android'){
+    if (Platform.OS === 'android') {
       StatusBar.setBackgroundColor(theme.colors.elevation.level2);
     }
   }, [theme.colors.elevation.level2]);
@@ -200,56 +204,68 @@ const Bookmarks: React.FC = () => {
           titleStyle={{ fontFamily: FONTS.p_regular }}
         />
       </Appbar.Header>
-      <FlatGrid
-        itemDimension={windowWidth / 2 - 20}
-        data={bookmarks}
-        renderItem={({ item }) => (
-          <Animated.View layout={SequencedTransition.duration(1000).delay(500)}>
-            <Card onPress={() => navigation.navigate('algo', { codeId: item.id })}>
-              <Card.Title
-                title={`${item.title}`}
-                titleNumberOfLines={2}
-                titleVariant={'labelLarge'}
-                subtitle={`${item.first_name} ${item.last_name}`}
-                subtitleVariant={'labelMedium'}
-                subtitleStyle={{ opacity: 0.75 }}
-              />
-              <Card.Content>
-                <Text variant="labelSmall" numberOfLines={3}>
-                  {item.description}
-                </Text>
-                <SpacerV height={heightPercentageToDP(0.2)} />
-                <Icon
-                  size={24}
-                  color={theme.colors.primary}
-                  source={
-                    item.language === 'algorithm'
-                      ? 'brain'
-                      : `language-${item.language}`
-                  }
-                />
-              </Card.Content>
-              <Card.Actions>
-                <View style={styles.deleteButton}>
-                  <IconButton
-                    icon="delete"
-                    iconColor={theme.colors.onPrimary}
-                    containerColor={theme.colors.primary}
-                    size={24}
-                    onPress={() => {
-                      setPostIdToDelete(item.id);
-                      setDialogVisible(true);
-                    }}
-                  />
-                </View>
-              </Card.Actions>
-            </Card>
-          </Animated.View>
-        )}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={ListFooterComponent}
-      />
+      {loading ? <LoadingScreen /> : (
+        <FlatGrid
+          itemDimension={windowWidth - 20}
+          data={bookmarks}
+          renderItem={({ item }) => (
+            <Animated.View layout={SequencedTransition.duration(1000).delay(500)}>
+              <Card onPress={() => navigation.navigate('algo', { codeId: item.id })}>
+                <Card.Content>
+                  <View style={styles.cardContainer}>
+                    {/* Left Icon */}
+                    <Avatar.Icon
+                      size={32}
+                      icon={item.language === 'algorithm' ? 'brain' : `language-${item.language}`}
+                    />
+
+                    {/* Title and Subtitle */}
+                    <View style={styles.textContainer}>
+                      <Text style={[styles.title, { color: theme.colors.onBackground }]} numberOfLines={2}>
+                        {item.title}
+                      </Text>
+                      <Text style={[styles.subtitle]}>
+                        {`${item.first_name} ${item.last_name}`}
+                      </Text>
+                    </View>
+
+                    {/* Right Icon */}
+                    <IconButton
+                      size={18}
+                      iconColor={theme.colors.primary}
+                      icon="delete"
+                    />
+                  </View>
+                  <SpacerV height={heightPercentageToDP(0.15)} />
+                  <Text style={styles.description} variant="labelSmall" numberOfLines={3}>
+                    {item.description}
+                  </Text>
+                  <SpacerV height={heightPercentageToDP(0.15)} />
+                  <Divider />
+                  <SpacerV height={heightPercentageToDP(0.15)} />
+                  <View style={styles.cardFooter}>
+                    <View style={styles.footerItem}>
+                      <Icon color={theme.colors.onBackground} source="bookmark" size={14} />
+                      <Text style={styles.footerValue}>{moment(item.createdAt.toDate()).fromNow()}</Text>
+                    </View>
+                    <View style={styles.footerItem}>
+                      <Icon color={theme.colors.onBackground} source={
+                        item.language === 'algorithm'
+                          ? 'brain'
+                          : `language-${item.language}`
+                      } size={14} />
+                      <Text style={styles.footerValue}>{customCapitalize(item.language)}</Text>
+                    </View>
+                  </View>
+                </Card.Content>
+              </Card>
+            </Animated.View>
+          )}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={ListFooterComponent}
+        />
+      )}
       <Portal>
         <Dialog visible={dialogVisible} dismissable={true} onDismiss={dismissDialog}>
           <Dialog.Icon icon="delete-alert-outline" />
@@ -274,12 +290,49 @@ const Bookmarks: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  cardContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  textContainer: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  title: {
+    fontFamily: FONTS.p_bold,
+    fontSize: 16,
+  },
+  subtitle: {
+    fontFamily: FONTS.p_regular,
+    fontSize: 14,
+    opacity: 0.75,
+  },
   dialogTitle: {
     textAlign: 'center',
   },
   deleteButton: {
     flexDirection: 'column',
     alignItems: 'center',
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '99%',
+  },
+  footerItem: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  footerValue: {
+    fontFamily: FONTS.p_regular,
+    fontSize: 12,
+    marginLeft: 5,
+    opacity: 0.75,
+  },
+  description: {
+    fontFamily: FONTS.p_regular,
   },
 });
 
