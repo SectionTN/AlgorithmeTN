@@ -6,6 +6,7 @@ import {
   Avatar,
   Card,
   Chip,
+  Icon,
   Menu,
   Text,
   Tooltip,
@@ -591,13 +592,16 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
               titleVariant={'titleLarge'}
             />
             <Card.Content style={styles.recentActivities}>
-              {recentActivities.map(activity => (
-                <Text
-                  key={activity.id}
-                  variant={'labelMedium'}
-                  style={{ fontFamily: FONTS.p_regular }}>
-                  {`- ${capitalize(activtyTranslator(activity))}`}
-                </Text>
+              {recentActivities.map((activity, key) => (
+                <View key={key} style={styles.activityItem}>
+                  <Icon source={'circle'} size={8} />
+                  <Text
+                    key={activity.id}
+                    variant={'labelMedium'}
+                    style={{ fontFamily: FONTS.p_regular }}>
+                    {capitalize(activtyTranslator(activity))}
+                  </Text>
+                </View>
               ))}
             </Card.Content>
           </Card>
@@ -686,6 +690,14 @@ const styles = StyleSheet.create({
     paddingLeft: widthPercentageToDP(4.5),
     paddingRight: '3%',
     flexDirection: 'column',
+  },
+  activityItem: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    gap: 5,
+    marginBottom: heightPercentageToDP(1),
+    width: '99%',
   },
 });
 
