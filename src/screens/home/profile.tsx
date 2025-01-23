@@ -32,7 +32,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../config/navigation/types.ts';
 import { ScrollView } from 'react-native-gesture-handler';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
-import { isUndefined } from 'lodash';
+import { capitalize, isUndefined } from 'lodash';
 import firestore, {
   FirebaseFirestoreTypes,
 } from '@react-native-firebase/firestore';
@@ -41,6 +41,7 @@ import getUserData from '../../utils/firebase.ts';
 import { useTranslation } from 'react-i18next';
 import { getRandomInt } from '../../utils/algo-utils.ts';
 import { Appodeal, AppodealAdType } from 'react-native-appodeal';
+import { LoadingScreen } from '../../components/LoadingScreen.tsx';
 
 interface ProfileProps {
   uid: string | undefined;
@@ -163,9 +164,7 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
 
   const closeMenu = () => setMenuVisible(false);
 
-  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>(
-    [],
-  );
+  const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
 
   const [statistics, setStatistics] = useState<Statistics>({
     posts: 0,
@@ -402,6 +401,10 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
     }
   };
 
+  if (firstName === '' || lastName === '') {
+    return <LoadingScreen />;
+  }
+
   return (
     <BaseView
       needsPaddingTop={false}
@@ -553,7 +556,7 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
                     styles.statLabel,
                     { color: theme.colors.onPrimaryContainer },
                   ]}>
-                    {viewCount !== 1 ? t('views') : t('view')}
+                  {viewCount !== 1 ? t('views') : t('view')}
                 </Text>
               </View>
             </Card.Content>
@@ -593,7 +596,7 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
                   key={activity.id}
                   variant={'labelMedium'}
                   style={{ fontFamily: FONTS.p_regular }}>
-                  {`- ${activtyTranslator(activity)}`}
+                  {`- ${capitalize(activtyTranslator(activity))}`}
                 </Text>
               ))}
             </Card.Content>
@@ -618,11 +621,11 @@ const styles = StyleSheet.create({
     paddingRight: '3%',
     paddingTop: '1%',
     textAlign: 'center',
-    fontFamily: FONTS.p_regular,
+    fontFamily: FONTS.p_bold,
   },
   bioText: {
     position: 'relative',
-    fontSize: fontValue(16),
+    fontSize: fontValue(14),
     paddingLeft: '2.5%',
     paddingRight: '2.5%',
     paddingTop: '1%',

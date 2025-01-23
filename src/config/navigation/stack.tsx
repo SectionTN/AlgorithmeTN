@@ -14,12 +14,16 @@ import {
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
+import analytics from '@react-native-firebase/analytics';
+import {useTheme} from 'react-native-paper';
+
 import {RootStackParamList} from './types';
+import HomeRender from './bottom-navigation';
+
 import Splash from '../../screens/splash';
 import Onboarding from '../../screens/onboarding';
 import Login from '../../screens/login/login.tsx';
 import Setup from '../../screens/setup';
-import HomeRender from './bottom-navigation';
 import Settings from '../../screens/settings/settings.tsx';
 import Algo from '../../screens/algo/algo.tsx';
 import AddCode from '../../screens/add-code.tsx';
@@ -28,10 +32,8 @@ import DarkMode from '../../screens/settings/dark-mode.tsx';
 import EditProfile from '../../screens/settings/edit-profile.tsx';
 import EditBio from '../../screens/settings/edit-bio.tsx';
 import EditUsername from '../../screens/settings/edit-username.tsx';
-import {useTheme} from 'react-native-paper';
 import BugReport from '../../screens/settings/bug-report.tsx';
 import ChangeLanguage from '../../screens/settings/change-language.tsx';
-import analytics from '@react-native-firebase/analytics';
 import PendingReview from '../../screens/pending-review.tsx';
 import Comments from '../../screens/comments.tsx';
 import Profile from '../../screens/home/profile.tsx';

@@ -1,5 +1,4 @@
 import i18n, {LanguageDetectorModule} from 'i18next';
-import {get} from 'lodash';
 import {initReactI18next} from 'react-i18next';
 import * as RNLocalize from 'react-native-localize';
 
