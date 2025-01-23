@@ -333,6 +333,7 @@ const resources = {
         did_something: 'a fait quelque chose',
         new_member: 'Nouveau Membre',
         bookmark: 'favori',
+        unbookmark: 'retiré le favori',
       },
       code: {
         title: 'Code',
