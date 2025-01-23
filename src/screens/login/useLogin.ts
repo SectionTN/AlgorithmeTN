@@ -40,6 +40,7 @@ const useLogin = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>('');
 
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+  const [showHelpMenu, setShowHelpMenu] = useState<boolean>(false);
 
   /**
    * Screen mode
@@ -53,6 +54,10 @@ const useLogin = () => {
 
   const handleTermsPress = async () => {
     await Linking.openURL('https://sectiontn.github.io/algotn/tos');
+  };
+
+  const handleHelpPress = async () => {
+    await Linking.openURL('https://sectiontn.github.io/algotn/help/login');
   };
 
   /**
@@ -379,10 +384,13 @@ const useLogin = () => {
     setConfirmPassword,
     passwordVisible,
     setPasswordVisible,
+    showHelpMenu,
+    setShowHelpMenu,
     currentMode,
     setCurrentMode,
     onMainButtonPress,
     handleTermsPress,
+    handleHelpPress,
     t,
     theme,
     keyboardOffset,

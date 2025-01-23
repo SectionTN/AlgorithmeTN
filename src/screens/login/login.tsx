@@ -1,9 +1,17 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import BaseView from '../../components/baseview/baseview.tsx';
-import {Appbar, Button, Text, TextInput, Tooltip} from 'react-native-paper';
+import {
+  Appbar,
+  Button,
+  Menu,
+  Text,
+  TextInput,
+  Tooltip,
+} from 'react-native-paper';
 import {
   fontValue,
+  getStatusBarHeight,
   heightPercentageToDP,
   widthPercentageToDP,
 } from '../../config/dimensions.ts';
@@ -28,11 +36,14 @@ const Login: React.FC = () => {
     setEmail,
     passwordVisible,
     setPasswordVisible,
+    showHelpMenu,
+    setShowHelpMenu,
     confirmPassword,
     setConfirmPassword,
     setPassword,
     password,
     handleTermsPress,
+    handleHelpPress,
     onMainButtonPress,
     keyboardOffset,
   } = useLogin();
@@ -50,7 +61,17 @@ const Login: React.FC = () => {
         )}
         <Appbar.Content title="" />
         <Tooltip title={t('help')}>
-          <Appbar.Action icon="dots-vertical" onPress={() => {}} />
+          <Menu
+            visible={showHelpMenu}
+            statusBarHeight={getStatusBarHeight()}
+            onDismiss={() => setShowHelpMenu(false)}
+            anchor={<Appbar.Action icon="dots-vertical" onPress={() => setShowHelpMenu(true)} />}>
+            <Menu.Item
+              onPress={handleHelpPress}
+              title={t('help')}
+              leadingIcon="help-circle-outline"
+            />
+          </Menu>
         </Tooltip>
       </Appbar.Header>
       <Animated.View
