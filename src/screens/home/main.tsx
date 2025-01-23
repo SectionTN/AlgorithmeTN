@@ -20,6 +20,8 @@ import {
   useTheme,
   ActivityIndicator,
   Menu,
+  Icon,
+  Divider,
 } from 'react-native-paper';
 import { FlatGrid } from 'react-native-super-grid';
 import { FONTS } from '../../config/misc.ts';
@@ -46,6 +48,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { toast } from '@baronha/ting';
 import Fuse from 'fuse.js';
 import lodash from 'lodash';
+import moment from 'moment';
 
 const LanguageAvatarIcon = (language: string) => (
   <Avatar.Icon
@@ -579,20 +582,6 @@ const Main = forwardRef<MainRef>((_, ref) => {
     const liked = uid ? item.likes.includes(uid) : false;
     const commentCount = commentCounts[item.id] || 0;
 
-    const rightContent = () => (
-      <View style={{ flexDirection: 'column', alignItems: 'center', paddingRight: 10 }}>
-        <IconButton
-          icon="eye"
-          iconColor={theme.colors.onPrimary}
-          containerColor={theme.colors.primary}
-          size={20}
-        />
-        <Text style={{ fontFamily: FONTS.p_regular }} variant={'labelSmall'}>
-          {item.views.length}
-        </Text>
-      </View>
-    );
-
     return (
       <Animated.View entering={SlideInLeft} exiting={SlideOutRight}>
         <Card
@@ -610,20 +599,10 @@ const Main = forwardRef<MainRef>((_, ref) => {
             titleStyle={{ fontFamily: FONTS.p_regular }}
             subtitleStyle={{ fontFamily: FONTS.p_regular }}
             left={() => LanguageAvatarIcon(item.language)}
-            right={rightContent}
           />
           <Card.Content>
             <Text variant="bodyMedium">{item.description}</Text>
             <SpacerV height={heightPercentageToDP(0.15)} />
-            {/* <Icon
-              size={24}
-              color={theme.colors.primary}
-              source={
-                item.language === 'algorithm'
-                  ? 'brain'
-                  : `language-${item.language}`
-              }
-            /> */}
             <SpacerV height={heightPercentageToDP(0.15)} />
             <Text
               variant={'bodySmall'}
@@ -632,9 +611,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
                 color: theme.colors.onBackground,
                 opacity: 0.875,
               }}>
-              {item.section
-                ? `Année: ${item.level} | Section: ${item.section}`
-                : `Année: ${item.level}`}
+              {`Année: ${item.level} ${item.section && `| Section: ${item.section}`}`}
             </Text>
 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10 }}>
@@ -708,6 +685,19 @@ const Main = forwardRef<MainRef>((_, ref) => {
              5, 294K
              </Text>
              </View>*/}
+            </View>
+            <SpacerV height={heightPercentageToDP(0.15)} />
+            <Divider />
+            <SpacerV height={heightPercentageToDP(0.15)} />
+            <View style={styles.cardFooter}>
+              <View style={styles.footerItem}>
+                <Icon source="clock" size={14} />
+                <Text style={styles.timeAgo}>{moment(item.createdAt.toDate()).locale('fr').fromNow()}</Text>
+              </View>
+              <View style={styles.footerItem}>
+                <Icon source="eye" size={14} />
+                <Text style={styles.timeAgo}>{item.views.length}</Text>
+              </View>
             </View>
           </Card.Content>
         </Card>
@@ -840,6 +830,22 @@ const styles = StyleSheet.create({
   itemCode: {
     fontFamily: FONTS.p_regular,
     fontSize: 12,
+    opacity: 0.75,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '99%',
+  },
+  footerItem: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  timeAgo: {
+    fontFamily: FONTS.p_regular,
+    marginLeft: 5,
     opacity: 0.75,
   },
 });
