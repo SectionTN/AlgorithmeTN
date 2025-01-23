@@ -72,8 +72,6 @@ const HomeRender: React.FC = () => {
 
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, [])
   );
 
