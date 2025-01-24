@@ -135,7 +135,6 @@ dependencies {
         exclude group: "com.appodeal.ads.sdk.networks", module: "my_target"
         exclude group: "com.appodeal.ads.sdk.networks", module: "pangle"
         exclude group: "com.appodeal.ads.sdk.networks", module: "vungle"
-        exclude group: "com.appodeal.ads.sdk.networks", module: "yandex"
         exclude group: "com.appodeal.ads.sdk.services", module: "adjust"
         exclude group: "com.appodeal.ads.sdk.services", module: "appsflyer"
         exclude group: "com.appodeal.ads.sdk.services", module: "facebook_analytics"
@@ -150,7 +149,6 @@ dependencies {
         exclude group: "com.applovin.mediation", module: "mintegral-adapter"
         exclude group: "com.applovin.mediation", module: "mytarget-adapter"
         exclude group: "com.applovin.mediation", module: "vungle-adapter"
-        exclude group: "com.applovin.mediation", module: "yandex-adapter"
         exclude group: "org.bidon", module: "admob-adapter"
         exclude group: "org.bidon", module: "gam-adapter"        
         exclude group: "org.bidon", module: "amazon-adapter"
@@ -164,7 +162,6 @@ dependencies {
         exclude group: "org.bidon", module: "vkads-adapter"
         exclude group: "org.bidon", module: "meta-adapter"
         exclude group: "org.bidon", module: "vungle-adapter"
-        exclude group: "org.bidon", module: "yandex-adapter"
     }
 
     if (hermesEnabled.toBoolean()) {
