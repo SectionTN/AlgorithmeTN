@@ -160,6 +160,7 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
   const [bio, setBio] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [loading, setLoading] = useState(true);
 
   const openMenu = () => setMenuVisible(true);
 
@@ -234,6 +235,7 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
 
     const fetchProfileData = async () => {
       if (profileUID) {
+        setLoading(true);
         try {
           const user = await getUserData(profileUID);
           if (user) {
@@ -251,6 +253,8 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
             crashlytics().recordError(error);
           }
           console.error('Error fetching profile data:', error);
+        } finally {
+          setLoading(false);
         }
       }
     };
@@ -438,7 +442,7 @@ const Profile: React.FC<ProfileProps> = ({ uid }) => {
         </Tooltip>
       </Appbar.Header>
       {
-        (firstName !== '' || lastName !== '') ? <LoadingScreen /> : (
+        loading ? <LoadingScreen /> : (
           <ScrollView nestedScrollEnabled={true} alwaysBounceVertical={true}>
             <Animated.View
               entering={BounceInUp}
