@@ -30,7 +30,6 @@ import {
 import {ScrollView} from 'react-native-gesture-handler';
 import {alert} from '@baronha/ting';
 import auth from '@react-native-firebase/auth';
-import {useBackHandler} from '@react-native-community/hooks';
 import {useMMKVString} from 'react-native-mmkv';
 import firestore from '@react-native-firebase/firestore';
 import {MidnightPhoto} from '../../utils/const.ts';
@@ -46,9 +45,9 @@ const Settings: React.FC = () => {
 
   const {t} = useTranslation();
 
-  const [themeStatus, setThemeStatus] = useMMKVString('theme');
+  const [themeStatus] = useMMKVString('theme');
 
-  const [languageStatus, setLanguageStatus] = useMMKVString('language');
+  const [languageStatus] = useMMKVString('language');
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -80,10 +79,6 @@ const Settings: React.FC = () => {
   useLayoutEffect(() => {
     setAvatar(auth()?.currentUser?.photoURL ?? 'XD');
   }, []);
-
-  useBackHandler(() => {
-    return false;
-  });
 
   return (
     <BaseView
@@ -303,7 +298,7 @@ const styles = StyleSheet.create({
     paddingRight: '3%',
     paddingTop: '1%',
     textAlign: 'center',
-    fontFamily: FONTS.p_regular,
+    fontFamily: FONTS.p_bold,
   },
   bioText: {
     position: 'relative',
