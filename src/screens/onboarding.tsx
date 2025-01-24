@@ -229,8 +229,6 @@ const Onboarding: React.FC = () => {
         return true;
       };
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, []),
   );
 

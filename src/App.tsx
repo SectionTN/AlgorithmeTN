@@ -137,9 +137,7 @@ function App(): React.JSX.Element {
             },
           ]}>
           <BottomSheetModalProvider>
-            <React.StrictMode>
               <StackNavigator />
-            </React.StrictMode>
           </BottomSheetModalProvider>
         </GestureHandlerRootView>
       </I18nextProvider>

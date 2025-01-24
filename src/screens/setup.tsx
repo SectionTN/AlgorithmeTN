@@ -139,8 +139,6 @@ const Setup: React.FC = () => {
 
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, [navigation]),
   );
 

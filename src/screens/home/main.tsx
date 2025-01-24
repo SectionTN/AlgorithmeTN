@@ -83,7 +83,6 @@ const Main = forwardRef<MainRef>((_, ref) => {
   const [role, setRole] = useState('member');
 
   const [codes, setCodes] = useState<CodeDataWithName[]>([]);
-  const insets = useSafeAreaInsets();
 
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>(
     {},
@@ -253,18 +252,16 @@ const Main = forwardRef<MainRef>((_, ref) => {
         'description',
         'language',
       ],
-      threshold: 0.4, // adjust this as u want (1 means everything, 0 means u need exact match)
+      threshold: 0.4,
     };
 
-    const fuse = new Fuse(codes, fuseOptions);
+    const fuse = new Fuse<CodeDataWithName>(codes, fuseOptions);
 
-    // Perform the search using the search query
-    const filtered =
+    const filtered: CodeDataWithName[] =
       searchQuery.trim() !== ''
         ? fuse.search(searchQuery).map(result => result.item)
         : codes;
 
-    // Sort the filtered results
     const sorted = lodash.orderBy(
       filtered,
       [
@@ -279,7 +276,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
               ? 'desc'
               : 'asc',
       ]
-    );
+    ) as CodeDataWithName[];
 
     return sorted;
   }, [codes, searchQuery, sortType]);
@@ -671,33 +668,17 @@ const Main = forwardRef<MainRef>((_, ref) => {
                   {bookmarkCounts[item.id] || 0}
                 </Text>
               </View>
-              {/**<View style={{flexDirection: 'column', alignItems: 'center'}}>
-             <IconButton
-             icon="share"
-             iconColor={theme.colors.onPrimary}
-             containerColor={theme.colors.primary}
-             size={20}
-             onPress={() => {
-             //alert({title: 'Bookmark saved', message: 'Take a look, you may found something else'});
-             }}
-             />
-             <Text
-             style={{fontFamily: FONTS.p_regular}}
-             variant={'labelSmall'}>
-             5, 294K
-             </Text>
-             </View>*/}
             </View>
             <SpacerV height={heightPercentageToDP(0.15)} />
             <Divider />
             <SpacerV height={heightPercentageToDP(0.15)} />
             <View style={styles.cardFooter}>
               <View style={styles.footerItem}>
-                <Icon source="clock" size={14} color={theme.colors.onBackground} />
+                <Icon source="clock" size={14} />
                 <Text style={[styles.footerValue, { color: theme.colors.onBackground }]}>{moment(item.createdAt.toDate()).fromNow()}</Text>
               </View>
               <View style={styles.footerItem}>
-                <Icon source="eye" size={14} color={theme.colors.onBackground} />
+                <Icon source="eye" size={14}  />
                 <Text style={styles.footerValue}>{item.views.length}</Text>
               </View>
             </View>
@@ -783,7 +764,7 @@ const Main = forwardRef<MainRef>((_, ref) => {
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder={t('search')}
-          elevation={1}
+          elevation={0}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />

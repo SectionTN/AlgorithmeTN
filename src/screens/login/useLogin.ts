@@ -78,8 +78,6 @@ const useLogin = () => {
 
       BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      return () =>
-        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
     }, [currentMode]),
   );
 
