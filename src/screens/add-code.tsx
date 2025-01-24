@@ -194,7 +194,7 @@ const AddCode: React.FC = () => {
   return (
     <BaseView
       needsPaddingTop={false}
-      needsPaddingBottom={false}
+      needsPaddingBottom={true}
       avoidingView={true}>
       <Appbar.Header style={{ backgroundColor: theme.colors.elevation.level2 }}>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
@@ -203,7 +203,7 @@ const AddCode: React.FC = () => {
           titleStyle={{ fontFamily: FONTS.p_regular }}
         />
       </Appbar.Header>
-      <SpacerV height={heightPercentageToDP(0.15)} />
+      <SpacerV height={heightPercentageToDP(0.10)} />
       <ScrollView
         nestedScrollEnabled={true}
         alwaysBounceVertical={true}
@@ -250,6 +250,7 @@ const AddCode: React.FC = () => {
             value: lvl,
           }
           ))}
+          style={{ padding: '2%'}}
         />
 
         {level !== '1ére' && level !== '' && (
@@ -264,6 +265,7 @@ const AddCode: React.FC = () => {
                 value: sec.value,
               }))
               }
+              style={{ padding: '2%'}}
             />
           </>
         )}
@@ -278,6 +280,7 @@ const AddCode: React.FC = () => {
             value: lang.value,
             icon: lang.icon,
           }))}
+          style={{ padding: '2%'}}
         />
 
         <SegmentedButtons
@@ -289,6 +292,7 @@ const AddCode: React.FC = () => {
             value: lang.value,
             icon: lang.icon,
           }))}
+          style={{ padding: '2%'}}
         />
         <SpacerV height={heightPercentageToDP(0.25)} />
         <TextInput
