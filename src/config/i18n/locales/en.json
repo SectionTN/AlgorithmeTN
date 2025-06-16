@@ -1,0 +1,195 @@
+{
+  "welcome": "Welcome to AlgoTN",
+  "slogan": "Work hard for the BAC",
+  "algorithm": "Algorithm",
+  "onboarding": {
+    "step1_heading": "Welcome to AlgoTN",
+    "step1_description": "Discover a world of algorithms, data structures, and coding solutions crafted by developers, for developers.",
+    "step2_heading": "Rich Learning Experience",
+    "step2_description": "Explore our vast collection of optimized algorithms, from sorting and searching to advanced graph theory and machine learning.",
+    "step3_heading": "Build Together",
+    "step3_description": "Share your implementations, get feedback from peers, and help others learn while building your professional portfolio.",
+    "step4_heading": "Join Our Community",
+    "step4_description": "Start your journey with AlgoTN today. Connect with fellow developers, showcase your skills, and grow together.",
+    "get_started": "Get Started"
+  },
+  "continue": "Continue",
+  "go_back": "Go Back",
+  "sort": {
+    "newest": "Newest First",
+    "oldest": "Oldest First",
+    "most_liked": "Most Liked"
+  },
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "connect": "Log In",
+    "create": "Sign Up",
+    "forgot": "Restore Account",
+    "confirm_password": "Confirm Password",
+    "login": "Welcome Back",
+    "login_slogan": "let's sign you in",
+    "signup": "Create Account",
+    "signup_slogan": "and start your journey here with us",
+    "forgot-password": "Forgot Password",
+    "forgot-password_slogan": "we gonna help you restore your account",
+    "forgot_password_interrogation": "Forgot Password?",
+    "terms": "Terms of Service",
+    "terms_text": "By Signing up, you agree to our",
+    "privacy": "Privacy Policy",
+    "create_account": "Create new account",
+    "incorrect_details": "Incorrect Details",
+    "invalid_email_address": "The email address is not valid.",
+    "account_disabled": "The user corresponding to the given email has been disabled.",
+    "user_not_found": "There is no user corresponding to the given email.",
+    "wrong_password": "The password is invalid for the given email.",
+    "invalid_creds": "The credential is invalid.",
+    "operation_not_allowed": "Email & password accounts are not enabled, at the moment.",
+    "weak_pass": "The password is not strong enough",
+    "pass_not_match": "Your password doesn't match.",
+    "email_in_use": "There already exists an account with the given email address.",
+    "enter_valid_email": "Please enter a valid email.",
+    "pass_reset": "Password Reset",
+    "reset_email": "A password reset email has been sent."
+  },
+  "invalid_operation": "Invalid Operation",
+  "error_occured": "An unknown error occurred.",
+  "check_entered": "Please check out what you've entered",
+  "help": "Help",
+  "no_internet": "No Internet",
+  "please_wait": "Please Wait",
+  "search": "Search",
+  "setup": {
+    "title": "Setup Account",
+    "description": "customize your account so people can know you",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "photo_removed": "Photo Removed",
+    "select_new_photo": "now select a new photo if you want",
+    "wrong_info": "Wrong Infos",
+    "wrong_info_message": "Please fill a proper name"
+  },
+  "home": {
+    "title": "Home"
+  },
+  "bookmarks": {
+    "title": "Bookmarks",
+    "dialog": {
+      "title": "Remove Bookmark",
+      "message": "Are you sure you want to remove this bookmark?",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "liked_your_post": "liked your post.",
+    "commented_post": "commented on your post."
+  },
+  "profile": {
+    "title": "Profile",
+    "stats": "Statistics",
+    "achievements": "Achievements",
+    "recent_activities": "Recent Activities",
+    "liked": "liked",
+    "unliked": "unliked",
+    "someone": "someone's",
+    "post": "post",
+    "created_account": "created their account",
+    "commented": "commented on",
+    "did_something": "did something",
+    "new_member": "New Member",
+    "bookmark": "bookmark"
+  },
+  "code": {
+    "title": "Code"
+  },
+  "instructions": {
+    "title": "Instructions"
+  },
+  "algo": {
+    "how_it_works": "How it works",
+    "no_instructions": "The code publisher did not provide any instructions."
+  },
+  "add-code": {
+    "sc": "Natural Science",
+    "inf": "Computer Science",
+    "eco": "Economy & Management",
+    "write_code": "Write Code",
+    "no_submit_code": "You haven't submitted any code",
+    "click_edit_code": "Click to edit code",
+    "add_instructions": "Add Instructions",
+    "write_instructions": "Write Instructions",
+    "language_not_select": "Language not selected",
+    "select_language": "Select Language",
+    "select_language_before": "Select a language before writing code.",
+    "select_section": "Select Section",
+    "select_level": "Select a level",
+    "code_title": "Code Title",
+    "code_desc": "Code Description",
+    "add_code": "Add code"
+  },
+  "comments": {
+    "title": "Comments",
+    "add": "Add a comment..."
+  },
+  "settings": {
+    "title": "Settings",
+    "dark_mode": "Dark Mode",
+    "dark_mode_system": "System",
+    "add_bio": "tap to add a biography",
+    "language": "Language",
+    "account_title": "Account",
+    "profile_title": "Profile",
+    "help_title": "Help",
+    "miscellaneous_title": "Miscellaneous",
+    "language_english": "English",
+    "language_french": "French",
+    "security": "Security and Privacy",
+    "log_out": "Log out",
+    "edit_profile": "Edit Profile",
+    "username": "Username",
+    "privacy_policy": "Privacy Policy",
+    "bug_report": "Bug Report",
+    "about_developer": "About Developer"
+  },
+  "views": "Views",
+  "view": "View",
+  "pending-review": {
+    "title": "Pending Review",
+    "accept": "Accept",
+    "deny": "Deny",
+    "accept_dialog": {
+      "title": "Accept Code",
+      "message": "Are you sure you want to accept this code?",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "deny_dialog": {
+      "title": "Deny Code",
+      "message": "Are you sure you want to deny this code?",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "accept-success": "Code accepted successfully",
+    "by": "by"
+  },
+  "about-developer": {
+    "title": "About developer",
+    "shortDescription": "hobbyist android developer",
+    "longDescription": "Hi, I am M. Rayen Sbai, a hobbyist Android developer from Tunisia. I started programming at the age of 14, and since then, I have been passionate about creating engaging apps and exploring new technologies. Currently, I am learning Unity to expand my skills in game development. With experience in React Native, Java, JavaScript, TypeScript and more, I enjoy building intuitive and functional applications."
+  },
+  "confirm-account": {
+    "title": "Confirm Account",
+    "description": "Please confirm your account to continue",
+    "check_confirmation_mail": "Please check the confirmatin mail at",
+    "wait_for_mail": "wait it may take some time to be there",
+    "spam_notice": "You can try resending the mail, before that. check the 'spam' folder. if you successfully verified your mail, go back here and we do the rest for you",
+    "resend_mail_after": "Resend mail after",
+    "resend_verification_mail": "Resend verification mail"
+  },
+  "bookmark_saved": "Bookmark saved",
+  "bookmark_saved_message": "The code has been saved to your bookmarks.",
+  "bookmark_removed": "Bookmark removed",
+  "bookmark_removed_message": "The code has been removed from your bookmarks."
+}
