@@ -1,97 +1,236 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# AlgorithmeTN
 
-# Getting Started
+[![React Native](https://img.shields.io/badge/React_Native-0.77.1-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactnative.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0.4-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-15.4.0-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![Material Design](https://img.shields.io/badge/Material%20Design-3-757575?style=for-the-badge&logo=material-design&logoColor=white)](https://m3.material.io/)
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+> [!CAUTION]
+> **PROJECT STATUS: DISCONTINUED** 
+> 
+> This project is currently discontinued because it didn't go as I planned. If I see any contributions, I will get back to work on the project.
 
-## Step 1: Start Metro
+**A comprehensive educational platform for Tunisian Baccalaureate students to master algorithms and programming concepts**
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+---
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## 🌟 About
 
-```sh
-# Using npm
-npm start
+> [!NOTE]
+> **AlgoTN** is a modern React Native application specifically designed for Tunisian high school students preparing for their Baccalaureate exams.
 
-# OR using Yarn
+The app provides an interactive platform to learn, practice, and share algorithms across different educational tracks:
+
+- 🧪 **Sciences Naturelles** (Natural Sciences)
+- 💻 **Sciences Informatiques** (Computer Science) 
+- 📊 **Économie & Gestion** (Economics & Management)
+
+### 🎯 Mission
+> To democratize algorithm education in Tunisia by providing accessible, interactive, and culturally relevant learning materials in multiple languages.
+
+## ✨ Features
+
+### 📚 Educational Platform
+```yaml
+Grade Levels: [1ère, 2ème, 3ème, BAC]
+Tracks: [Sciences Naturelles, Sciences Informatiques, Économie & Gestion]
+Content: Interactive algorithms with step-by-step explanations
+Progress: Bookmark system and achievement tracking
+```
+
+### 💻 Advanced Code Editor
+```yaml
+Languages: [JavaScript, Python, Java, C++, PHP, SQL, Custom "algo" pseudocode]
+Features: [Syntax highlighting, Real-time editing, Copy/paste, Undo/redo]
+Integration: Seamless WebView integration with native app
+```
+
+### 🌐 Social & Sharing
+```yaml
+Community: [Comments system, Like/bookmark functionality]
+Profiles: [User statistics, Achievements, Activity feeds]
+Notifications: Real-time updates and notifications
+```
+
+### 🎨 Modern UX/UI
+```yaml
+Design: Material Design 3 with React Native Paper
+Themes: [Dark mode, Light mode, System integration]
+Animation: Smooth transitions with Reanimated 3
+Responsive: Adaptive design for all screen sizes
+```
+
+
+## 🚀 Installation
+
+> [!IMPORTANT]
+> **Prerequisites:** Ensure you have the following installed before proceeding
+
+```mermaid
+flowchart TD
+    A[Node.js >= 16.x] --> B[Yarn Package Manager]
+    B --> C[React Native CLI]
+    C --> D[Android Studio]
+    C --> E[Xcode macOS only]
+    D --> F[Ready to Build!]
+    E --> F
+```
+
+### ⚡ Quick Start
+
+> [!TIP]
+> Follow these steps to get the project running locally
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/yourusername/AlgorithmeTN.git
+cd AlgorithmeTN
+
+# 2. Install dependencies
+yarn install
+
+# 3. Install iOS dependencies (macOS only)
+cd ios && pod install && cd ..
+
+# 4. Start Metro bundler
 yarn start
+
+# 5. Run on your platform
+yarn android  # For Android
+yarn ios      # For iOS (macOS only)
 ```
 
-## Step 2: Build and run your app
+### 🔧 Environment Setup
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+> [!WARNING]
+> **Required Configuration:** These steps are mandatory for the app to function properly
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+#### Firebase Configuration
+```bash
+# Add your Firebase config files to:
+# 📁 android/app/google-services.json
+# 📁 ios/AlgoTN/GoogleService-Info.plist
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+#### OneSignal Setup
+```bash
+# Configure OneSignal App ID in your environment variables
+ONESIGNAL_APP_ID=your_app_id_here
 ```
 
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
+#### Appodeal Integration
+```bash
+# Set up Appodeal keys for monetization
+APPODEAL_API_KEY=your_api_key_here
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## 🏗️ Project Structure
 
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+```
+AlgorithmeTN/
+├── 📁 src/
+│   ├── 📁 components/           # Reusable UI components
+│   │   ├── 📁 baseview/        # Base layout component
+│   │   ├── 📁 code-editor-webview/  # Custom code editor with algo syntax
+│   │   ├── 📁 modals/          # Modal components (image picker, etc.)
+│   │   ├── 📁 numbered-list/   # Instruction list component
+│   │   └── 📁 spacer/          # Layout spacing utilities
+│   ├── 📁 config/              # Configuration files
+│   │   ├── 📁 i18n/           # Internationalization (FR/EN/AR)
+│   │   ├── 📁 navigation/     # Navigation setup & deep linking
+│   │   ├── 📁 storage/        # MMKV storage configuration
+│   │   └── 📄 dimensions.ts    # Responsive design helpers
+│   ├── 📁 screens/             # Application screens
+│   │   ├── 📁 algo/           # Algorithm viewing & editing
+│   │   ├── 📁 home/           # Main app screens
+│   │   ├── 📁 login/          # Authentication flow
+│   │   └── 📁 settings/       # User settings & preferences
+│   ├── 📁 types/              # TypeScript type definitions
+│   └── 📁 utils/              # Helper functions & utilities
+├── 📁 android/                # Android-specific code
+├── 📁 ios/                    # iOS-specific code
+└── 📄 package.json           # Dependencies & scripts
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## 🤝 Contributing
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+> [!NOTE]
+> **We welcome contributions!** This project needs community support to continue development.
 
-## Step 3: Modify your app
+### 🐛 How to Contribute
 
-Now that you have successfully run the app, let's make changes!
+```mermaid
+gitGraph
+    commit id: "Fork Repo"
+    branch feature/amazing-feature
+    checkout feature/amazing-feature
+    commit id: "Add Feature"
+    commit id: "Add Tests"
+    commit id: "Update Docs"
+    checkout main
+    merge feature/amazing-feature
+    commit id: "Feature Merged!"
+```
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+#### Step-by-step guide:
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+1. **🍴 Fork** the repository
+2. **🌿 Create** a feature branch: `git checkout -b feature/amazing-feature`
+3. **📝 Follow** TypeScript and React Native best practices
+4. **🧪 Test** your changes thoroughly
+5. **💾 Commit** with clear messages: `git commit -m 'Add amazing feature'`
+6. **🚀 Push** to your branch: `git push origin feature/amazing-feature`
+7. **📬 Submit** a pull request
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+> [!TIP]
+> **Code Style:** Follow the existing patterns in the codebase and use TypeScript strictly
 
-## Congratulations! :tada:
+## 🔮 Future Roadmap
 
-You've successfully run and modified your React Native App. :partying_face:
+> [!NOTE]
+> **If development resumes**, these features are planned for future releases
 
-### Now what?
+```mermaid
+gantt
+    title AlgoTN Development Roadmap
+    dateFormat  YYYY-MM-DD
+    section Phase 1
+    Arabic Language Support     :done, arabic, 2024-01-01, 2024-03-01
+    Offline Functionality      :active, offline, 2024-03-01, 2024-06-01
+    
+    section Phase 2
+    AI Recommendations         :ai, 2024-06-01, 2024-09-01
+    Video Tutorials            :video, 2024-07-01, 2024-10-01
+    
+    section Phase 3
+    Collaborative Features     :collab, 2024-09-01, 2024-12-01
+    Progressive Web App        :pwa, 2024-10-01, 2025-01-01
+```
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### Planned Features:
 
-# Troubleshooting
+- [ ] 🌍 **Arabic language support** with full RTL layout
+- [ ] 📱 **Offline functionality** for algorithm access without internet  
+- [ ] 🎮 **Gamification system** with points and achievements
+- [ ] 🤖 **AI-powered recommendations** for personalized learning
+- [ ] 🎥 **Video tutorials** integration for visual learners
+- [ ] 👥 **Collaborative features** for group learning
+- [ ] 📤 **Export functionality** for sharing algorithms
+- [ ] 📊 **Advanced analytics** for learning progress
+- [ ] 🌐 **Progressive Web App** version for web access
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+---
 
-# Learn More
+## ‍💻 Author
 
-To learn more about React Native, take a look at the following resources:
+**M. Rayen Sbai** - *Hobbyist Android Developer from Tunisia*
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SectionTN)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/mohamed-rayen-sbai)
+
+---
+
+> [!NOTE]
+> **Made with ❤️ for Tunisian students preparing for their Baccalaureate exams**
+> 
+> *Empowering the next generation of Tunisian developers and computer scientists*
