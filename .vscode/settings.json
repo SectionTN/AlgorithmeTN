@@ -2,6 +2,9 @@
         "editor.codeActionsOnSave": {
           "source.fixAll.eslint": "always",
       },
-      "editor.formatOnSave": false
+      "editor.formatOnSave": false,
+      "i18n-ally.localesPaths": [
+        "src/config/i18n"
+      ]
       
 }
