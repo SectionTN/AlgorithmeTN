@@ -224,7 +224,7 @@ gantt
 
 ## ‍💻 Author
 
-**M. Rayen Sbai** - *Hobbyist Android Developer from Tunisia*
+**M. Rayen Sbai** - *Android Developer from Tunisia*
 
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/SectionTN)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/mohamed-rayen-sbai)
